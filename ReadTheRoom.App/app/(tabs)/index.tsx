@@ -1,168 +1,171 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator, SafeAreaView, Platform, StatusBar } from 'react-native';
-import axios from 'axios';
-import { LanguageStrings } from '../../constants/LanguageStrings';
+import { StyleSheet, Text, View, TouchableOpacity, Platform, StatusBar } from 'react-native';
+// Updated import for SafeAreaView to resolve the deprecation warning
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-interface GameLog {
+// 1. Define Data Types (TypeScript)
+type Choice = {
+  text: string;
+  hpChange: number; // HP change upon selection (can be positive or negative)
+  nextScenarioId: number; // The ID of the next scenario to navigate to
+};
+
+type Scenario = {
   id: number;
-  userChoice: string;
-  narrative: string;
-  hpChange: number;
-  isGameOver: boolean;
-}
+  description: string; // The situation description
+  choices: Choice[];
+};
 
-interface ApiResponse {
-  narrative: string;
-  hp_change: number;
-  is_game_over: boolean;
-}
-
-
-type LanguageType = keyof typeof LanguageStrings;
-
-export default function App() {
-  const [inputText, setInputText] = useState('');
- const [gameLogs, setGameLogs] = useState<GameLog[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentLang, setCurrentLang] = useState<LanguageType>('Korean'); // Default Language
-
-  const uiText = LanguageStrings[currentLang];
-
-  if (!uiText) {
-    return <View><Text>Loading language settings...</Text></View>;
+// 2. Dummy Data - Expanded for better flow testing
+const DUMMY_SCENARIOS: Record<number, Scenario> = {
+  1: {
+    id: 1,
+    description: "Company dinner. The boss makes a terrible dad joke and looks at you. The room goes dead silent.",
+    choices: [
+      { text: "Laugh out loud and agree.", hpChange: -10, nextScenarioId: 2 },
+      { text: "Pretend you didn't hear and look at your phone.", hpChange: -20, nextScenarioId: 3 },
+      { text: "Quietly escape to the restroom.", hpChange: 0, nextScenarioId: 4 },
+    ],
+  },
+  2: {
+    id: 2,
+    description: "The boss gets excited and continues with a second and third joke. Your coworkers glare at you with resentment...",
+    choices: [
+      { text: "Try to change the subject to work.", hpChange: -15, nextScenarioId: 5 },
+      { text: "Keep laughing nervously.", hpChange: -20, nextScenarioId: 6 },
+    ],
+  },
+  3: {
+    id: 3,
+    description: "The boss singles you out. 'Hey, wasn't that funny?' You can feel the tension.",
+    choices: [
+      { text: "Apologize and say you missed it.", hpChange: -10, nextScenarioId: 5 },
+      { text: "Give a fake, awkward smile.", hpChange: -15, nextScenarioId: 6 },
+    ]
+  },
+  4: {
+    id: 4,
+    description: "You successfully escaped, but now you have to stay in the restroom for at least 10 minutes.",
+    choices: [
+      { text: "Wait patiently and check social media.", hpChange: +10, nextScenarioId: 7 },
+      { text: "Go back out immediately.", hpChange: -10, nextScenarioId: 5 },
+    ]
+  },
+  // --- NEW SCENARIOS ADDED BELOW ---
+  5: {
+    id: 5,
+    description: "You managed to shift the focus, but now the boss is passionately talking about the Q3 performance report.",
+    choices: [
+      { text: "Nod vigorously like you care.", hpChange: -5, nextScenarioId: 1 },
+      { text: "Pour him another drink to keep him talking.", hpChange: 0, nextScenarioId: 1 },
+    ]
+  },
+  6: {
+    id: 6,
+    description: "Suddenly, a coworker 'accidentally' spills a glass of water, breaking the awkward atmosphere. A true hero!",
+    choices: [
+      { text: "Quickly help clean it up.", hpChange: +15, nextScenarioId: 1 },
+      { text: "Use the chaos to sneak away.", hpChange: +5, nextScenarioId: 1 },
+    ]
+  },
+  7: {
+    id: 7,
+    description: "While hiding in the restroom stall, you receive a text from a coworker: 'Where are you? Save me...'",
+    choices: [
+      { text: "Reply 'Stay strong' and ignore it.", hpChange: +5, nextScenarioId: 1 },
+      { text: "Take a deep breath and return to the battlefield.", hpChange: -10, nextScenarioId: 5 },
+    ]
   }
+};
 
-  // Android Emulator: 'http://10.0.2.2:7114/api/AnalyzeChoice'
-  // iOS Simulator: 'http://localhost:7114/api/AnalyzeChoice'
-  const API_URL = 'http://10.0.2.2:7114/api/AnalyzeChoice'; 
+export default function GameScreen() {
+  // State Management
+  const [currentScenarioId, setCurrentScenarioId] = useState<number>(1);
+  const [mentalHP, setMentalHP] = useState<number>(100);
 
-  const toggleLanguage = () => {
-    setCurrentLang((prev) => (prev === 'Korean' ? 'English' : 'Korean'));
-  };
+  // Get the current scenario object based on the ID
+  const currentScenario = DUMMY_SCENARIOS[currentScenarioId] || DUMMY_SCENARIOS[1];
 
-  const handleSend = async () => {
-    if (!inputText.trim()) {
-      Alert.alert(uiText.alertTitle, uiText.alertMessage);
-      return;
-    }
+  // Function to handle choice selection
+  const handleChoice = (choice: Choice) => {
+    // 1. Calculate new HP (keep it strictly between 0 and 100)
+    const newHP = Math.max(0, Math.min(100, mentalHP + choice.hpChange));
+    setMentalHP(newHP);
 
-    setIsLoading(true);
-
-    try {
-      const payload = {
-        choice: inputText,
-        lang: currentLang 
-      };
-
-      const response = await axios.post<ApiResponse>(API_URL, payload);
-      const result = response.data;
-
-      const newLog: GameLog = {
-        id: Date.now(),
-        userChoice: inputText,
-        narrative: result.narrative,
-        hpChange: result.hp_change,
-        isGameOver: result.is_game_over
-      };
-
-      setGameLogs([newLog, ...gameLogs]); 
-      setInputText(''); 
-
-      if (result.is_game_over) {
-        Alert.alert("GAME OVER", "You failed to read the room...");
-      }
-
-    } catch (error) {
-      console.error('API Error:', error);
-      Alert.alert('Error', 'Failed to connect to the Game Master.\nIs the server running?');
-    } finally {
-      setIsLoading(false);
-    }
+    // 2. Navigate to the next scenario
+    setCurrentScenarioId(choice.nextScenarioId);
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Header */}
+        
+        {/* Top Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>{uiText.appTitle}</Text>
-          <TouchableOpacity onPress={toggleLanguage} style={styles.langButton}>
-            <Text style={styles.langButtonText}>{uiText.langButton}</Text>
+          <Text style={styles.headerTitle}>Read the Room</Text>
+          <TouchableOpacity style={styles.langButton}>
+            <Text style={styles.langButtonText}>Switch to Korean</Text>
           </TouchableOpacity>
         </View>
 
-        {/* HP Bar */}
+        {/* Mental HP Status Bar */}
         <View style={styles.statusContainer}>
-          <Text style={styles.statusText}>{uiText.hpLabel}: 100%</Text>
+          <Text style={styles.statusText}>Mental HP: {mentalHP}%</Text>
           <View style={styles.hpBarBackground}>
-            <View style={[styles.hpBarFill, { width: '100%' }]} />
+            <View style={[styles.hpBarFill, { width: `${mentalHP}%` }]} />
           </View>
         </View>
 
-        {/* Chat Log */}
-        <ScrollView style={styles.logContainer}>
-          {gameLogs.map((log) => (
-            <View key={log.id} style={[styles.logCard, log.isGameOver && styles.gameOverCard]}>
-              <Text style={styles.userText}>You: {log.userChoice}</Text>
-              <View style={styles.divider} />
-              <Text style={styles.aiText}>{log.narrative}</Text>
-              <Text style={[
-                styles.hpText, 
-                { color: log.hpChange >= 0 ? '#4CAF50' : '#F44336' }
-              ]}>
-                HP {log.hpChange > 0 ? '+' : ''}{log.hpChange}
-              </Text>
-            </View>
-          ))}
-        </ScrollView>
-
-        {/* Input Area */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder={uiText.placeholder}
-            value={inputText}
-            onChangeText={setInputText}
-            editable={!isLoading}
-          />
-          <TouchableOpacity 
-            style={[styles.sendButton, isLoading && styles.disabledButton]} 
-            onPress={handleSend} 
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.sendButtonText}>{uiText.sendButton}</Text>
-            )}
-          </TouchableOpacity>
+        {/* Scenario Description Card */}
+        <View style={styles.scenarioContainer}>
+          <View style={styles.scenarioCard}>
+            <Text style={styles.scenarioText}>{currentScenario.description}</Text>
+          </View>
         </View>
+
+        {/* Bottom Choice Buttons */}
+        <View style={styles.choicesContainer}>
+          {currentScenario.choices.map((choice, index) => (
+            <TouchableOpacity 
+              key={index} 
+              style={styles.choiceButton}
+              onPress={() => handleChoice(choice)}
+            >
+              <Text style={styles.choiceText}>{choice.text}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
       </View>
     </SafeAreaView>
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
+  // 1. Core Wrappers
   safeArea: { flex: 1, backgroundColor: '#f8f9fa', paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
   container: { flex: 1 },
+
+  // 2. Top Header
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, backgroundColor: '#fff', elevation: 2 },
   headerTitle: { fontSize: 22, fontWeight: 'bold', color: '#333' },
   langButton: { paddingVertical: 6, paddingHorizontal: 12, backgroundColor: '#e9ecef', borderRadius: 20 },
   langButtonText: { fontSize: 12, fontWeight: '600', color: '#495057' },
+
+  // 3. Status Bar
   statusContainer: { padding: 20, backgroundColor: '#fff', paddingBottom: 10 },
   statusText: { fontSize: 14, color: '#666', marginBottom: 5 },
   hpBarBackground: { height: 10, backgroundColor: '#e9ecef', borderRadius: 5, overflow: 'hidden' },
   hpBarFill: { height: '100%', backgroundColor: '#4CAF50' },
-  logContainer: { flex: 1, padding: 20 },
-  logCard: { backgroundColor: 'white', padding: 15, borderRadius: 12, marginBottom: 15, elevation: 3, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 5 },
-  gameOverCard: { borderWidth: 2, borderColor: '#F44336' },
-  userText: { fontSize: 16, color: '#212529', fontWeight: 'bold' },
-  aiText: { fontSize: 15, color: '#495057', marginTop: 8, lineHeight: 22 },
-  hpText: { fontSize: 14, fontWeight: 'bold', marginTop: 8, textAlign: 'right' },
-  divider: { height: 1, backgroundColor: '#f1f3f5', marginVertical: 10 },
-  inputContainer: { flexDirection: 'row', padding: 15, backgroundColor: 'white', borderTopWidth: 1, borderTopColor: '#e9ecef' },
-  input: { flex: 1, backgroundColor: '#f8f9fa', borderRadius: 25, paddingHorizontal: 20, paddingVertical: 10, marginRight: 10, borderWidth: 1, borderColor: '#ced4da' },
-  sendButton: { backgroundColor: '#228BE6', width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center' },
-  disabledButton: { backgroundColor: '#adb5bd' },
-  sendButtonText: { color: 'white', fontWeight: 'bold', fontSize: 12 } 
+
+  // 4. Scenario Area
+  scenarioContainer: { flex: 1, padding: 20, justifyContent: 'center' },
+  scenarioCard: { backgroundColor: 'white', padding: 25, borderRadius: 12, elevation: 3, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 5 },
+  scenarioText: { fontSize: 18, color: '#212529', lineHeight: 28, textAlign: 'center', fontWeight: '500' },
+
+  // 5. Choice Buttons
+  choicesContainer: { padding: 20, paddingBottom: 30, backgroundColor: '#f8f9fa' },
+  choiceButton: { backgroundColor: '#228BE6', padding: 15, borderRadius: 12, marginBottom: 12, elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 3 },
+  choiceText: { color: 'white', textAlign: 'center', fontSize: 16, fontWeight: 'bold' },
 });
