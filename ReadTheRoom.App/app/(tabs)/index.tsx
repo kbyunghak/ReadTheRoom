@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Platform, StatusBar } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Platform, StatusBar, Image } from 'react-native';
 // Updated import for SafeAreaView to resolve the deprecation warning
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -86,6 +86,9 @@ export default function GameScreen() {
   // Get the current scenario object based on the ID
   const currentScenario = DUMMY_SCENARIOS[currentScenarioId] || DUMMY_SCENARIOS[1];
 
+  //Game Over Condition
+  const isGameOver = mentalHP <= 0;
+
   // Function to handle choice selection
   const handleChoice = (choice: Choice) => {
     // 1. Calculate new HP (keep it strictly between 0 and 100)
@@ -96,11 +99,15 @@ export default function GameScreen() {
     setCurrentScenarioId(choice.nextScenarioId);
   };
 
+  const restartGame = () => {
+    setMentalHP(100);
+    setCurrentScenarioId(1);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         
-        {/* Top Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Read the Room</Text>
           <TouchableOpacity style={styles.langButton}>
@@ -108,32 +115,45 @@ export default function GameScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Mental HP Status Bar */}
         <View style={styles.statusContainer}>
           <Text style={styles.statusText}>Mental HP: {mentalHP}%</Text>
           <View style={styles.hpBarBackground}>
-            <View style={[styles.hpBarFill, { width: `${mentalHP}%` }]} />
+            <View style={[styles.hpBarFill, { width: `${mentalHP}%` }, isGameOver && styles.hpBarDanger]} />
           </View>
         </View>
 
-        {/* Scenario Description Card */}
         <View style={styles.scenarioContainer}>
-          <View style={styles.scenarioCard}>
-            <Text style={styles.scenarioText}>{currentScenario.description}</Text>
+          <View style={[styles.scenarioCard, isGameOver && styles.gameOverCard]}>            
+            <Text style={styles.scenarioText}>
+              {isGameOver ? "My body and mind are completely broken. I just want to give up and go home." : currentScenario.description}
+            </Text>
           </View>
         </View>
-
-        {/* Bottom Choice Buttons */}
+        
         <View style={styles.choicesContainer}>
-          {currentScenario.choices.map((choice, index) => (
-            <TouchableOpacity 
-              key={index} 
-              style={styles.choiceButton}
-              onPress={() => handleChoice(choice)}
-            >
-              <Text style={styles.choiceText}>{choice.text}</Text>
-            </TouchableOpacity>
-          ))}
+          {isGameOver ? (
+            <View style={styles.gameOverContainer}>
+              <Image 
+                source={require('../../assets/UI/GameOver.png')}
+                style={styles.gameOverImage} 
+                resizeMode="contain"
+              />
+              {/* <Text style={styles.gameOverTitle}>GAME OVER</Text> */}
+              <TouchableOpacity style={styles.restartButton} onPress={restartGame}>
+                <Text style={styles.restartButtonText}>Restart Game</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            currentScenario.choices.map((choice, index) => (
+              <TouchableOpacity 
+                key={index} 
+                style={styles.choiceButton}
+                onPress={() => handleChoice(choice)}
+              >
+                <Text style={styles.choiceText}>{choice.text}</Text>
+              </TouchableOpacity>
+            ))
+          )}
         </View>
 
       </View>
@@ -158,14 +178,23 @@ const styles = StyleSheet.create({
   statusText: { fontSize: 14, color: '#666', marginBottom: 5 },
   hpBarBackground: { height: 10, backgroundColor: '#e9ecef', borderRadius: 5, overflow: 'hidden' },
   hpBarFill: { height: '100%', backgroundColor: '#4CAF50' },
+  hpBarDanger: { backgroundColor: '#F44336' }, // Red color when HP is low (added for better visual feedback)
 
   // 4. Scenario Area
   scenarioContainer: { flex: 1, padding: 20, justifyContent: 'center' },
   scenarioCard: { backgroundColor: 'white', padding: 25, borderRadius: 12, elevation: 3, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 5 },
-  scenarioText: { fontSize: 18, color: '#212529', lineHeight: 28, textAlign: 'center', fontWeight: '500' },
+  gameOverCard: { borderWidth: 2, borderColor: '#F44336', backgroundColor: '#fff5f5' }, // Game over card style
+  scenarioText: { fontSize: 18, color: '#000000', lineHeight: 28, textAlign: 'center', fontWeight: '500' },
 
   // 5. Choice Buttons
   choicesContainer: { padding: 20, paddingBottom: 30, backgroundColor: '#f8f9fa' },
   choiceButton: { backgroundColor: '#228BE6', padding: 15, borderRadius: 12, marginBottom: 12, elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 3 },
   choiceText: { color: 'white', textAlign: 'center', fontSize: 16, fontWeight: 'bold' },
+
+  // 6. Game Over Styles
+  gameOverContainer: { alignItems: 'center', paddingVertical: 10},
+  gameOverImage: { width: 300, height: 180, marginBottom: 10 },
+  gameOverTitle: { fontSize: 32, fontWeight: 'bold', color: '#F44336', marginBottom: 5 },
+  restartButton: { backgroundColor: '#333', paddingVertical: 15, paddingHorizontal: 40, borderRadius: 30, elevation: 3 },
+  restartButtonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
 });
