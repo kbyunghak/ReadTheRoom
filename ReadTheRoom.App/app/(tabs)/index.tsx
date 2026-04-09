@@ -1,133 +1,212 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Platform, StatusBar, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Platform, StatusBar, Image, ScrollView, ImageSourcePropType } from 'react-native';
 // Updated import for SafeAreaView to resolve the deprecation warning
 import { SafeAreaView } from 'react-native-safe-area-context';
+import scenariosData from '../../assets/data/scenarios.json';
+// Expo Router specific tab settings
+import { Tabs } from 'expo-router';
 
 // 1. Define Data Types
 type LocalizedText = { en: string; ko: string;};
 
+type StatChanges = {
+  funds: number;
+  mental: number;
+  english: number;
+  insight: number;
+  stamina: number;
+}
+
 type Choice = {
   text: LocalizedText;
-  hpChange: number; // HP change upon selection
+  feedback: LocalizedText; // Feedback text after selecting this choice, can be used in the future to show feedback or animations
+  statChanges: StatChanges; // The changes to the player's stats when this choice is selected
   nextScenarioId: number; // The ID of the next scenario to navigate to
 };
 
 type Scenario = {
   id: number;
+  level: number; // Difficulty level (1-5)
+  question: number; // Scenario number within the level
   description: LocalizedText; // The situation description
   choices: Choice[];
 };
+
+const SCENARIOS: Record<string, Scenario> = scenariosData as unknown as Record<string, Scenario>;
 
 // 2. UI Texts Dictionary (for future localization)
 const UI_TEXT = {
   en: {
     title: "Vancouver Survival Guide",
     switchLangBtn: "Switch to Korean",
-    mentalHpLabel: "Mental HP",
+    mentalHpLabel: "Mental",
+    fundsLabel: "Funds",
+    englishLabel: "English",
+    insightLabel: "Insight",
+    staminaLabel: "Stamina",
     gameOverDesc: "My body and mind are completely broken. I just want to give up and go home.",
     restartBtn: "Restart Game",
+    nextBtn:"Next"
   },
   ko: {
     title: "밴쿠버 생존기",
     switchLangBtn: "영어로 전환",
-    mentalHpLabel: "멘탈 체력",
+    mentalHpLabel: "멘탈",
+    fundsLabel: "자금",
+    englishLabel: "영어",
+    insightLabel: "눈치",
+    staminaLabel: "체력",
     gameOverDesc: "몸도 마음도 지쳐버린 밴쿠버 생활에 힘들었어. 다시 돌아가고 싶어.",
     restartBtn: "처음부터 다시",
+    nextBtn: "다음"
   }
 };
 
-// 3. Dummy Scenario Data (for testing and development)
-const DUMMY_SCENARIOS: Record<number, Scenario> = {
-  1: {
-    id: 1,
-    description: {
-      en: "You are looking for a room on Craigslist. You find a 'cozy' basement with no windows. The rent is $1,500/month, utilities not included.",
-      ko: "크레이그리스트에서 방을 구하고 있다. 창문 하나 없는 '아늑한' 베이스먼트가 한 달에 1500불이다. 유틸리티는 별도다."
-    },
-    choices: [
-      { text: { en: "Sign the contract before someone else takes it.", ko: "누가 채갈까 봐 서둘러 계약한다." }, hpChange: -15, nextScenarioId: 2 },
-      { text: { en: "Give up and search for a shared room with 3 others.", ko: "포기하고 거실 쉐어룸을 알아본다." }, hpChange: -20, nextScenarioId: 2 },
-    ],
-  },
-  2: {
-    id: 2,
-    description: {
-      en: "It's November in 'Raincouver'. It's been raining for 14 days straight. You are waiting for the bus, but three full buses just pass you by.",
-      ko: "11월의 '레인쿠버'. 2주째 비가 내리고 있다. 버스를 기다리는데, 만원 버스 세 대가 당신을 그냥 지나쳐 간다."
-    },
-    choices: [
-      { text: { en: "Walk 40 minutes in the freezing rain.", ko: "차가운 비를 맞으며 40분을 걸어간다." }, hpChange: -20, nextScenarioId: 3 },
-      { text: { en: "Call an Uber with surge pricing ($45).", ko: "눈물을 머금고 45불짜리 우버를 부른다." }, hpChange: -10, nextScenarioId: 3 },
-    ],
-  },
-  3: {
-    id: 3,
-    description: {
-      en: "You caught a bad flu. You go to a walk-in clinic at 9 AM, but the receptionist says, 'We are full for the day. Come line up at 6 AM tomorrow.'",
-      ko: "독감에 심하게 걸렸다. 아침 9시에 워크인 클리닉에 갔지만, 리셉셔니스트가 말한다. '오늘 마감됐어요. 내일 새벽 6시에 와서 줄 서세요.'"
-    },
-    choices: [
-      { text: { en: "Buy Advil at Shoppers and endure the pain.", ko: "샤퍼스에서 애드빌을 사서 깡으로 버틴다." }, hpChange: -25, nextScenarioId: 4 },
-      { text: { en: "Wait 8 hours at the ER.", ko: "응급실에 가서 8시간 동안 대기한다." }, hpChange: -30, nextScenarioId: 4 },
-    ]
-  },
-  4: {
-    id: 4,
-    description: {
-      en: "You went to a cafe to cheer yourself up. A simple coffee and a muffin cost $15, and the terminal asks for a 20%, 25%, or 30% tip.",
-      ko: "기분 전환 겸 카페에 왔다. 커피와 머핀 하나가 15불인데, 결제 단말기에는 팁 20%, 25%, 30% 버튼이 떠 있다."
-    },
-    choices: [
-      { text: { en: "Awkwardly press 'Custom Tip' and enter 15%.", ko: "눈치를 보며 'Custom Tip'을 눌러 15%를 준다." }, hpChange: -10, nextScenarioId: 5 },
-      { text: { en: "Press 20% out of pressure and skip dinner.", ko: "압박감에 20%를 누르고 오늘 저녁을 굶는다." }, hpChange: -15, nextScenarioId: 5 },
-    ]
-  },
-  5: {
-    id: 5,
-    description: {
-      en: "Grocery shopping day. You pick up a pack of chicken breasts, but it's $25. The cost of living is suffocating.",
-      ko: "장보는 날. 닭가슴살 한 팩을 집어 들었는데 25불이다. 숨 막히는 물가에 정신이 아득해진다."
-    },
-    choices: [
-      { text: { en: "Put it back and buy instant noodles instead.", ko: "조용히 내려놓고 라면 코너로 향한다." }, hpChange: -15, nextScenarioId: 1 }, // 다시 1번으로 루프하거나 다른 엔딩으로
-      { text: { en: "Buy it, convincing yourself it's an 'investment'.", ko: "이건 나를 위한 '투자'라고 자기합리화하며 산다." }, hpChange: -10, nextScenarioId: 1 },
-    ]
-  }
+// 3. Stat Configuration: color and icon for each stat, can be expanded in the future to include more stats or different UI representations
+const STAT_CONFIG = {
+  funds:   { color: '#F59F00', icon: require('../../assets/icon/funds.png') },
+  mental:  { color: '#F03E3E', icon: require('../../assets/icon/mental.png') },
+  english: { color: '#339AF0', icon: require('../../assets/icon/english.png') },
+  insight: { color: '#BE4BDB', icon: require('../../assets/icon/insight.png') },
+  stamina: { color: '#40C057', icon: require('../../assets/icon/stamina.png') },
+} as const;
+
+// const STAT_UI_TYPE: 'bar' | 'battery' = 'battery'; 
+// Version 1: bar style is a horizontal gauge, 
+const StatBar = ({ icon, label, value, max, color }: { icon: ImageSourcePropType, label: string, value: number, max: number, color: string }) => {
+  const percentage = Math.max(0, Math.min(100, (value / max) * 100));
+  return (
+    <View style={styles.statBox}>
+      <View style={styles.iconLabelRow}>
+        <Image source={icon} style={styles.statIcon} resizeMode="contain" />
+        <Text style={styles.statLabel} numberOfLines={1}>{label}</Text>
+      </View>
+      <View style={styles.gaugeBackground}>
+        <View style={[styles.gaugeFill, { width: `${percentage}%`, backgroundColor: color }]} />
+      </View>
+      <Text style={styles.statValue}>{value}</Text>
+    </View>
+  );
 };
+// Version 2: battery style is a rectangular box with the value displayed on top of the gauge.
+const StatBattery = ({ icon, label, value, max, color }: { icon: ImageSourcePropType, label: string, value: number, max: number, color: string }) => {
+  const percentage = Math.max(0, Math.min(100, (value / max) * 100));
+  return (
+    <View style={styles.statBox}>
+      <View style={styles.iconLabelRow}>
+        <Image source={icon} style={styles.statIcon} resizeMode="contain" />
+        <Text style={styles.statLabel} numberOfLines={1}>{label}</Text>
+      </View>
+      <View style={styles.batteryBody}>
+        <View style={[styles.batteryFill, { width: `${percentage}%`, backgroundColor: color }]} />
+        <Text style={styles.batteryText}>{value}</Text>
+      </View>
+    </View>
+  );
+};
+
+// 5. StatChageBadge component to show the stat changes after selecting a choice, can be used in the future to show floating badges or animations for stat changes
+const StatChangeBadge = ({ statKey, value, label }: { statKey: keyof typeof STAT_CONFIG, value: number, label: string }) => {
+  if (value === 0) return null;
+  const isPositive = value > 0;
+  return (
+    <View style={[styles.badge, isPositive ? styles.badgePositive : styles.badgeNegative]}>
+      <View style={[styles.badgeDot, { backgroundColor: STAT_CONFIG[statKey].color }]} />
+      <Text style={[styles.badgeText, isPositive ? styles.badgeTextPositive : styles.badgeTextNegative]}>
+        {label} {isPositive ? `+${value}` : value}
+      </Text>
+    </View>
+  );
+};
+
 
 export default function GameScreen() {
   // State Management
   const [lang, setLang] = useState<'en' | 'ko'>('en'); // Default language is English
   const [currentScenarioId, setCurrentScenarioId] = useState<number>(1);
-  const [mentalHP, setMentalHP] = useState<number>(100);
-
+  const [statUiType, setStatUiType] = useState<'bar' | 'battery'>('battery');
+  const [stats, setStats] = useState<StatChanges>({
+    funds: 1000,
+    mental: 100,
+    english: 30,
+    insight: 50,
+    stamina: 100,
+  }); //1st stat change implementation for ken, can be expanded in the future for more complex stat management
+   
+  //Display result state for feedback after choice selection
+  const [showResult, setShowResult] = useState<boolean>(false);
+  const [selectedChoice, setSelectedChoice] = useState<Choice | null>(null);
   const t = UI_TEXT[lang]; // Shorthand for current language texts
   // Get the current scenario object based on the ID
-  const currentScenario = DUMMY_SCENARIOS[currentScenarioId] || DUMMY_SCENARIOS[1];
-  //Game Over Condition
-  const isGameOver = mentalHP <= 0;
+  const currentScenario = SCENARIOS[String(currentScenarioId)] || SCENARIOS['1']; // Fallback to scenario 1 if ID not found
+
+  // Game Over Condition: If any of the main stats drop to 0 or below, the game is over.
+  // This can be expanded in the future to include more complex conditions or additional stats.
+  const isGameOver = stats.mental <= 0 || stats.stamina <= 0 || stats.funds <= 0 || stats.english <= 0 || stats.insight <= 0;
+
+  // Function to determine the game over description based on which stat caused the game over, 
+  // can be expanded in the future to include more detailed descriptions or different endings based on the player's stats and choices throughout the game.
+  const getGameOverDesc = () => {
+    if (stats.funds <= 0)   return lang === 'ko' ? '통장 잔고가 바닥났다. 밴쿠버는 돈 없으면 못 버틴다.' : 'Your bank account hit zero. Vancouver has no mercy for the broke.';
+    if (stats.mental <= 0)  return lang === 'ko' ? '멘탈이 완전히 무너졌다. 이제 한국으로 돌아가고 싶다.' : 'Your mental health has collapsed. You just want to go home.';
+    if (stats.stamina <= 0) return lang === 'ko' ? '체력이 바닥났다. 아파도 쉴 수가 없는 삶이었다.' : 'Your body gave out. There was no time to rest.';
+    if (stats.english <= 0) return lang === 'ko' ? '영어에 완전히 자신을 잃었다. 아무것도 말할 수가 없다.' : 'You lost all confidence in English. Communication feels impossible.';
+    if (stats.insight <= 0) return lang === 'ko' ? '눈치가 완전히 사라졌다. 모든 상황이 미스터리다.' : 'You lost all sense of reading the room. Everything feels foreign.';
+    return t.gameOverDesc;
+  };
 
   //Function to toggle language
   const toggleLanguage = () => {
     setLang(prevLang => (prevLang === 'en' ? 'ko' : 'en'));
   };
 
+  // Function to toggle between stat UI types (bar and battery)
+  const toggleStatUiType = () => {
+    setStatUiType(prev => (prev === 'bar' ? 'battery' : 'bar'));
+  };
+
   // Function to handle choice selection
   const handleChoice = (choice: Choice) => {
-    // 1. Calculate new HP (keep it strictly between 0 and 100)
-    const newHP = Math.max(0, Math.min(100, mentalHP + choice.hpChange));
-    setMentalHP(newHP);
-    // 2. Navigate to the next scenario
-    setCurrentScenarioId(choice.nextScenarioId);
+    // Update stats based on the choice's stat changes
+    setStats(prev => ({
+      funds: prev.funds + (choice.statChanges.funds || 0),
+      mental: Math.max(0, Math.min(100, prev.mental + (choice.statChanges.mental || 0))),
+      english: Math.max(0, Math.min(100, prev.english + (choice.statChanges.english || 0))),
+      insight: Math.max(0, Math.min(100, prev.insight + (choice.statChanges.insight || 0))),
+      stamina: Math.max(0, Math.min(100, prev.stamina + (choice.statChanges.stamina || 0))),
+    }));
+ 
+    setSelectedChoice(choice);
+    setShowResult(true); // Show result feedback after choice selection
+  };
+
+  const proceedToNextScenario = () => {
+    if (selectedChoice) {
+      setCurrentScenarioId(selectedChoice.nextScenarioId);        
+    } 
+    setShowResult(false); // Hide result feedback when moving to the next scenario
+    setSelectedChoice(null); // Reset selected choice for the next scenario
   };
 
   const restartGame = () => {
-    setMentalHP(100);
+    setStats({ funds: 1000, mental: 100, english: 30, insight: 50, stamina: 100 });
     setCurrentScenarioId(1);
+    setShowResult(false);
+    setSelectedChoice(null);
+  };
+
+  // Function to determine the border color of the result feedback based on whether the overall stat changes are positive or negative
+  // Positive changes will have a green border, while negative changes will have a blue border.
+  const getFeedbackBorderColor = (choice: Choice) => {
+    const total = Object.values(choice.statChanges).reduce((a, b) => a + b, 0);
+    return total >= 0 ? '#40C057' : '#228BE6';
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+   // SafeAreaView fix: Add edges={['top']} to prevent overlap with status bar
+  <SafeAreaView style={styles.safeArea} edges={['top']}>
+      {/* Hide Expo Router default header to prevent double header issue */}
+      <Tabs.Screen options={{ headerShown: false }} />
       <View style={styles.container}>
         
         {/* Header */}
@@ -139,24 +218,50 @@ export default function GameScreen() {
         </View>
 
         {/* Status Container */}
-        <View style={styles.statusContainer}>
-          <Text style={styles.statusText}>{t.mentalHpLabel}: {mentalHP}%</Text>
-          <View style={styles.hpBarBackground}>
-            <View style={[styles.hpBarFill, { width: `${mentalHP}%` }, isGameOver && styles.hpBarDanger]} />
-          </View>
-        </View>
+        <TouchableOpacity 
+          style={styles.statusContainer} 
+          onPress={toggleStatUiType} 
+          activeOpacity={0.9} // 클릭할 때 살짝 깜빡이는 효과 (1에 가까울수록 효과 적음)
+        >
+          {statUiType === 'bar' ? (
+            <>
+              <StatBar icon={STAT_CONFIG.funds.icon} label={t.fundsLabel} value={stats.funds} max={1000} color={STAT_CONFIG.funds.color} />
+              <StatBar icon={STAT_CONFIG.mental.icon} label={t.mentalHpLabel} value={stats.mental} max={100} color={STAT_CONFIG.mental.color} />
+              <StatBar icon={STAT_CONFIG.english.icon} label={t.englishLabel} value={stats.english} max={100} color={STAT_CONFIG.english.color} />
+              <StatBar icon={STAT_CONFIG.insight.icon} label={t.insightLabel} value={stats.insight} max={100} color={STAT_CONFIG.insight.color} />
+              <StatBar icon={STAT_CONFIG.stamina.icon} label={t.staminaLabel} value={stats.stamina} max={100} color={STAT_CONFIG.stamina.color} />
+            </>
+          ) : (
+            <>
+              <StatBattery icon={STAT_CONFIG.funds.icon} label={t.fundsLabel} value={stats.funds} max={1000} color={STAT_CONFIG.funds.color} />
+              <StatBattery icon={STAT_CONFIG.mental.icon} label={t.mentalHpLabel} value={stats.mental} max={100} color={STAT_CONFIG.mental.color} />
+              <StatBattery icon={STAT_CONFIG.english.icon} label={t.englishLabel} value={stats.english} max={100} color={STAT_CONFIG.english.color} />
+              <StatBattery icon={STAT_CONFIG.insight.icon} label={t.insightLabel} value={stats.insight} max={100} color={STAT_CONFIG.insight.color} />
+              <StatBattery icon={STAT_CONFIG.stamina.icon} label={t.staminaLabel} value={stats.stamina} max={100} color={STAT_CONFIG.stamina.color} />
+            </>
+          )}
+        </TouchableOpacity>
 
         {/* Scenario Container */}
         <View style={styles.scenarioContainer}>
-          <View style={[styles.scenarioCard, isGameOver && styles.gameOverCard]}>            
+          <View style={[styles.scenarioCard, isGameOver && styles.gameOverCard]}>
+            {/* Display level and quest number on the screen */}
+            {!isGameOver && (
+              <Text style={styles.levelText}>
+                {lang === 'ko' 
+                  ? `상황 ${currentScenario.level} - 퀘스트 ${currentScenario.question}` 
+                  : `Level ${currentScenario.level} - Quest ${currentScenario.question}`}
+              </Text>
+            )}
+            
             <Text style={styles.scenarioText}>
-              {isGameOver ? t.gameOverDesc : currentScenario.description[lang]}
+              {isGameOver ? getGameOverDesc() : currentScenario.description[lang]}
             </Text>
           </View>
         </View>
         
         {/* Choices Container */}
-        <View style={styles.choicesContainer}>
+         <ScrollView style={styles.choicesContainer} contentContainerStyle={{ paddingBottom: 30 }}>
           {isGameOver ? (
             <View style={styles.gameOverContainer}>
               <Image 
@@ -164,23 +269,56 @@ export default function GameScreen() {
                 style={styles.gameOverImage} 
                 resizeMode="contain"
               />
-              {/* <Text style={styles.gameOverTitle}>GAME OVER</Text> */}
               <TouchableOpacity style={styles.restartButton} onPress={restartGame}>
                 <Text style={styles.restartButtonText}>{t.restartBtn}</Text>
               </TouchableOpacity>
             </View>
           ) : (
-            currentScenario.choices.map((choice, index) => (
-              <TouchableOpacity 
-                key={index} 
-                style={styles.choiceButton}
-                onPress={() => handleChoice(choice)}
-              >
-                <Text style={styles.choiceText}>{choice.text[lang]}</Text>
-              </TouchableOpacity>
-            ))
+            <>
+              {/* 1. Selection Options */}
+              {currentScenario.choices.map((choice, index) => {
+                // Hide unselected choices after selection to focus on the selected choice and its feedback. 
+                // This also prevents confusion about which choice was selected, especially if the stat changes are significant. 
+                // This can be adjusted in the future to show all choices with the selected one highlighted instead, 
+                // depending on user feedback and design preferences.
+                if (showResult && selectedChoice !== choice) return null;
+
+                return (
+                  <TouchableOpacity 
+                    key={index} 
+                    // Highlight the selected choice button after selection, and disable all buttons to prevent multiple selections until the next scenario loads
+                    style={[styles.choiceButton, showResult && styles.choiceButtonSelected]}
+                    disabled={showResult}
+                    onPress={() => handleChoice(choice)}
+                  >
+                    <Text style={styles.choiceText}>{choice.text[lang]}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+
+              {/* Result Feedback */}
+              {showResult && selectedChoice && (
+                <View style={[styles.resultContainer, { borderLeftColor: getFeedbackBorderColor(selectedChoice) }]}>
+                    {/* Feedback */}
+                    <Text style={styles.resultDescText}>{selectedChoice.feedback[lang]}</Text>
+
+                    {/* Stat Changes */}
+                    <View style={styles.badgeRow}>
+                      <StatChangeBadge statKey="funds"   value={selectedChoice.statChanges.funds}   label={t.fundsLabel} />
+                      <StatChangeBadge statKey="mental"  value={selectedChoice.statChanges.mental}  label={t.mentalHpLabel} />
+                      <StatChangeBadge statKey="english" value={selectedChoice.statChanges.english} label={t.englishLabel} />
+                      <StatChangeBadge statKey="insight" value={selectedChoice.statChanges.insight} label={t.insightLabel} />
+                      <StatChangeBadge statKey="stamina" value={selectedChoice.statChanges.stamina} label={t.staminaLabel} />
+                    </View>
+
+                    <TouchableOpacity style={styles.nextButton} onPress={proceedToNextScenario}>
+                      <Text style={styles.nextButtonText}>{t.nextBtn} →</Text>
+                    </TouchableOpacity>
+                </View>
+              )}
+            </>
           )}
-        </View>
+        </ScrollView>
 
       </View>
     </SafeAreaView>
@@ -190,7 +328,7 @@ export default function GameScreen() {
 // Styles
 const styles = StyleSheet.create({
   // 1. Core Wrappers
-  safeArea: { flex: 1, backgroundColor: '#f8f9fa', paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
+  safeArea: { flex: 1, backgroundColor: '#f8f9fa' },
   container: { flex: 1 },
 
   // 2. Top Header
@@ -199,22 +337,36 @@ const styles = StyleSheet.create({
   langButton: { paddingVertical: 6, paddingHorizontal: 12, backgroundColor: '#e9ecef', borderRadius: 20 },
   langButtonText: { fontSize: 12, fontWeight: '600', color: '#495057' },
 
-  // 3. Status Bar
-  statusContainer: { padding: 20, backgroundColor: '#fff', paddingBottom: 10 },
-  statusText: { fontSize: 14, color: '#666', marginBottom: 5 },
-  hpBarBackground: { height: 10, backgroundColor: '#e9ecef', borderRadius: 5, overflow: 'hidden' },
-  hpBarFill: { height: '100%', backgroundColor: '#4CAF50' },
-  hpBarDanger: { backgroundColor: '#F44336' }, // Red color when HP is low (added for better visual feedback)
+  // 3. Status Style  
+  statusContainer: { flexDirection: 'row', justifyContent: 'space-around', padding: 12, backgroundColor: '#343a40' },
+  statBox: { flex: 1, alignItems: 'center', marginHorizontal: 3 },
+  iconLabelRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+  statIcon: { width: 14, height: 14, marginRight: 4 },
+  statLabel: { fontSize: 11, fontWeight: 'bold', color: '#fff' },
+
+  // Bar Style
+  gaugeBackground: { height: 8, width: '100%', backgroundColor: '#495057', borderRadius: 4, overflow: 'hidden', marginBottom: 4 },
+  gaugeFill: { height: '100%', borderRadius: 4 },
+  statValue: { fontSize: 10, color: '#adb5bd', fontWeight: 'bold' },
+
+  // Battery Style
+  batteryBody: { height: 20, width: '100%', backgroundColor: '#495057', borderRadius: 4, overflow: 'hidden', justifyContent: 'center', alignItems: 'center', position: 'relative' },
+  batteryFill: { position: 'absolute', left: 0, top: 0, bottom: 0 },
+  batteryText: { fontSize: 11, fontWeight: 'bold', color: '#fff', textShadowColor: 'rgba(0, 0, 0, 0.75)', textShadowOffset: {width: 1, height: 1}, textShadowRadius: 2, zIndex: 1 },
 
   // 4. Scenario Area
-  scenarioContainer: { flex: 1, padding: 20, justifyContent: 'center' },
-  scenarioCard: { backgroundColor: 'white', padding: 25, borderRadius: 12, elevation: 3, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 5 },
+   scenarioContainer: { padding: 20, justifyContent: 'center' },
+  // Added minHeight and justifyContent to prevent crushing
+  scenarioCard: { backgroundColor: 'white', padding: 25, borderRadius: 12, elevation: 3, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 5, minHeight: 160, justifyContent: 'center' },
   gameOverCard: { borderWidth: 2, borderColor: '#F44336', backgroundColor: '#fff5f5' }, // Game over card style
+  levelText: { fontSize: 14, color: '#888', marginBottom: 10, fontWeight: 'bold', textAlign: 'center' },
   scenarioText: { fontSize: 18, color: '#000000', lineHeight: 28, textAlign: 'center', fontWeight: '500' },
 
   // 5. Choice Buttons
-  choicesContainer: { padding: 20, paddingBottom: 30, backgroundColor: '#f8f9fa' },
+  //choicesContainer: { padding: 20, paddingBottom: 30, backgroundColor: '#f8f9fa' },
+  choicesContainer: { flex: 1, padding: 20, backgroundColor: '#f8f9fa' },
   choiceButton: { backgroundColor: '#228BE6', padding: 15, borderRadius: 12, marginBottom: 12, elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 3 },
+  choiceButtonSelected: { backgroundColor: '#1864AB', elevation: 0 },
   choiceText: { color: 'white', textAlign: 'center', fontSize: 16, fontWeight: 'bold' },
 
   // 6. Game Over Styles
@@ -223,4 +375,22 @@ const styles = StyleSheet.create({
   gameOverTitle: { fontSize: 32, fontWeight: 'bold', color: '#F44336', marginBottom: 5 },
   restartButton: { backgroundColor: '#333', paddingVertical: 15, paddingHorizontal: 40, borderRadius: 30, elevation: 3 },
   restartButtonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
+
+  // 7. Result Feedback Styles
+  resultContainer: { backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#e9ecef', borderLeftWidth: 4, padding: 18, marginTop: 4 },
+  resultDescText: { fontSize: 15, color: '#1a1a1a', lineHeight: 23, marginBottom: 14, fontWeight: '500', textAlign: 'center' },
+
+  //8. Stat Change Badge Styles
+  badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginBottom: 16 },
+  badge: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 5, paddingHorizontal: 11, borderRadius: 20 },
+  badgePositive: { backgroundColor: '#f0fff4' },
+  badgeNegative: { backgroundColor: '#fff0f0' },
+  badgeDot: { width: 7, height: 7, borderRadius: 4 },
+  badgeText: { fontSize: 13, fontWeight: '600' },
+  badgeTextPositive: { color: '#2f9e44' },
+  badgeTextNegative: { color: '#c92a2a' },
+
+  // 9. Next Button Style
+  nextButton: { backgroundColor: '#1976d2', padding: 15, borderRadius: 12, alignItems: 'center' },
+  nextButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },  
 });

@@ -1,0 +1,437 @@
+{
+  "1": {
+    "id": 1,
+    "level": 1,
+    "question": 1,
+    "description": {
+      "en": "You arrived at YVR airport. A strict-looking immigration officer asks, 'What's the purpose of your visit and how long are you staying?'",
+      "ko": "부푼 꿈을 안고 밴쿠버 공항에 도착한 켄. 12시간의 비행 후 피곤한 상태에서 무서운 표정의 백인 입국 심사관을 마주합니다. 'What's the purpose of your visit and how long are you staying?'"
+    },
+    "choices": [
+      {
+        "text": { "en": "Uh... Study! Four years! UBC!", "ko": "(당황하지만 쿨한 척하며) 'Uh... Study! Four years! UBC!'" },
+        "statChanges": { "funds": 0, "mental": 0, "english": 10, "insight": -10, "stamina": 0 },
+        "feedback": { "en": "The officer smirks and stamps your passport.", "ko": "심사관이 피식 웃으며 도장을 찍어줍니다." },
+        "nextScenarioId": 2
+      },
+      {
+        "text": { "en": "My purpose of visit is...", "ko": "(머릿속으로 완벽한 문장을 조립하며) 'My purpose of visit is studying at the University of British Columbia...'" },
+        "statChanges": { "funds": 0, "mental": -20, "english": 20, "insight": 0, "stamina": 0 },
+        "feedback": { "en": "Grammar is perfect, but the line behind you sighs loudly.", "ko": "문법은 맞으나 시간이 오래 걸려 뒤에 줄 선 사람들이 한숨을 쉽니다." },
+        "nextScenarioId": 2
+      },
+      {
+        "text": { "en": "Hand over the documents silently.", "ko": "(시선을 피하며 아무 말 없이) 여권과 입학 허가서를 스윽 내민다." },
+        "statChanges": { "funds": 0, "mental": -50, "english": 0, "insight": -20, "stamina": 0 },
+        "feedback": { "en": "The officer frowns. 'I asked you a question, sir.'", "ko": "심사관이 미간을 찌푸리며 'I asked you a question, sir.' 라고 경고합니다." },
+        "nextScenarioId": 2
+      }
+    ]
+  },
+  "2": {
+    "id": 2,
+    "level": 1,
+    "question": 2,
+    "description": {
+      "en": "You are struggling with 3 heavy bags. A friendly local approaches: 'Hey buddy, need a hand with that? Just 20 bucks.'",
+      "ko": "이민 가방 3개를 낑낑대며 카트에 싣고 있는데, 친절해 보이는 현지인이 다가옵니다. 'Hey buddy, need a hand with that? Just 20 bucks.'"
+    },
+    "choices": [
+      {
+        "text": { "en": "Oh, thank you! Here is 20 dollars.", "ko": "(캐나다 사람들은 친절하구나!) 'Oh, thank you! Here is 20 dollars.'" },
+        "statChanges": { "funds": -30, "mental": 0, "english": 0, "insight": -20, "stamina": 0 },
+        "feedback": { "en": "They load the bags and take the money. Too expensive for a tip.", "ko": "짐을 올려주고 20달러를 채갑니다. 팁이라기엔 너무 큰 돈을 뜯겼습니다." },
+        "nextScenarioId": 3
+      },
+      {
+        "text": { "en": "No, thank you. I can do it.", "ko": "(경계하며 단호하게) 'No, thank you. I can do it.'" },
+        "statChanges": { "funds": 0, "mental": 10, "english": 0, "insight": 20, "stamina": 0 },
+        "feedback": { "en": "They shrug and walk away. Successful defense.", "ko": "상대방이 어깨를 으쓱하며 돌아갑니다. 방어 성공." },
+        "nextScenarioId": 3
+      },
+      {
+        "text": { "en": "Avoid eye contact and walk away fast.", "ko": "(못 알아들은 척) 눈을 피하며 빠르게 카트를 밀고 도망간다." },
+        "statChanges": { "funds": 0, "mental": 0, "english": 0, "insight": -10, "stamina": -30 },
+        "feedback": { "en": "You rush and hurt your back.", "ko": "무거운 짐을 급하게 밀다 허리를 삐끗합니다." },
+        "nextScenarioId": 3
+      }
+    ]
+  },
+  "3": {
+    "id": 3,
+    "level": 1,
+    "question": 3,
+    "description": {
+      "en": "You stepped outside. It's raining, and your bags are heavy. How will you get to your UBC dorm?",
+      "ko": "공항 밖으로 나왔습니다. 비는 부슬부슬 내리고 짐은 무겁습니다."
+    },
+    "choices": [
+      {
+        "text": { "en": "Take the 'Cheap ride to UBC' private van.", "ko": "호객 행위를 하는 'Cheap ride to UBC' 팻말을 든 사설 밴에 탄다." },
+        "statChanges": { "funds": -100, "mental": -50, "english": 0, "insight": -30, "stamina": 0 },
+        "feedback": { "en": "They demand $150 with no meter. You got scammed.", "ko": "미터기 없이 도착 후 150달러를 요구하는 바가지를 썼습니다." },
+        "nextScenarioId": 4
+      },
+      {
+        "text": { "en": "Call an Uber using the app.", "ko": "안전하게 공식 앱을 켜서 우버(Uber)를 호출한다." },
+        "statChanges": { "funds": -40, "mental": 0, "english": 0, "insight": 0, "stamina": 20 },
+        "feedback": { "en": "Arrived comfortably for a fixed price.", "ko": "정가(약 40달러)에 편안하게 도착했습니다." },
+        "nextScenarioId": 4
+      },
+      {
+        "text": { "en": "Take the Skytrain and bus to save money.", "ko": "돈을 아끼기 위해 스카이트레인(지하철)과 버스를 환승해서 간다." },
+        "statChanges": { "funds": -5, "mental": -40, "english": 0, "insight": 0, "stamina": -100 },
+        "feedback": { "en": "You lost your soul dragging 3 bags in the rain.", "ko": "비 오는 날 짐 3개를 끌고 대중교통을 타다 영혼이 나갔습니다." },
+        "nextScenarioId": 4
+      }
+    ]
+  },
+  "4": {
+    "id": 4,
+    "level": 1,
+    "question": 4,
+    "description": {
+      "en": "At the dorm reception, a staff member hands you the key and asks, 'How's it going, eh? Brutal flight?'",
+      "ko": "기숙사 리셉션의 백인 직원이 열쇠를 주며 묻습니다. 'How's it going, eh? Brutal flight?'"
+    },
+    "choices": [
+      {
+        "text": { "en": "Yes, I am going to the dormitory.", "ko": "'Yes, I am going to the dormitory.' (어디 가냐는 뜻으로 오해함)" },
+        "statChanges": { "funds": 0, "mental": 0, "english": 0, "nuninsightchi": -20, "stamina": 0 },
+        "feedback": { "en": "They look confused and say 'Alright...'", "ko": "직원이 묘한 표정을 지으며 'Alright...' 하고 넘어갑니다. 켄만 이유를 모름." },
+        "nextScenarioId": 5
+      },
+      {
+        "text": { "en": "It was so long... I'm exhausted.", "ko": "'It was so long... I'm exhausted.' (솔직하게 피곤하다고 답함)" },
+        "statChanges": { "funds": 0, "mental": 0, "english": 20, "insight": 20, "stamina": 0 },
+        "feedback": { "en": "They smile and say, 'Get some rest, buddy!'", "ko": "직원이 'Get some rest, buddy!'라며 웃어줍니다. 스몰토크 성공." },
+        "nextScenarioId": 5
+      },
+      {
+        "text": { "en": "I'm fine, thank you. And you?", "ko": "'I'm fine, thank you. And you?' (수능 영어의 교과서적 반사 신경)" },
+        "statChanges": { "funds": 0, "mental": 0, "english": 0, "insight": -10, "stamina": 0 },
+        "feedback": { "en": "They look at you like a robot and reply awkwardly.", "ko": "직원이 로봇 보듯 쳐다보며 어색하게 'I'm good...' 합니다." },
+        "nextScenarioId": 5
+      }
+    ]
+  },
+  "5": {
+    "id": 5,
+    "level": 1,
+    "question": 5,
+    "description": {
+      "en": "Your new roommate is playing games, smelling heavily of cannabis. 'Yo! You're the new guy! Want a hit?'",
+      "ko": "방에 들어가니 현지인 룸메이트가 강렬한 냄새(대마초)를 풍기며 게임 중입니다. 켄을 보더니 'Yo! You're the new guy! Want a hit?' 라며 권합니다."
+    },
+    "choices": [
+      {
+        "text": { "en": "Take a hit to look cool.", "ko": "(인싸가 되고 싶어!) 쿨하게 받아서 한 모금 피운다." },
+        "statChanges": { "funds": 0, "mental": -50, "english": 0, "insight": -30, "stamina": -80 },
+        "feedback": { "en": "You cough violently and pass out. It's illegal for Koreans anyway.", "ko": "대마초에 기침을 심하게 하며 앓아눕습니다. 합법이라도 한국인은 속지주의로 불법!" },
+        "nextScenarioId": 6
+      },
+      {
+        "text": { "en": "Ah, no thank you. I do not smoke.", "ko": "(정중하게 거절) 'Ah, no thank you. I do not smoke.'" },
+        "statChanges": { "funds": 0, "mental": 0, "english": 0, "insight": 20, "stamina": 0 },
+        "feedback": { "en": "'Cool, more for me,' they reply. Peaceful defense.", "ko": "룸메이트가 'Cool, more for me'라며 자기 할 일을 합니다. 평화로운 방어." },
+        "nextScenarioId": 6
+      },
+      {
+        "text": { "en": "Is that illegal?! I will call the police!", "ko": "(경악하며) 'Is that illegal?! I will call the police!'" },
+        "statChanges": { "funds": 0, "mental": -40, "english": 0, "insight": -50, "stamina": 0 },
+        "feedback": { "en": "'It's Canada, bro. Chill.' They think you are a loser.", "ko": "룸메이트가 어이없어하며 'It's Canada, bro. Chill.' 이라며 켄을 찌질이 취급합니다." },
+        "nextScenarioId": 6
+      }
+    ]
+  },
+  "6": {
+    "id": 6,
+    "level": 2,
+    "question": 1,
+    "description": {
+      "en": "Day 2. It's raining lightly outside. Your local roommate goes out wearing just a hoodie.",
+      "ko": "2일차. 창밖을 보니 굵지 않은 비가 추적추적 내립니다. 현지인 룸메이트는 후드티 하나만 뒤집어쓰고 나갑니다."
+    },
+    "choices": [
+      {
+        "text": { "en": "Take a sturdy umbrella.", "ko": "(한국인은 장비빨!) 튼튼한 3단 우산을 챙겨 쓴다." },
+        "statChanges": { "funds": -15, "mental": -20, "english": 0, "insight": 0, "stamina": 0 },
+        "feedback": { "en": "The Vancouver wind flips and breaks it in 10 minutes.", "ko": "밴쿠버의 돌풍에 우산이 10분 만에 뒤집혀 부러집니다." },
+        "nextScenarioId": 7
+      },
+      {
+        "text": { "en": "Wear a waterproof jacket like a local.", "ko": "(로컬처럼!) 방수 재킷의 모자를 푹 눌러쓰고 나간다." },
+        "statChanges": { "funds": 0, "mental": 0, "english": 0, "insight": 20, "stamina": 10 },
+        "feedback": { "en": "You block the wind perfectly and look like a local.", "ko": "비바람을 완벽히 차단하며 로컬의 분위기를 풍깁니다." },
+        "nextScenarioId": 7
+      },
+      {
+        "text": { "en": "Walk in the rain with nothing.", "ko": "(이 정도 비쯤이야!) 아무것도 쓰지 않고 그냥 걷는다." },
+        "statChanges": { "funds": 0, "mental": -10, "english": 0, "insight": 0, "stamina": -30 },
+        "feedback": { "en": "The cold rain chills you to the bone.", "ko": "생각보다 찬 비에 뼛속까지 시려오며 콧물이 흐릅니다." },
+        "nextScenarioId": 7
+      }
+    ]
+  },
+  "7": {
+    "id": 7,
+    "level": 2,
+    "question": 2,
+    "description": {
+      "en": "First time at Tim Hortons. The cashier blankly asks, 'What can I get for you?'",
+      "ko": "팀홀튼 첫 주문. 메뉴판을 보니 머리가 하얘집니다. 직원이 무심하게 'What can I get for you?'라고 묻습니다."
+    },
+    "choices": [
+      {
+        "text": { "en": "Can I get a Double Double, please?", "ko": "(어디서 들은 건 있다) 'Can I get a Double Double, please?'" },
+        "statChanges": { "funds": 0, "mental": 0, "english": 15, "insight": 10, "stamina": 0 },
+        "feedback": { "en": "They understand immediately. Localization +1.", "ko": "직원이 바로 알아듣고 컵을 꺼냅니다. 현지화 +1." },
+        "nextScenarioId": 8
+      },
+      {
+        "text": { "en": "I want one hot coffee with two sugars...", "ko": "(정석대로) 'I want one hot coffee with two sugars and two creams.'" },
+        "statChanges": { "funds": 0, "mental": -5, "english": 10, "insight": 0, "stamina": 0 },
+        "feedback": { "en": "Grammar is perfect, but they ask back: 'You mean a double double?'", "ko": "문법은 완벽하나 직원이 'You mean a double double?' 하고 되물어봅니다." },
+        "nextScenarioId": 8
+      },
+      {
+        "text": { "en": "Point and say 'This one'.", "ko": "(손가락으로 메뉴판을 가리키며) 'This one. And this bread.'" },
+        "statChanges": { "funds": 0, "mental": 0, "english": -10, "insight": -20, "stamina": 0 },
+        "feedback": { "en": "They get annoyed and ask 'Which one?'", "ko": "직원이 못 알아보고 'Which one?'이라며 짜증을 냅니다." },
+        "nextScenarioId": 8
+      }
+    ]
+  },
+  "8": {
+    "id": 8,
+    "level": 2,
+    "question": 3,
+    "description": {
+      "en": "The total is $3.45. You have a $20 bill and a bunch of unfamiliar coins.",
+      "ko": "커피와 도넛 값이 $3.45가 나왔습니다. 지갑에는 20달러 지폐와 정체를 알 수 없는 동전들이 수북합니다."
+    },
+    "choices": [
+      {
+        "text": { "en": "Give the $20 bill and get more change.", "ko": "동전 세는 걸 포기하고 20달러 지폐를 내밀어 거스름돈을 더 받는다." },
+        "statChanges": { "funds": 0, "mental": 0, "english": 0, "insight": -10, "stamina": -10 },
+        "feedback": { "en": "Your pockets are now filled with heavy Loonies and Toonies.", "ko": "주머니가 무거운 동전(루니, 투니)으로 가득 차서 걸을 때마다 짤랑거립니다." },
+        "nextScenarioId": 9
+      },
+      {
+        "text": { "en": "Slowly count exact change holding up the line.", "ko": "뒤에 줄이 길어지든 말든 1센트, 5센트 동전을 하나하나 찾아낸다." },
+        "statChanges": { "funds": 0, "mental": -30, "english": 0, "insight": -20, "stamina": 0 },
+        "feedback": { "en": "The cashier sighs. Also, 1-cent pennies are retired here.", "ko": "캐셔의 깊은 한숨 소리를 들으며 진땀을 뺍니다. (참고: 캐나다는 1센트 페니가 폐지됨)" },
+        "nextScenarioId": 9
+      },
+      {
+        "text": { "en": "Tap with your Korean credit card.", "ko": "수수료가 나가더라도 편하게 한국 신용카드로 탭(Tap) 결제한다." },
+        "statChanges": { "funds": -5, "mental": 10, "english": 0, "insight": 0, "stamina": 0 },
+        "feedback": { "en": "You paid a 1.5% foreign fee, but feel at peace.", "ko": "1.5% 해외 수수료가 빠져나가지만 마음은 평온합니다." },
+        "nextScenarioId": 9
+      }
+    ]
+  },
+  "9": {
+    "id": 9,
+    "level": 2,
+    "question": 4,
+    "description": {
+      "en": "The cashier hands you the coffee and robotically says, 'Have a good one.'",
+      "ko": "직원이 커피를 건네주며 영혼 없는 목소리로 'Have a good one.'이라고 인사합니다."
+    },
+    "choices": [
+      {
+        "text": { "en": "'You too!'", "ko": "'You too!'라며 경쾌하게 받아친다." },
+        "statChanges": { "funds": 0, "mental": 0, "english": 10, "insight": 15, "stamina": 0 },
+        "feedback": { "en": "A perfect North American wrap-up.", "ko": "완벽한 북미식 마무리 인사." },
+        "nextScenarioId": 10
+      },
+      {
+        "text": { "en": "'I am good, thank you.'", "ko": "'I am good, thank you.' (상태를 묻는 줄 착각함)" },
+        "statChanges": { "funds": 0, "mental": 0, "english": -10, "insight": -10, "stamina": 0 },
+        "feedback": { "en": "They look at you, confused.", "ko": "직원이 '뭐라는 거지'라는 표정으로 쳐다봅니다." },
+        "nextScenarioId": 10
+      },
+      {
+        "text": { "en": "Smile awkwardly and leave.", "ko": "(어색하게 미소만 짓고) 도망치듯 매장을 빠져나온다." },
+        "statChanges": { "funds": 0, "mental": -5, "english": 0, "insight": 0, "stamina": 0 },
+        "feedback": { "en": "You become awkward Asian student #1.", "ko": "무례하지는 않지만 어색한 아시안 유학생 1이 되었습니다." },
+        "nextScenarioId": 10
+      }
+    ]
+  },
+  "10": {
+    "id": 10,
+    "level": 2,
+    "question": 5,
+    "description": {
+      "en": "A homeless person approaches with a cup: 'Change, please?'",
+      "ko": "낡은 담요를 두른 노숙자가 다가와 종이컵을 내밀며 'Change, please?'라고 합니다."
+    },
+    "choices": [
+      {
+        "text": { "en": "Give them your heavy coins.", "ko": "지갑을 열어 아까 받은 동전들을 친절하게 부어준다." },
+        "statChanges": { "funds": -15, "mental": -30, "english": 0, "insight": -20, "stamina": 0 },
+        "feedback": { "en": "Other homeless people see you and swarm around.", "ko": "주변의 다른 노숙자들까지 당신을 타겟으로 삼고 몰려옵니다." },
+        "nextScenarioId": 11
+      },
+      {
+        "text": { "en": "Say 'Sorry' and walk faster.", "ko": "'Sorry'라고 짧게 말하고 걸음을 재촉한다." },
+        "statChanges": { "funds": 0, "mental": 0, "english": 0, "insight": 10, "stamina": 0 },
+        "feedback": { "en": "They give up easily.", "ko": "흔한 거절 방식이므로 노숙자도 쿨하게 포기합니다." },
+        "nextScenarioId": 11
+      },
+      {
+        "text": { "en": "Pretend you don't speak English and avoid eye contact.", "ko": "영어를 못 알아들은 척 고개를 젓고 시선을 회피한다." },
+        "statChanges": { "funds": 0, "mental": -10, "english": 0, "insight": 0, "stamina": 0 },
+        "feedback": { "en": "You passed, but feel a bit guilty.", "ko": "무사히 지나갔지만, 알 수 없는 죄책감과 찝찝함이 남습니다." },
+        "nextScenarioId": 11
+      }
+    ]
+  },
+  "11": {
+    "id": 11,
+    "level": 3,
+    "question": 1,
+    "description": {
+      "en": "At a phone carrier, the rep says: '$85/month for 50GB! Best deal for students!'",
+      "ko": "통신사 직원이 화려한 언변으로 '월 85달러에 50GB 무제한 데이터! 유학생에게 최고의 딜!'이라며 계약서를 내밉니다."
+    },
+    "choices": [
+      {
+        "text": { "en": "Sigh and sign the contract.", "ko": "(역시 캐나다 데이터는 비싸구나) 체념하고 계약서에 사인한다." },
+        "statChanges": { "funds": -85, "mental": 0, "english": 0, "insight": -30, "stamina": 0 },
+        "feedback": { "en": "You got scammed. UBC has WiFi everywhere anyway.", "ko": "완벽한 호구. 와이파이가 널린 학교에서 데이터를 다 쓰지도 못합니다." },
+        "nextScenarioId": 12
+      },
+      {
+        "text": { "en": "Ask: 'Do you have any cheaper plans for students?'", "ko": "'Do you have any cheaper plans for students?'라며 저렴한 요금제를 묻는다." },
+        "statChanges": { "funds": -45, "mental": 0, "english": 15, "insight": 20, "stamina": 0 },
+        "feedback": { "en": "They reveal a hidden $45 plan from a flanker brand.", "ko": "직원이 숨겨뒀던 월 45달러짜리 플랭커 브랜드 요금제를 꺼냅니다." },
+        "nextScenarioId": 12
+      },
+      {
+        "text": { "en": "Bring out your Korean prepaid SIM: 'I just need activation.'", "ko": "한국에서 미리 사 온 선불 유심을 꺼내며 'I just need activation.'이라고 한다." },
+        "statChanges": { "funds": 0, "mental": 0, "english": 0, "insight": 30, "stamina": 0 },
+        "feedback": { "en": "Their smile drops, but it's done. Saved money.", "ko": "직원의 미소가 사라지지만 개통은 완료. 돈 굳었습니다." },
+        "nextScenarioId": 12
+      }
+    ]
+  },
+  "12": {
+    "id": 12,
+    "level": 3,
+    "question": 2,
+    "description": {
+      "en": "At TD Bank. The rep asks, 'Did you book an appointment?'",
+      "ko": "TD 뱅크. 당당히 'I want to open an account'라고 하자 직원이 묻습니다. 'Did you book an appointment?'"
+    },
+    "choices": [
+      {
+        "text": { "en": "'No... Can I do it now?'", "ko": "'No... Can I do it now?'라며 쭈뼛쭈뼛 부탁한다." },
+        "statChanges": { "funds": 0, "mental": -10, "english": 0, "insight": 0, "stamina": -30 },
+        "feedback": { "en": "They squeeze you in, but you wait 1.5 hours.", "ko": "직원이 한숨을 쉬며 빈 시간에 끼워줌. 1시간 반을 대기함." },
+        "nextScenarioId": 13
+      },
+      {
+        "text": { "en": "'Appointment? Why?'", "ko": "'Appointment? Why?'라며 한국식 마인드로 따진다." },
+        "statChanges": { "funds": 0, "mental": -40, "english": 0, "insight": -20, "stamina": 0 },
+        "feedback": { "en": "'No walk-ins.' They turn you away.", "ko": "직원이 무표정으로 '예약 없이는 불가합니다'라며 쫓아냅니다. 내일 다시 와야 함." },
+        "nextScenarioId": 13
+      },
+      {
+        "text": { "en": "'Yes, I booked it at 2 PM.'", "ko": "(미리 예약해뒀지!) 'Yes, I booked it at 2 PM under Ken.'" },
+        "statChanges": { "funds": 0, "mental": 10, "english": 0, "insight": 20, "stamina": 0 },
+        "feedback": { "en": "Prepared student. You are seated in 5 minutes.", "ko": "준비된 유학생의 품격. 5분 만에 상담실로 들어갑니다." },
+        "nextScenarioId": 13
+      }
+    ]
+  },
+  "13": {
+    "id": 13,
+    "level": 3,
+    "question": 3,
+    "description": {
+      "en": "The teller speaks fast: 'So, you want Chequing or Savings or both?'",
+      "ko": "텔러가 엄청난 속도로 묻습니다. 'So, you want Chequing or Savings or both?'"
+    },
+    "choices": [
+      {
+        "text": { "en": "'Both, please.'", "ko": "(못 알아들었지만) 'Both, please.'라며 웃어 보인다." },
+        "statChanges": { "funds": -10, "mental": 0, "english": 0, "insight": -10, "stamina": 0 },
+        "feedback": { "en": "You open a Savings account you don't need and get confused.", "ko": "굳이 필요 없는 세이빙까지 열고 헷갈리기 시작합니다." },
+        "nextScenarioId": 14
+      },
+      {
+        "text": { "en": "'Is there a monthly fee for the Chequing account?'", "ko": "(핵심 질문) 'Is there a monthly fee for the Chequing account?'라고 묻는다." },
+        "statChanges": { "funds": 20, "mental": 0, "english": 20, "insight": 0, "stamina": 0 },
+        "feedback": { "en": "They give you a free Student account.", "ko": "직원이 유학생 무료 플랜(Student account)을 챙겨줍니다." },
+        "nextScenarioId": 14
+      },
+      {
+        "text": { "en": "'Just Chequing.'", "ko": "'Just Chequing.'이라고 말하고 빨리 끝내려 한다." },
+        "statChanges": { "funds": -15, "mental": 0, "english": 0, "insight": -10, "stamina": 0 },
+        "feedback": { "en": "You miss the student discount and pay a $15 monthly fee.", "ko": "유학생 혜택을 못 받아 월 수수료가 15불씩 나갑니다." },
+        "nextScenarioId": 14
+      }
+    ]
+  },
+  "14": {
+    "id": 14,
+    "level": 3,
+    "question": 4,
+    "description": {
+      "en": "Setting up your PIN. You input your familiar 6-digit birthdate.",
+      "ko": "비밀번호(PIN) 설정. 데빗 머신에 익숙한 6자리 생년월일을 꾹꾹 누른다."
+    },
+    "choices": [
+      {
+        "text": { "en": "Press 6 digits and hit enter.", "ko": "익숙한 6자리 비밀번호를 꾹꾹 누르고 확인을 누른다." },
+        "statChanges": { "funds": 0, "mental": -5, "english": 0, "insight": -10, "stamina": 0 },
+        "feedback": { "en": "'Error' pops up. The teller says it must be 4 digits. So embarrassing.", "ko": "'Error'가 뜨고 직원이 4자리만 입력하라고 함. 부끄러움이 몰려옴." },
+        "nextScenarioId": 15
+      },
+      {
+        "text": { "en": "Observe the machine and enter 4 digits.", "ko": "기계를 유심히 보고 캐나다 방식에 맞춰 4자리를 입력한다." },
+        "statChanges": { "funds": 0, "mental": 0, "english": 0, "insight": 10, "stamina": 0 },
+        "feedback": { "en": "Passed on the first try!", "ko": "한 번에 통과." },
+        "nextScenarioId": 15
+      },
+      {
+        "text": { "en": "Just put '1234'.", "ko": "헷갈려서 제일 쉬운 1234를 입력한다." },
+        "statChanges": { "funds": 0, "mental": -15, "english": 0, "insight": -20, "stamina": 0 },
+        "feedback": { "en": "The teller glares: 'Sir, please choose a safer number.'", "ko": "직원이 'Sir, please choose a safer number.'라고 정색함." },
+        "nextScenarioId": 15
+      }
+    ]
+  },
+  "15": {
+    "id": 15,
+    "level": 3,
+    "question": 5,
+    "description": {
+      "en": "Using your new Debit card to buy a $5 hot dog.",
+      "ko": "드디어 데빗카드를 받았습니다. 5불짜리 핫도그를 사 먹으려 합니다."
+    },
+    "choices": [
+      {
+        "text": { "en": "Insert the chip and enter the PIN.", "ko": "자랑스럽게 카드를 단말기에 꽂고 방금 만든 PIN 번호를 입력한다." },
+        "statChanges": { "funds": -5, "mental": 20, "english": 0, "insight": 0, "stamina": 0 },
+        "feedback": { "en": "First transaction needs chip authentication. Success!", "ko": "첫 결제라 칩을 꽂아 인증해야 함. 정상 결제 완료!" },
+        "nextScenarioId": 1 
+      },
+      {
+        "text": { "en": "Tap the card confidently.", "ko": "카드 뒷면을 단말기에 시크하게 탭(Tap)한다." },
+        "statChanges": { "funds": 0, "mental": -5, "english": 0, "insight": -10, "stamina": 0 },
+        "feedback": { "en": "'Tap is not working for the first transaction.' Declined.", "ko": "'Tap is not working for the first transaction.' 핀 번호부터 입력하라고 빠꾸먹음." },
+        "nextScenarioId": 1
+      },
+      {
+        "text": { "en": "'Do you take cash?'", "ko": "'Do you take cash?'라며 한국에서 환전해 온 현금을 낸다." },
+        "statChanges": { "funds": -5, "mental": 0, "english": 0, "insight": -5, "stamina": 0 },
+        "feedback": { "en": "They take it but are annoyed to give change.", "ko": "현금을 받기는 하지만 잔돈 거슬러주며 귀찮아함. 카드는 지갑 속에 고이 잠듦." },
+        "nextScenarioId": 1
+      }
+    ]
+  }
+}
