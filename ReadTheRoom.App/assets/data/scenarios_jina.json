@@ -1,0 +1,127 @@
+{
+  "character": "Jina",
+  "version": "2.6",
+  "nodes": [
+    {
+      "id": 1,
+      "backgroundKey": "airport",
+      "situation": { "ko": "공항, 눈물의 이별", "en": "Airport Farewell" },
+      "description": { "ko": "부모님이 떠난 자리에 정막이 흐릅니다. 마크가 걱정스러운 듯 묻습니다. \"지나, 괜찮아?\"", "en": "Silence follows as your parents leave. Mark asks with concern, \"Jina, are you okay?\"" },
+      "choices": [
+        { "type": "GROWTH", "text": { "ko": "억지로 웃으며 고개를 끄덕인다. \"응, 나 괜찮아.\"", "en": "Force a smile and nod. \"Yeah, I'm fine.\"" }, "nextScenarioId": 2 },
+        { "type": "STABLE", "text": { "ko": "마크의 손을 잡는다. \"조금만... 이렇게 있어도 돼?\"", "en": "Take Mark's hand. \"Can I stay like this... for a moment?\"" }, "nextScenarioId": 2 },
+        { "type": "REALIST", "text": { "ko": "\"나 지금 울어야 하는 타이밍 같은데... 왜 주차비부터 걱정하고 있지?\"", "en": "\"I should be crying right now... why am I worrying about parking fees?\"" }, "nextScenarioId": 2 }
+      ]
+    },
+    {
+      "id": 2,
+      "backgroundKey": "cafe",
+      "situation": { "ko": "팁의 무게", "en": "The Weight of Tipping" },
+      "description": { "ko": "첫 커피 주문. 결제 화면에 뜬 팁 선택지 앞에서 손가락이 멈춥니다.", "en": "First coffee order. Your finger stops in front of the tip options on the screen." },
+      "choices": [
+        { "type": "GROWTH", "text": { "ko": "현지 방식대로 18%를 선택한다. 익숙해져야 하니까.", "en": "Pick 18% like a local. I need to get used to this." }, "nextScenarioId": 3 },
+        { "type": "STABLE", "text": { "ko": "마크에게 적당한 금액을 물어본다.", "en": "Ask Mark for the appropriate amount." }, "nextScenarioId": 3 },
+        { "type": "REALIST", "text": { "ko": "\"커피값보다 팁이 더 고민되네. 나 너무 속물인가?\"", "en": "\"Worrying more about the tip than the coffee. Am I too materialistic?\"" }, "nextScenarioId": 3 }
+      ]
+    },
+    {
+      "id": 3,
+      "backgroundKey": "street",
+      "situation": { "ko": "길 찾기의 난관", "en": "Navigation Struggles" },
+      "description": { "ko": "구글 맵이 길을 잘못 알려줍니다. 낯선 골목 한복판에 덩그러니 남겨졌습니다.", "en": "Google Maps points the wrong way. You're left in the middle of a strange alley." },
+      "choices": [
+        { "type": "GROWTH", "text": { "ko": "지나가는 행인에게 용기 내어 길을 묻는다.", "en": "Pluck up the courage to ask a passerby for directions." }, "nextScenarioId": 4 },
+        { "type": "STABLE", "text": { "ko": "마크에게 위치를 전송하고 기다린다.", "en": "Send your location to Mark and wait." }, "nextScenarioId": 4 },
+        { "type": "REALIST", "text": { "ko": "\"데이터 아까운데... 그냥 감으로 가볼까?\"", "en": "\"Data is expensive... should I just trust my gut?\"" }, "nextScenarioId": 4 }
+      ]
+    },
+    {
+      "id": 4,
+      "backgroundKey": "grocery",
+      "situation": { "ko": "마트의 물가 충격", "en": "Grocery Price Shock" },
+      "description": { "ko": "식재료를 고르는데 가격표가 살벌합니다. 장바구니에 담기가 겁나네요.", "en": "Picking groceries, but the price tags are scary. Scared to put them in the basket." },
+      "choices": [
+        { "type": "GROWTH", "text": { "ko": "건강을 위해 신선한 채소를 담는다.", "en": "Pick fresh vegetables for your health." }, "nextScenarioId": 5 },
+        { "type": "STABLE", "text": { "ko": "마크가 좋아하는 간식을 슬쩍 끼워 넣는다.", "en": "Sneak in a snack that Mark likes." }, "nextScenarioId": 5 },
+        { "type": "REALIST", "text": { "ko": "\"환율 계산하니까 배가 안 고파지네. 다시 내려놓자.\"", "en": "\"Calculating the exchange rate makes me lose my appetite. Put it back.\"" }, "nextScenarioId": 5 }
+      ]
+    },
+    {
+      "id": 5,
+      "backgroundKey": "bus",
+      "situation": { "ko": "버스 안의 긴장", "en": "Tension on the Bus" },
+      "description": { "ko": "벨을 눌러야 하는데 타이밍을 놓쳤습니다. 다음 정거장은 너무 멉니다.", "en": "Missed the timing to pull the cord. The next stop is too far." },
+      "choices": [
+        { "type": "GROWTH", "text": { "ko": "기사님께 세워달라고 크게 외친다.", "en": "Shout loudly to the driver to stop." }, "nextScenarioId": 6 },
+        { "type": "STABLE", "text": { "ko": "그냥 다음 정거장에서 내려서 한참을 걷는다.", "en": "Just get off at the next stop and walk a long way." }, "nextScenarioId": 6 },
+        { "type": "REALIST", "text": { "ko": "\"걷는 것도 유산소지 뭐. 강제로 운동하게 됐네.\"", "en": "\"Walking is cardio, right? Guess I'm forced to exercise.\"" }, "nextScenarioId": 6 }
+      ]
+    },
+    {
+      "id": 6,
+      "backgroundKey": "bank",
+      "situation": { "ko": "계좌 개설", "en": "Opening a Bank Account" },
+      "description": { "ko": "은행 직원이 복잡한 약관을 설명합니다. 무슨 말인지 하나도 모르겠습니다.", "en": "Bank teller explains complex terms. You have no idea what they're saying." },
+      "choices": [
+        { "type": "GROWTH", "text": { "ko": "모르는 부분을 다시 천천히 말해달라고 부탁한다.", "en": "Ask them to explain the parts you don't know again slowly." }, "nextScenarioId": 7 },
+        { "type": "STABLE", "text": { "ko": "일단 알겠다고 고개를 끄덕이며 서명한다.", "en": "Just nod and sign, saying you understand." }, "nextScenarioId": 7 },
+        { "type": "REALIST", "text": { "ko": "\"수수료 면제만 되면 돼요. 핵심만 짚어주시죠.\"", "en": "\"As long as the fees are waived. Just give me the gist.\"" }, "nextScenarioId": 7 }
+      ]
+    },
+    {
+      "id": 7,
+      "backgroundKey": "park",
+      "situation": { "ko": "공원의 평화?", "en": "Peace in the Park?" },
+      "description": { "ko": "공원에서 쉬는데 캐나다 기러기(Goose)가 당신의 샌드위치를 노립니다.", "en": "Resting in the park, a Canada Goose eyes your sandwich." },
+      "choices": [
+        { "type": "GROWTH", "text": { "ko": "눈을 부라리며 내 음식을 지켜낸다.", "en": "Glared at it and defend your food." }, "nextScenarioId": 8 },
+        { "type": "STABLE", "text": { "ko": "샌드위치를 포기하고 자리를 피한다.", "en": "Give up the sandwich and leave the spot." }, "nextScenarioId": 8 },
+        { "type": "REALIST", "text": { "ko": "\"너도 먹고살기 힘들지? 반 떼어줄게, 합의 보자.\"", "en": "\"Hard to make a living, right? I'll give you half, let's settle.\"" }, "nextScenarioId": 8 }
+      ]
+    },
+    {
+      "id": 8,
+      "backgroundKey": "laundry",
+      "situation": { "ko": "코인 세탁실의 비극", "en": "Coin Laundry Tragedy" },
+      "description": { "ko": "세탁기가 멈췄습니다. 옷은 여전히 젖어 있고 동전은 다 떨어졌습니다.", "en": "The washer stopped. Clothes are still wet, and you're out of coins." },
+      "choices": [
+        { "type": "GROWTH", "text": { "ko": "관리실에 전화해 상황을 조목조목 설명한다.", "en": "Call the management and explain the situation clearly." }, "nextScenarioId": 9 },
+        { "type": "STABLE", "text": { "ko": "축축한 빨래를 들고 집으로 돌아와 넌다.", "en": "Go home with damp laundry and hang it up." }, "nextScenarioId": 9 },
+        { "type": "REALIST", "text": { "ko": "\"이게 밴쿠버식 자연 건조인가. 긍정적으로 생각하자.\"", "en": "\"Is this Vancouver-style natural drying? Let's stay positive.\"" }, "nextScenarioId": 9 }
+      ]
+    },
+    {
+      "id": 9,
+      "backgroundKey": "night_street",
+      "situation": { "ko": "레인쿠버의 첫 경험", "en": "Rainy Vancouver" },
+      "description": { "ko": "갑자기 비가 쏟아집니다. 젖은 옷만큼이나 기분도 가라앉습니다.", "en": "Suddenly, it pours. Your mood sinks along with your damp clothes." },
+      "choices": [
+        { "type": "GROWTH", "text": { "ko": "비를 맞으며 집까지 씩씩하게 걷는다.", "en": "Walk bravely home through the rain." }, "nextScenarioId": 10 },
+        { "type": "STABLE", "text": { "ko": "근처 카페로 들어가 비를 피한다.", "en": "Evade to a nearby cafe." }, "nextScenarioId": 10 },
+        { "type": "REALIST", "text": { "ko": "\"우산 사기엔 돈 아깝고... 비 맞으면 머리 빠지나?\"", "en": "\"Buying an umbrella is a waste of money... does rain cause hair loss?\"" }, "nextScenarioId": 10 }
+      ]
+    },
+    {
+      "id": 10,
+      "backgroundKey": "city_night",
+      "situation": { "ko": "첫 주의 마무리", "en": "End of Week 1" },
+      "description": { "ko": "창밖의 야경을 봅니다. \"지나야, 너 잘하고 있는 거니?\"", "en": "Looking at the night view. \"Jina, are you doing okay?\"" },
+      "choices": [
+        { "type": "GROWTH", "text": { "ko": "내일부터 바로 일자리를 찾겠다고 다짐한다.", "en": "Vow to start job hunting immediately tomorrow." }, "nextScenarioId": 11 },
+        { "type": "STABLE", "text": { "ko": "마크와 대화하며 따뜻한 위안을 얻는다.", "en": "Find warm comfort in talking with Mark." }, "nextScenarioId": 11 },
+        { "type": "REALIST", "text": { "ko": "\"고민해봤자 답 안 나오네. 일단 자고 내일 생각하자.\"", "en": "\"Thinking won't give me answers. Let's just sleep and think tomorrow.\"" }, "nextScenarioId": 11 }
+      ]
+    },
+    {
+      "id": 11,
+      "backgroundKey": "office",
+      "situation": { "ko": "SIN 넘버 신청", "en": "Applying for SIN" },
+      "description": { "ko": "두 시간을 기다린 끝에 차례가 왔습니다. 직원이 서류를 요청합니다.", "en": "After waiting two hours, it's finally your turn. Staff asks for papers." },
+      "choices": [
+        { "type": "GROWTH", "text": { "ko": "준비한 서류를 차분하게 하나씩 설명한다.", "en": "Calmly explain the prepared documents one by one." }, "nextScenarioId": 12 },
+        { "type": "STABLE", "text": { "ko": "긴장한 기색을 내비치며 마크를 바라본다.", "en": "Look at Mark, showing your nervousness." }, "nextScenarioId": 12 },
+        { "type": "REALIST", "text": { "ko": "\"이 번호 하나 받으려고 반나절을 버렸네. 시급으로 치면 얼마야?\"", "en": "\"Wasted half a day for just one number. How much is that in hourly wage?\"" }, "nextScenarioId": 12 }
+      ]
+    }
+  ]
+}
