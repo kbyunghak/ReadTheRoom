@@ -64,7 +64,7 @@ export default function WarningScreen({ onComplete }: Props) {
     <Pressable style={styles.pressable} onPress={finish}>
       {isReady ? (
         <ImageBackground
-          source={require('../assets/background/dream.png')}
+          source={require('../assets/images/background/dream.png')}
           style={styles.background}
           imageStyle={styles.backgroundImage}
         >

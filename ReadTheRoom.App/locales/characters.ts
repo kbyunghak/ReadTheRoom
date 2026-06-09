@@ -16,8 +16,8 @@ export const CHARACTERS: Character[] = [
     name: { ko: '지나', en: 'Jina' },
     age: { ko: '32세 (여)', en: '32 (F)' },
     jobTitle: { ko: '국제결혼한 새댁', en: 'Newlywed in an International Marriage' },
-    image: require('../assets/characters/jina.png'),
-    cardImage: require('../assets/characters/jina_card.png'),
+    image: require('../assets/images/characters/jina.png'),
+    cardImage: require('../assets/images/characters/jina_card.png'),
     description: {
       ko: [
         '사회생활 만렙처럼 보이지만, 임신과 정착 스트레스가 겹치며 가장 먼저 흔들릴 수 있는 캐릭터입니다.',
@@ -47,8 +47,8 @@ export const CHARACTERS: Character[] = [
     name: { ko: '켄', en: 'Ken' },
     age: { ko: '20세 (남)', en: '20 (M)' },
     jobTitle: { ko: '유학생', en: 'International Student' },
-    image: require('../assets/characters/ken.png'),
-    cardImage: require('../assets/characters/ken_card.png'),
+    image: require('../assets/images/characters/ken.png'),
+    cardImage: require('../assets/images/characters/ken_card.png'),
     description: {
       ko: [
         '맨땅에 헤딩하듯 밴쿠버에 도착한 20세 유학생입니다.',
@@ -78,8 +78,8 @@ export const CHARACTERS: Character[] = [
     name: { ko: '에이미', en: 'Amy' },
     age: { ko: '26세 (여)', en: '26 (F)' },
     jobTitle: { ko: '워홀러 겸 바리스타', en: 'Working Holiday Barista' },
-    image: require('../assets/characters/amy.png'),
-    cardImage: require('../assets/characters/amy_card.png'),
+    image: require('../assets/images/characters/amy.png'),
+    cardImage: require('../assets/images/characters/amy_card.png'),
     description: {
       ko: [
         '낯선 곳에도 빠르게 섞여드는 워홀러이자 바리스타입니다.',
@@ -109,8 +109,8 @@ export const CHARACTERS: Character[] = [
     name: { ko: '준', en: 'Jun' },
     age: { ko: '50세 (남)', en: '50 (M)' },
     jobTitle: { ko: '물류센터 직원', en: 'Warehouse Worker' },
-    image: require('../assets/characters/jun.png'),
-    cardImage: require('../assets/characters/jun_card.png'),
+    image: require('../assets/images/characters/jun.png'),
+    cardImage: require('../assets/images/characters/jun_card.png'),
     description: {
       ko: [
         '물류센터를 버티는 생계형 가장으로, 처음엔 누구보다 단단해 보입니다.',
@@ -136,8 +136,8 @@ export const CHARACTERS: Character[] = [
     name: { ko: '소라', en: 'Sora' },
     age: { ko: '36세 (여)', en: '36 (F)' },
     jobTitle: { ko: '유학맘', en: 'Study Abroad Mom' },
-    image: require('../assets/characters/sora.png'),
-    cardImage: require('../assets/characters/sora_card.png'),
+    image: require('../assets/images/characters/sora.png'),
+    cardImage: require('../assets/images/characters/sora_card.png'),
     description: {
       ko: [
         '아이를 지키는 것이 전부인 보호자형 캐릭터입니다.',
@@ -163,8 +163,8 @@ export const CHARACTERS: Character[] = [
     name: { ko: '윤', en: 'Yoon' },
     age: { ko: '68세 (여)', en: '68 (F)' },
     jobTitle: { ko: '부모 초청 이민 할머니', en: 'Family-Sponsored Grandmother' },
-    image: require('../assets/characters/yoon.png'),
-    cardImage: require('../assets/characters/yoon_card.png'),
+    image: require('../assets/images/characters/yoon.png'),
+    cardImage: require('../assets/images/characters/yoon_card.png'),
     description: {
       ko: [
         '직접 움직이는 힘은 약하지만, 사람의 기류와 권력 지형을 읽는 데는 누구보다 강합니다.',

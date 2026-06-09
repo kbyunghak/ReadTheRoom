@@ -93,21 +93,21 @@ const resolveLocalizedScenarioTitle = (scenario: Scenario, lang: 'en' | 'ko') =>
 };
 
 const BACKGROUND_IMAGES: Record<BackgroundKey, ImageSourcePropType> = {
-  adaptation: require('../../assets/background/adaptation.png'),
-  airport: require('../../assets/background/airport.png'),
-  office: require('../../assets/background/office.png'),
-  house: require('../../assets/background/house.png'),
-  cafe: require('../../assets/background/cafe.png'),
-  bank: require('../../assets/background/bank.png'),
-  busstop: require('../../assets/background/busstop.png'),
-  night_street: require('../../assets/background/night_street.png'),
-  nightstreet_ppl: require('../../assets/background/nightstreet_ppl.png'),
-  city_night: require('../../assets/background/city_night.png'),
-  observatory_nature: require('../../assets/background/observatory_nature.png'),
-  partyroom_lonely: require('../../assets/background/partyroom_lonely.png'),
-  street: require('../../assets/background/busstop.png'),
-  mart: require('../../assets/background/cafe.png'),
-  arrival: require('../../assets/background/airport.png'),
+  adaptation: require('../../assets/images/background/adaptation.png'),
+  airport: require('../../assets/images/background/airport.png'),
+  office: require('../../assets/images/background/office.png'),
+  house: require('../../assets/images/background/house.png'),
+  cafe: require('../../assets/images/background/cafe.png'),
+  bank: require('../../assets/images/background/bank.png'),
+  busstop: require('../../assets/images/background/busstop.png'),
+  night_street: require('../../assets/images/background/night_street.png'),
+  nightstreet_ppl: require('../../assets/images/background/nightstreet_ppl.png'),
+  city_night: require('../../assets/images/background/city_night.png'),
+  observatory_nature: require('../../assets/images/background/observatory_nature.png'),
+  partyroom_lonely: require('../../assets/images/background/partyroom_lonely.png'),
+  street: require('../../assets/images/background/busstop.png'),
+  mart: require('../../assets/images/background/mart.png'),
+  arrival: require('../../assets/images/background/airport.png'),
 };
 
 const BACKGROUND_KEY_ALIASES: Record<string, BackgroundKey> = {

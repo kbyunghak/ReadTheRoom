@@ -88,7 +88,7 @@ export default function SplashScreen({ onLoadComplete }: Props) {
       >
         {isBackgroundReady ? (
           <Image
-            source={require('../assets/UI/main.png')}
+            source={require('../assets/images/main.png')}
             style={{
               position: 'absolute',
               top: 0,

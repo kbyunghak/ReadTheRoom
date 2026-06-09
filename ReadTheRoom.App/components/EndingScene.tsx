@@ -57,12 +57,12 @@ const END_TEXT = {
 } as const;
 
 const FAILURE_OVERLAYS: Partial<Record<string, ImageSourcePropType>> = {
-  ken: require('../assets/characters/ken_end.png'),
-  amy: require('../assets/characters/amy_end.png'),
-  sora: require('../assets/characters/sora_end.png'),
-  jun: require('../assets/characters/jun_end.png'),
-  yoon: require('../assets/characters/yoon_end.png'),
-  jina: require('../assets/characters/jina_end.png'),
+  ken: require('../assets/images/characters/ken_end.png'),
+  amy: require('../assets/images/characters/amy_end.png'),
+  sora: require('../assets/images/characters/sora_end.png'),
+  jun: require('../assets/images/characters/jun_end.png'),
+  yoon: require('../assets/images/characters/yoon_end.png'),
+  jina: require('../assets/images/characters/jina_end.png'),
 };
 
 export default function EndingScene({
@@ -78,7 +78,7 @@ export default function EndingScene({
   const [showFailureRecap, setShowFailureRecap] = useState(false);
   const text = END_TEXT[lang];
   const failureOverlay = variant === 'failure' && characterId ? FAILURE_OVERLAYS[characterId] : undefined;
-  const backgroundSource = failureOverlay ?? require('../assets/background/end.png');
+  const backgroundSource = failureOverlay ?? require('../assets/images/background/end.png');
 
   return (
     <ImageBackground
