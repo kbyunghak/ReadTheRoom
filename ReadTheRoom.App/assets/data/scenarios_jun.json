@@ -1,0 +1,180 @@
+{
+  "character": "Jina",
+  "version": "2.0",
+  "startScenarioId": 1,
+  "phases": [
+    {
+      "phaseId": "1.1",
+      "title": {
+        "ko": "첫 번째 주의 적응",
+        "en": "First Week Adjustment"
+      },
+      "nodes": [
+        {
+          "id": 1,
+          "type": "NORMAL",
+          "backgroundKey": "airport",
+          "situation": { "ko": "공항, 눈물의 이별", "en": "Airport Farewell" },
+          "description": { "ko": "부모님이 한국으로 떠나고 마크와 둘만 남았습니다. 마크가 괜찮냐고 묻습니다.", "en": "Parents left for Korea, and you're alone with Mark. He asks if you're okay." },
+          "isPhaseEnd": false, "isEnding": false,
+          "choices": [
+            {
+              "type": "GROWTH",
+              "text": { "ko": "나 벌써 로컬인가 봐!", "en": "Maybe I'm already a local!" },
+              "feedback": { "ko": "의욕이 넘칩니다! 하지만 긴장이 풀리자 피로가 몰려옵니다.", "en": "Full of energy! But fatigue hits as the tension eases." },
+              "statChanges": { "funds": 0, "mental": -5, "english": 5, "insight": 5, "stamina": -12, "relation": 0 },
+              "branchTags": ["P11_AMBITIOUS"], "nextScenarioId": 2
+            },
+            {
+              "type": "STABLE",
+              "text": { "ko": "아직은 좀 실감이 안 나.", "en": "It just hasn't sunk in yet." },
+              "feedback": { "ko": "마음을 차분히 추스릅니다. 정막한 공기가 내려앉습니다.", "en": "You calm yourself. A quiet air settles in." },
+              "statChanges": { "funds": 0, "mental": 10, "english": 0, "insight": -10, "stamina": 5, "relation": 5 },
+              "branchTags": ["P11_STABLE"], "nextScenarioId": 2
+            },
+            {
+              "type": "REALIST",
+              "text": { "ko": "주차비 아끼게 빨리 나갈까?", "en": "Should we leave quickly to save on parking?" },
+              "feedback": { "ko": "지갑은 지켰지만 마크가 당신을 멍하게 쳐다봅니다.", "en": "Atmosphere killer! Saved money, but Mark stares at you blankly." },
+              "statChanges": { "funds": 5, "mental": 2, "english": 0, "insight": -5, "stamina": 0, "relation": -10 },
+              "branchTags": ["P11_SOCIAL_AVOID"], "nextScenarioId": 2
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "NORMAL",
+          "backgroundKey": "cafe",
+          "situation": { "ko": "팁의 공포", "en": "Tip Terror" },
+          "description": { "ko": "결제기 화면의 팁 선택지. 뒤에 선 사람들의 시선이 느껴집니다.", "en": "Tip options on screen. You feel the glares from those behind." },
+          "isPhaseEnd": false, "isEnding": false,
+          "choices": [
+            {
+              "type": "GROWTH",
+              "text": { "ko": "18%를 누른다.", "en": "Hit 18%." },
+              "feedback": { "ko": "현지 매너를 배웁니다! 밴쿠버의 매운맛을 지갑으로 느낍니다.", "en": "Learning local manners! Your wallet feels the Vancouver heat." },
+              "statChanges": { "funds": -15, "mental": 0, "english": 0, "insight": 10, "stamina": 0, "relation": 5 },
+              "branchTags": ["P11_TIP_ADAPT"], "nextScenarioId": 3
+            },
+            {
+              "type": "STABLE",
+              "text": { "ko": "마크에게 대신 계산을 부탁한다.", "en": "Ask Mark to pay instead." },
+              "feedback": { "ko": "위기를 넘겼지만 마크의 표정이 조금 어둡습니다.", "en": "Avoided the crisis, but Mark looks a bit down." },
+              "statChanges": { "funds": 0, "mental": 10, "english": 0, "insight": -5, "stamina": 0, "relation": -10 },
+              "branchTags": ["P11_RELY_ON_MARK"], "nextScenarioId": 3
+            },
+            {
+              "type": "REALIST",
+              "text": { "ko": "기계가 버벅이는 척 'No Tip'.", "en": "Pretend the machine lagged and hit 'No Tip'." },
+              "feedback": { "ko": "지갑은 지켰지만 점원의 차가운 시선이 등에 꽂힙니다.", "en": "Saved money, but the server's cold stare stings." },
+              "statChanges": { "funds": 15, "mental": -15, "english": 0, "insight": 0, "stamina": 0, "relation": -25 },
+              "branchTags": ["P11_NO_TIP"], "nextScenarioId": 3
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "type": "NORMAL",
+          "backgroundKey": "night_street",
+          "situation": { "ko": "레인쿠버", "en": "Rainy Walk" },
+          "description": { "ko": "비가 쏟아집니다. 옷이 젖으니 마음도 처지네요.", "en": "Pouring rain. Damp clothes, damp mood." },
+          "isPhaseEnd": false, "isEnding": false,
+          "choices": [
+            {
+              "type": "GROWTH",
+              "text": { "ko": "빗속을 뚫고 씩씩하게 걷는다.", "en": "Walk bravely through the rain." },
+              "feedback": { "ko": "강해진 기분입니다! 감기는 조심하세요.", "en": "Feeling stronger! But watch out for a cold." },
+              "statChanges": { "funds": 0, "mental": -10, "english": 0, "insight": 5, "stamina": -20, "relation": 0 },
+              "branchTags": ["P11_RAINY_HARD"], "nextScenarioId": 10
+            },
+            {
+              "type": "STABLE",
+              "text": { "ko": "예쁜 카페로 피신한다.", "en": "Evade to a cafe." },
+              "feedback": { "ko": "와플 한 입에 기분이 풀립니다.", "en": "A bite of waffle cheers you up." },
+              "statChanges": { "funds": -12, "mental": 20, "english": 0, "insight": 0, "stamina": 5, "relation": 0 },
+              "branchTags": ["P11_RAINY_CAFE"], "nextScenarioId": 10
+            },
+            {
+              "type": "REALIST",
+              "text": { "ko": "가장 빨리 오는 버스에 탄다.", "en": "Hop on the first bus that arrives." },
+              "feedback": { "ko": "비용은 들었지만 쾌적하게 귀가합니다.", "en": "Cost some money, but home comfortably." },
+              "statChanges": { "funds": -5, "mental": 5, "english": 0, "insight": 5, "stamina": 10, "relation": 0 },
+              "branchTags": ["P11_RAINY_BUS"], "nextScenarioId": 10
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "type": "NORMAL",
+          "backgroundKey": "city_night",
+          "situation": { "ko": "첫 주의 마무리", "en": "End of First Week" },
+          "description": { "ko": "나, 잘하고 있는 걸까?", "en": "Am I doing okay?" },
+          "isPhaseEnd": true, "isEnding": false,
+          "choices": [
+            {
+              "type": "GROWTH",
+              "text": { "ko": "내일부터 구직 활동 시작!", "en": "Job hunting starts tomorrow!" },
+              "feedback": { "ko": "본격적인 서바이벌이 시작됩니다.", "en": "Real survival starts now." },
+              "statChanges": { "funds": 0, "mental": -5, "english": 0, "insight": 15, "stamina": -25, "relation": 0 },
+              "branchTags": ["P11_WEEK1_END_AMBITIOUS"], "nextScenarioId": 11
+            },
+            {
+              "type": "STABLE",
+              "text": { "ko": "마크와 영화를 보며 쉰다.", "en": "Rest watching a movie with Mark." },
+              "feedback": { "ko": "따뜻한 휴식이 에너지를 채워줍니다.", "en": "A warm rest recharges your energy." },
+              "statChanges": { "funds": -5, "mental": 20, "english": 0, "insight": -10, "stamina": 10, "relation": 15 },
+              "branchTags": ["P11_WEEK1_END_REST"], "nextScenarioId": 11
+            },
+            {
+              "type": "REALIST",
+              "text": { "ko": "가계부를 정리한다.", "en": "Organize the ledger." },
+              "feedback": { "ko": "현실을 직시하니 정신이 번쩍 듭니다.", "en": "Facing reality snaps you back to focus." },
+              "statChanges": { "funds": 0, "mental": -10, "english": 0, "insight": 20, "stamina": -5, "relation": 0 },
+              "branchTags": ["P11_WEEK1_END_LEDGER"], "nextScenarioId": 11
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phaseId": "1.2",
+      "title": {
+        "ko": "본격적인 서바이벌",
+        "en": "Real Survival Begins"
+      },
+      "nodes": [
+        {
+          "id": 11,
+          "type": "NORMAL",
+          "backgroundKey": "office",
+          "situation": { "ko": "SIN 넘버 신청", "en": "Applying for SIN" },
+          "description": { "ko": "본격적인 구직을 위해 서비스 캐나다를 방문했습니다. 대기 줄이 어마어마합니다.", "en": "Visited Service Canada for your SIN. The line is incredibly long." },
+          "isPhaseEnd": false, "isEnding": false,
+          "choices": [
+            {
+              "type": "GROWTH",
+              "text": { "ko": "기다리는 동안 채용 공고를 검색한다.", "en": "Search for job postings while waiting." },
+              "feedback": { "ko": "시간을 효율적으로 썼습니다! 의욕이 앞서네요.", "en": "Used time efficiently! You're feeling motivated." },
+              "statChanges": { "funds": 0, "mental": -5, "english": 5, "insight": 15, "stamina": -10, "relation": 0 },
+              "branchTags": ["P12_JOB_HUNT_START"], "nextScenarioId": 12
+            },
+            {
+              "type": "STABLE",
+              "text": { "ko": "마크에게 전화를 걸어 수다를 떤다.", "en": "Call Mark and have a chat." },
+              "feedback": { "ko": "지루한 대기 시간이 금방 지나갑니다.", "en": "The boring wait time flies by." },
+              "statChanges": { "funds": 0, "mental": 10, "english": 0, "insight": -5, "stamina": 5, "relation": 15 },
+              "branchTags": ["P12_TALK_MARK"], "nextScenarioId": 12
+            },
+            {
+              "type": "REALIST",
+              "text": { "ko": "근처 카페에서 노트북으로 서류를 정리한다.", "en": "Organize documents on a laptop at a nearby cafe." },
+              "feedback": { "ko": "효율적이지만 커피값 지출이 발생했습니다.", "en": "Efficient, but you spent money on coffee." },
+              "statChanges": { "funds": -7, "mental": 5, "english": 0, "insight": 10, "stamina": 0, "relation": 0 },
+              "branchTags": ["P12_CAFE_WORK"], "nextScenarioId": 12
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
