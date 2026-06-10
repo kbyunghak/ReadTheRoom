@@ -17,6 +17,9 @@ export type ResultStatEntry = {
 export type ResultCardData = {
   selectedText: string;
   feedbackText: string;
+  resultTone: 'good' | 'mid' | 'bad';
+  resultLabel: string;
+  resultSummary: string;
   changedStats: ResultStatEntry[];
   tipText: string | null;
 };
@@ -61,13 +64,41 @@ export const getChangedStatEntries = (statChanges: ScenarioStatChanges): ResultS
 
 export const getLocalizedTip = (tip: LocalizedText | undefined, lang: ResultCardLanguage) => tip?.[lang] ?? null;
 
+export const getResultTone = (statChanges: ScenarioStatChanges): ResultCardData['resultTone'] => {
+  const total = Object.values(statChanges).reduce((sum, value) => sum + (value ?? 0), 0);
+  if (total > 0) return 'good';
+  if (total < 0) return 'bad';
+  return 'mid';
+};
+
+const RESULT_COPY = {
+  ko: {
+    good: { label: '성공', summary: '상황을 잘 풀어냈어요. 좋은 흐름을 이어가고 있습니다.' },
+    mid: { label: '보통', summary: '무난하게 넘어갔어요. 다음 선택에서 흐름을 바꿀 수 있습니다.' },
+    bad: { label: '아쉬움', summary: '조금 흔들렸지만 괜찮아요. 다음 선택에서 만회할 수 있습니다.' },
+  },
+  en: {
+    good: { label: 'Success', summary: 'You handled the situation well and kept the momentum going.' },
+    mid: { label: 'Steady', summary: 'You made it through. The next choice can still shift the direction.' },
+    bad: { label: 'Setback', summary: 'That was a difficult moment, but the next choice is another chance.' },
+  },
+} as const;
+
 export const buildResultCardData = (
   choice: ScenarioChoice,
   lang: ResultCardLanguage,
   tip?: LocalizedText,
-): ResultCardData => ({
-  selectedText: buildSelectedChoiceText(choice.text[lang]),
-  feedbackText: choice.feedback[lang],
-  changedStats: getChangedStatEntries(choice.statChanges),
-  tipText: getLocalizedTip(tip, lang),
-});
+): ResultCardData => {
+  const resultTone = getResultTone(choice.statChanges);
+  const resultCopy = RESULT_COPY[lang][resultTone];
+
+  return {
+    selectedText: buildSelectedChoiceText(choice.text[lang]),
+    feedbackText: choice.feedback[lang],
+    resultTone,
+    resultLabel: resultCopy.label,
+    resultSummary: resultCopy.summary,
+    changedStats: getChangedStatEntries(choice.statChanges),
+    tipText: getLocalizedTip(tip, lang),
+  };
+};

@@ -30,8 +30,10 @@ export type ScenarioChoice = {
 export type Scenario = {
   id: number;
   type?: string;
+  week?: number;
   day?: number;
   episode?: number;
+  mainEpisode?: number;
   title?: LocalizedText;
   tip?: LocalizedText;
   situation?: string | LocalizedText;

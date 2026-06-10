@@ -15,8 +15,10 @@ type Choice = {
 type ScenarioNode = {
   id: number;
   type: 'NORMAL' | 'SUMMARY' | 'ENDING';
+  week?: number;
   day: number;
   episode: number;
+  mainEpisode?: number;
   statChanges?: StatChanges;
   nextScenarioId?: number;
   choices?: Choice[];
@@ -175,4 +177,31 @@ run('Ken exception branch is reachable and returns to the main flow', () => {
   assert.ok(branchSource?.choices?.some((choice) => choice.nextScenarioId === 9001));
   assert.ok(exceptionNode);
   assert.ok(exceptionNode.choices?.every((choice) => choice.nextScenarioId === 23));
+});
+
+run('Ken nodes preserve week and episode metadata', () => {
+  assert.ok(nodes.every((node) => node.week === 1));
+  assert.ok(nodes.every((node) => typeof node.episode === 'number'));
+});
+
+run('Ken Day 1 and Day 2 main episode counts match the UI sequence', () => {
+  const mainEpisodesForDay = (day: number) =>
+    nodes
+      .filter(
+        (node) =>
+          node.day === day &&
+          node.type === 'NORMAL' &&
+          typeof node.mainEpisode === 'number',
+      )
+      .map((node) => node.mainEpisode)
+      .sort((left, right) => left! - right!);
+
+  assert.deepEqual(mainEpisodesForDay(1), Array.from({ length: 19 }, (_, index) => index + 1));
+  assert.deepEqual(mainEpisodesForDay(2), Array.from({ length: 10 }, (_, index) => index + 1));
+});
+
+run('Ken special and SUMMARY nodes do not have main episodes', () => {
+  assert.equal(nodesById.get(9001)?.mainEpisode, undefined);
+  assert.equal(nodesById.get(1001)?.mainEpisode, undefined);
+  assert.equal(nodesById.get(1002)?.mainEpisode, undefined);
 });

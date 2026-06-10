@@ -5,6 +5,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 1,
+      "week": 1,
+      "mainEpisode": 1,
       "title": { "ko": "입국 심사", "en": "YVR Airport, The Dreaded Immigration" },
       "backgroundKey": "airport",
       "description": {
@@ -40,6 +42,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 2,
+      "week": 1,
+      "mainEpisode": 2,
       "title": { "ko": "수상한 호의 (수하물 찾기)", "en": "Suspicious Kindness" },
       "backgroundKey": "arrival",
       "description": {
@@ -75,6 +79,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 3,
+      "week": 1,
+      "mainEpisode": 3,
       "title": { "ko": "이동 수단 선택의 기로", "en": "Choosing a Ride" },
       "backgroundKey": "airport_exit",
       "description": {
@@ -110,6 +116,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 4,
+      "week": 1,
+      "mainEpisode": 4,
       "title": { "ko": "기숙사 리셉션 스몰토크", "en": "Dorm Reception Small Talk" },
       "backgroundKey": "reception",
       "description": {
@@ -145,6 +153,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 5,
+      "week": 1,
+      "mainEpisode": 5,
       "title": { "ko": "룸메이트의 위험한 유혹", "en": "Roommate's Dangerous Temptation" },
       "backgroundKey": "dorm_room",
       "description": {
@@ -180,6 +190,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 6,
+      "week": 1,
+      "mainEpisode": 6,
       "title": { "ko": "팀홀튼, 첫 주문의 공포", "en": "Tim Hortons, The First Order" },
       "backgroundKey": "tim_hortons",
       "description": {
@@ -215,6 +227,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 7,
+      "week": 1,
+      "mainEpisode": 7,
       "title": { "ko": "동전 폭격과 멘붕", "en": "The Coin Bomb" },
       "backgroundKey": "tim_hortons",
       "description": {
@@ -250,6 +264,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 8,
+      "week": 1,
+      "mainEpisode": 8,
       "title": { "ko": "노숙자의 접근", "en": "Homeless Approach" },
       "backgroundKey": "street",
       "description": {
@@ -285,6 +301,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 9,
+      "week": 1,
+      "mainEpisode": 9,
       "title": { "ko": "도난당한 자리와 인종차별", "en": "Stolen Seat and Racism" },
       "backgroundKey": "cafe_outdoor",
       "description": {
@@ -320,6 +338,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 10,
+      "week": 1,
+      "mainEpisode": 10,
       "title": { "ko": "길 잃음과 차가운 거절", "en": "Lost and Cold Rejection" },
       "backgroundKey": "campus_night",
       "description": {
@@ -343,8 +363,8 @@
         },
         {
           "type": "REALIST",
-          "text": { "ko": "한국인 같은 사람에게 한국말로 묻는다.", "en": "Ask someone who looks Korean in Korean." },
-          "feedback": { "ko": "중국계 캐네디언이었습니다. \"한국말 못 해\"라는 차가운 답만 돌아옵니다.", "en": "They were Chinese-Canadian. A cold \"I don't speak Korean\" is all you get." },
+          "text": { "ko": "K-pop 키링을 단 학생에게 한국어로 길을 물어본다.", "en": "Ask a student with a K-pop keyring for directions in Korean." },
+          "feedback": { "ko": "K-pop을 좋아하는 학생이었지만 한국어를 할 줄 아는 건 아니었습니다. 익숙한 단서만 보고 바로 단정하기보다는, 먼저 짧게 영어로 도움을 요청하는 편이 더 안전합니다.", "en": "They liked K-pop, but that didn’t mean they could speak Korean. Instead of assuming based on a familiar clue, it’s safer to ask for help in simple English first." },
           "statChanges": { "funds": 0, "mental": -20, "english": -5, "insight": -30, "stamina": -10, "relation": -10 },
           "nextScenarioId": 11
         }
@@ -355,6 +375,7 @@
       "type": "SUMMARY",
       "day": 1,
       "episode": 11,
+      "week": 1,
       "title": { "ko": "Day 1 회고: 밴쿠버의 첫인상", "en": "Day 1 Reflection: First Impressions" },
       "backgroundKey": "city_night",
       "description": {
@@ -374,6 +395,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 11,
+      "week": 1,
+      "mainEpisode": 11,
       "title": { "ko": "마트 장보기, 단위의 늪", "en": "Grocery Shopping, Units Trap" },
       "backgroundKey": "mart",
       "description": {
@@ -409,6 +432,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 12,
+      "week": 1,
+      "mainEpisode": 12,
       "title": { "ko": "셀프 계산대의 비명", "en": "Scream of the Self-Checkout" },
       "backgroundKey": "mart",
       "description": {
@@ -444,6 +469,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 13,
+      "week": 1,
+      "mainEpisode": 13,
       "title": { "ko": "휴대폰 개통, 옵션의 늪", "en": "Mobile Plan, The Option Swamp" },
       "backgroundKey": "office",
       "description": {
@@ -479,6 +506,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 14,
+      "week": 1,
+      "mainEpisode": 14,
       "title": { "ko": "은행 계좌 개설과 텔러의 미소", "en": "Opening a Bank Account" },
       "backgroundKey": "office",
       "description": {
@@ -514,6 +543,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 15,
+      "week": 1,
+      "mainEpisode": 15,
       "title": { "ko": "동아리 박람회, 인싸의 꿈", "en": "Club Fair, Dream of an Insider" },
       "backgroundKey": "campus",
       "description": {
@@ -549,6 +580,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 16,
+      "week": 1,
+      "mainEpisode": 16,
       "title": { "ko": "로컬 펍(Pub)의 높은 문턱", "en": "The High Threshold of a Local Pub" },
       "backgroundKey": "pub",
       "description": {
@@ -584,6 +617,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 17,
+      "week": 1,
+      "mainEpisode": 17,
       "title": { "ko": "취객의 니하오 공격", "en": "Drunkard's 'Ni-hao' Attack" },
       "backgroundKey": "pub",
       "description": {
@@ -619,6 +654,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 18,
+      "week": 1,
+      "mainEpisode": 18,
       "title": { "ko": "옆방의 광란, 잠 못 드는 밤", "en": "Wild Neighbors, Sleepless Night" },
       "backgroundKey": "dorm_room",
       "description": {
@@ -654,6 +691,8 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 19,
+      "week": 1,
+      "mainEpisode": 19,
       "title": { "ko": "엄마와의 통화, 무너진 마음", "en": "Call with Mom, Heart Crumbling" },
       "backgroundKey": "dorm_room",
       "description": {
@@ -691,6 +730,8 @@
       "type": "NORMAL",
       "day": 2,
       "episode": 1,
+      "week": 1,
+      "mainEpisode": 1,
       "title": { "ko": "낯선 아침, 빈손의 허전함", "en": "Strange Morning, Empty Hands" },
       "backgroundKey": "house",
       "description": {
@@ -730,6 +771,8 @@
       "type": "NORMAL",
       "day": 2,
       "episode": 2,
+      "week": 1,
+      "mainEpisode": 2,
       "title": { "ko": "거대 마트의 미로", "en": "Maze of the Giant Mart" },
       "backgroundKey": "mart",
       "description": {
@@ -769,6 +812,8 @@
       "type": "NORMAL",
       "day": 2,
       "episode": 3,
+      "week": 1,
+      "mainEpisode": 3,
       "title": { "ko": "결제대의 긴장감", "en": "Tension at the Checkout" },
       "backgroundKey": "mart",
       "description": {
@@ -808,6 +853,7 @@
       "type": "NORMAL",
       "day": 2,
       "episode": 3.1,
+      "week": 1,
       "title": { "ko": "마트 결제대의 식은땀", "en": "Sweat at the Checkout" },
       "backgroundKey": "mart",
       "description": {
@@ -847,6 +893,8 @@
       "type": "NORMAL",
       "day": 2,
       "episode": 4,
+      "week": 1,
+      "mainEpisode": 4,
       "title": { "ko": "세상과의 연결, 통신사 매장", "en": "Connecting to the World, Mobile Shop" },
       "backgroundKey": "bank",
       "description": {
@@ -886,6 +934,8 @@
       "type": "NORMAL",
       "day": 2,
       "episode": 5,
+      "week": 1,
+      "mainEpisode": 5,
       "title": { "ko": "복잡한 계약서의 늪", "en": "Swamp of Complex Contracts" },
       "backgroundKey": "office",
       "description": {
@@ -925,6 +975,8 @@
       "type": "NORMAL",
       "day": 2,
       "episode": 6,
+      "week": 1,
+      "mainEpisode": 6,
       "title": { "ko": "개통 완료, 세상과의 연결", "en": "Activation Complete" },
       "backgroundKey": "office",
       "description": {
@@ -960,6 +1012,8 @@
       "type": "NORMAL",
       "day": 2,
       "episode": 7,
+      "week": 1,
+      "mainEpisode": 7,
       "title": { "ko": "밴쿠버에서의 첫 외식", "en": "First Dining Out in Vancouver" },
       "backgroundKey": "cafe",
       "description": {
@@ -999,6 +1053,8 @@
       "type": "NORMAL",
       "day": 2,
       "episode": 8,
+      "week": 1,
+      "mainEpisode": 8,
       "title": { "ko": "팁, 보이지 않는 가격", "en": "Tips, the Invisible Price" },
       "backgroundKey": "cafe",
       "description": {
@@ -1038,6 +1094,8 @@
       "type": "NORMAL",
       "day": 2,
       "episode": 9,
+      "week": 1,
+      "mainEpisode": 9,
       "title": { "ko": "밴쿠버의 밤거리, 정착의 무게", "en": "Vancouver Night, Weight of Settling" },
       "backgroundKey": "night_street",
       "description": {
@@ -1073,6 +1131,8 @@
       "type": "NORMAL",
       "day": 2,
       "episode": 10,
+      "week": 1,
+      "mainEpisode": 10,
       "title": { "ko": "다시 돌아온 집, 내일의 기도", "en": "Home Again, Prayer for Tomorrow" },
       "backgroundKey": "house",
       "description": {
@@ -1108,6 +1168,7 @@
       "type": "SUMMARY",
       "day": 2,
       "episode": 11,
+      "week": 1,
       "title": { "ko": "Day 2 회고: 생존 기초 다지기", "en": "Day 2 Reflection" },
       "backgroundKey": "city_night",
       "description": {

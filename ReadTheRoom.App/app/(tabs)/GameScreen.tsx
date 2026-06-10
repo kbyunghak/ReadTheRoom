@@ -33,6 +33,11 @@ import { buildSituationSummary, type SituationSummary } from '../../utils/situat
 import { shouldShowSituationSummary } from '../../utils/questProgress';
 import { saveGame, type SavedGameSession } from '../../utils/gamePersistence';
 import { playBgm } from '../../utils/bgmPlayer';
+import {
+  getRoadmapProgressLabel,
+  isRoadmapMainScenario,
+} from '../../utils/scenarioProgress';
+import { getScenarioDisplayTitle, getScenarioHeaderTitle } from '../../utils/scenarioDisplay';
 
 type Choice = {
   text: LocalizedText;
@@ -49,7 +54,7 @@ type PlayedChoice = {
 type RoadmapNode = {
   scenarioId: number;
   day: number;
-  episode: number;
+  progressLabel: string;
   title: LocalizedText;
   stampLabel: string;
 };
@@ -76,22 +81,6 @@ type BackgroundKey =
   | 'street'
   | 'mart'
   | 'arrival';
-
-const resolveLocalizedScenarioTitle = (scenario: Scenario, lang: 'en' | 'ko') => {
-  if (scenario.title) {
-    return scenario.title[lang];
-  }
-
-  if (typeof scenario.situation === 'object' && scenario.situation) {
-    return scenario.situation[lang];
-  }
-
-  if (lang === 'ko') {
-    return scenario.situation || scenario.situationEN || '';
-  }
-
-  return scenario.situationEN || scenario.situation || '';
-};
 
 const BACKGROUND_IMAGES: Record<BackgroundKey, ImageSourcePropType> = {
   adaptation: require('../../assets/images/background/adaptation.png'),
@@ -181,7 +170,7 @@ const UI_TEXT = {
     insightLabel: 'Insight',
     staminaLabel: 'Stamina',
     relationLabel: 'Relation',
-    nextBtn: 'NEXT >',
+    nextBtn: 'Continue',
     summaryContinue: 'Continue',
     roadmapTitle: 'StoryMap',
     roadmapHint: 'Tap a completed card to return to that point.',
@@ -190,10 +179,16 @@ const UI_TEXT = {
     roadmapCurrent: 'YOU ARE HERE',
     roadmapRewind: 'TAP TO REWIND',
     roadmapPageHeader: 'VISA / VISAS - PAGE 1',
-    resultTitle: 'Choice & Feedback',
     resultSelectedLabel: 'Choice',
-    resultFeedbackLabel: 'Feedback',
+    resultSummaryLabel: 'Result',
     resultValuesLabel: 'Changes',
+    feedbackButton: 'View Feedback',
+    feedbackModalTitle: 'Feedback',
+    feedbackExplanation: 'Why this happened',
+    feedbackTip: 'TIP',
+    closeButton: 'Close',
+    daySummaryLabel: "Today's Summary",
+    noStatChanges: 'No stat changes',
   },
   ko: {
     roadmapBtn: '스토리맵',
@@ -204,7 +199,7 @@ const UI_TEXT = {
     insightLabel: '눈치',
     staminaLabel: '체력',
     relationLabel: '관계',
-    nextBtn: '다음 >',
+    nextBtn: '계속하기',
     summaryContinue: '계속하기',
     roadmapTitle: '스토리맵',
     roadmapHint: '완료한 카드를 누르면 그 시점으로 돌아갈 수 있어요.',
@@ -213,10 +208,16 @@ const UI_TEXT = {
     roadmapCurrent: '현재 위치',
     roadmapRewind: '여기서 돌아가기',
     roadmapPageHeader: 'VISA / VISAS - PAGE 1',
-    resultTitle: '선택 및 피드백',
     resultSelectedLabel: '선택',
-    resultFeedbackLabel: '피드백',
+    resultSummaryLabel: '결과',
     resultValuesLabel: '결과값',
+    feedbackButton: '피드백 보기',
+    feedbackModalTitle: '피드백',
+    feedbackExplanation: '결과 해설',
+    feedbackTip: 'TIP',
+    closeButton: '닫기',
+    daySummaryLabel: '오늘의 정리',
+    noStatChanges: '스탯 변화 없음',
   },
 } as const;
 
@@ -338,6 +339,7 @@ export default function GameScreen({ character, initialLang = 'en', initialSessi
   );
   const [stats, setStats] = useState<GameStats>(initialStats);
   const [showResult, setShowResult] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedChoice, setSelectedChoice] = useState<Choice | null>(null);
   const [endingType, setEndingType] = useState<'success' | 'failure' | null>(null);
   const [isStatusCardFlipped, setIsStatusCardFlipped] = useState(false);
@@ -391,6 +393,7 @@ export default function GameScreen({ character, initialLang = 'en', initialSessi
     setShowRoadmap(false);
     setShowLanguageMenu(false);
     setShowResult(false);
+    setShowFeedbackModal(false);
     setSelectedChoice(null);
     setEndingType(null);
     setPendingSummary(null);
@@ -444,7 +447,7 @@ export default function GameScreen({ character, initialLang = 'en', initialSessi
     : 'arrival';
   const currentBackground = BACKGROUND_IMAGES[resolvedBackgroundKey];
   const currentCharacterOverlay = character?.cardImage ?? character?.image;
-  const situationTitle = resolveLocalizedScenarioTitle(currentScenario, lang);
+  const situationTitle = getScenarioDisplayTitle(currentScenario, lang);
 
   useEffect(() => {
     let isMounted = true;
@@ -484,10 +487,14 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
       : `Week ${weekNumber}: Day ${startDay} - ${endDay}`;
   };
 
-  const headerTitle = `Day${currentScenario.day ?? 1}. ${situationTitle}`;
+  const usesMainEpisodeProgress = useMemo(
+    () => Object.values(scenarios).some((scenario) => typeof scenario.mainEpisode === 'number'),
+    [scenarios],
+  );
+  const headerTitle = getScenarioHeaderTitle(currentScenario, lang);
   const currentSituationTitleLocalized = {
-    ko: resolveLocalizedScenarioTitle(currentScenario, 'ko'),
-    en: resolveLocalizedScenarioTitle(currentScenario, 'en'),
+    ko: getScenarioDisplayTitle(currentScenario, 'ko'),
+    en: getScenarioDisplayTitle(currentScenario, 'en'),
   };
 
   const failureRecap = useMemo(() => {
@@ -542,18 +549,30 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
   }, [playHistory]);
   const roadmapNodes = useMemo(() => {
     return Object.values(scenarios)
-      .sort((a, b) => a.id - b.id)
+      .filter((scenario) => !usesMainEpisodeProgress || isRoadmapMainScenario(scenario))
+      .sort(
+        (a, b) =>
+          usesMainEpisodeProgress
+            ? (a.week ?? 1) - (b.week ?? 1) ||
+              (a.day ?? 1) - (b.day ?? 1) ||
+              (a.mainEpisode ?? 0) - (b.mainEpisode ?? 0)
+            : a.id - b.id,
+      )
       .map((scenario) => ({
         scenarioId: scenario.id,
         day: scenario.day ?? 1,
-        episode: scenario.episode ?? scenario.id,
+        progressLabel: usesMainEpisodeProgress
+          ? getRoadmapProgressLabel(scenario)
+          : `DAY ${String(scenario.day ?? 1).padStart(2, '0')} · EP ${String(
+              scenario.episode ?? scenario.id,
+            ).padStart(2, '0')}`,
         title: {
-          ko: resolveLocalizedScenarioTitle(scenario, 'ko') || `상황 ${scenario.id}`,
-          en: resolveLocalizedScenarioTitle(scenario, 'en') || `Situation ${scenario.id}`,
+          ko: getScenarioDisplayTitle(scenario, 'ko') || `상황 ${scenario.id}`,
+          en: getScenarioDisplayTitle(scenario, 'en') || `Situation ${scenario.id}`,
         },
-        stampLabel: getRoadmapStampLabel(resolveLocalizedScenarioTitle(scenario, 'en') || `Step ${scenario.id}`, scenario.id),
+        stampLabel: getRoadmapStampLabel(getScenarioDisplayTitle(scenario, 'en') || `Step ${scenario.id}`, scenario.id),
       }));
-  }, [scenarios]);
+  }, [scenarios, usesMainEpisodeProgress]);
 
   useEffect(() => {
     setCheckpoints((prev) => {
@@ -582,7 +601,14 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
   useEffect(() => {
     if (!showRoadmap) return;
 
-    const currentIndex = roadmapNodes.findIndex((node) => node.scenarioId === currentScenarioId);
+    const exactCurrentIndex = roadmapNodes.findIndex((node) => node.scenarioId === currentScenarioId);
+    const currentIndex =
+      exactCurrentIndex >= 0
+        ? exactCurrentIndex
+        : roadmapNodes.reduce(
+            (lastIndex, node, index) => (checkpoints[node.scenarioId] ? index : lastIndex),
+            -1,
+          );
     if (currentIndex < 0) return;
 
     const timer = setTimeout(() => {
@@ -593,7 +619,7 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
     }, 80);
 
     return () => clearTimeout(timer);
-  }, [currentScenarioId, roadmapNodes, showRoadmap]);
+  }, [checkpoints, currentScenarioId, roadmapNodes, showRoadmap]);
 
   useEffect(() => {
     if (!showRoadmap) {
@@ -638,6 +664,7 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
     ]);
     setSelectedChoice(choice);
     setShowResult(true);
+    setShowFeedbackModal(false);
   };
 
   const handleSummaryContinue = () => {
@@ -670,6 +697,7 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
   };
 
   const proceedToNextScenario = () => {
+    setShowFeedbackModal(false);
     if (selectedChoice) {
       if (isGameOverFromStats(stats)) {
         setShowResult(false);
@@ -709,6 +737,7 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
     }
 
     setShowResult(false);
+    setShowFeedbackModal(false);
     setSelectedChoice(null);
   };
 
@@ -716,6 +745,7 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
     setStats(initialStats);
     setCurrentScenarioId(startScenarioId);
     setShowResult(false);
+    setShowFeedbackModal(false);
     setSelectedChoice(null);
     setEndingType(null);
     setCurrentSituationChoices([]);
@@ -839,7 +869,7 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
   if (!sceneAssetsReady) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <Tabs.Screen options={{ headerShown: false }} />
+        <Tabs.Screen options={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
         <View style={styles.scenePlaceholder} />
       </SafeAreaView>
     );
@@ -847,7 +877,7 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <Tabs.Screen options={{ headerShown: false }} />
+      <Tabs.Screen options={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
       <ImageBackground source={currentBackground} style={styles.backgroundImage} imageStyle={styles.backgroundImageStyle}>
         <View style={styles.backgroundScrim} />
         {currentCharacterOverlay && (
@@ -894,8 +924,7 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                   <MaterialCommunityIcons name="map-outline" size={20} color="#F1F1EF" />
                 </TouchableOpacity>
 
-                <View
-                  pointerEvents="none"
+                <TouchableOpacity
                   style={{
                     position: 'absolute',
                     left: 56,
@@ -905,11 +934,18 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
+                  activeOpacity={0.82}
+                  onPress={() => {
+                    Alert.alert(
+                      isKorean ? '장면 제목' : 'Scene Title',
+                      headerTitle,
+                    );
+                  }}
                 >
                   <Text
                     style={{
-                      fontSize: 16,
-                      lineHeight: 19,
+                      fontSize: 14,
+                      lineHeight: 18,
                       fontWeight: '700',
                       color: '#FFFFFF',
                       letterSpacing: -0.2,
@@ -919,12 +955,11 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                       textShadowRadius: 6,
                     }}
                     numberOfLines={1}
-                    adjustsFontSizeToFit
-                    minimumFontScale={0.78}
+                    ellipsizeMode="tail"
                   >
                     {headerTitle}
                   </Text>
-                </View>
+                </TouchableOpacity>
 
                 <TouchableOpacity
                   style={{
@@ -955,7 +990,7 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                 </TouchableOpacity>
               </View>
             ) : null}
-            <TouchableOpacity
+            {!showResult ? <TouchableOpacity
               activeOpacity={0.96}
               onPress={toggleStatusCard}
               style={[
@@ -1096,7 +1131,7 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                   </View>
                 </Animated.View>
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> : null}
           </View>
 
           <ScrollView
@@ -1145,7 +1180,7 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                     }
               }
             >
-              <View
+              {!showResult ? <View
                 style={{
                   width: '100%',
                   marginTop: showResult ? -scenarioOverlap : 0,
@@ -1154,7 +1189,9 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                 }}
               >
                 <View style={styles.scenarioTab}>
-                  <Text style={styles.scenarioTabText}>{isKorean ? '상황 설명' : 'Situation'}</Text>
+                  <Text style={styles.scenarioTabText}>
+                    {isSummaryScenario ? t.daySummaryLabel : isKorean ? '상황 설명' : 'Situation'}
+                  </Text>
                 </View>
                 <View
                   style={{
@@ -1192,7 +1229,12 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                         marginBottom: 6,
                       }}
                     >
-                      <Text style={styles.scenarioText}>{currentScenario.description[lang]}</Text>
+                      <Text
+                        style={styles.scenarioText}
+                        numberOfLines={isSummaryScenario ? 3 : undefined}
+                      >
+                        {currentScenario.description[lang]}
+                      </Text>
                     </View>
                     {!showResult ? (
                       <View
@@ -1206,9 +1248,24 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                         }}
                       >
                         {isSummaryScenario ? (
-                          <TouchableOpacity style={styles.nextButton} onPress={handleSummaryContinue}>
-                            <Text style={styles.nextButtonText}>{t.summaryContinue}</Text>
-                          </TouchableOpacity>
+                          <>
+                            {currentScenario.tip?.[lang] ? (
+                              <View style={styles.summaryTipCard}>
+                                <View style={styles.summaryTipHeader}>
+                                  <MaterialCommunityIcons
+                                    name="lightbulb-on-outline"
+                                    size={19}
+                                    color="#F4C542"
+                                  />
+                                  <Text style={styles.summaryTipLabel}>TIP</Text>
+                                </View>
+                                <Text style={styles.summaryTipText}>{currentScenario.tip[lang]}</Text>
+                              </View>
+                            ) : null}
+                            <TouchableOpacity style={styles.nextButton} onPress={handleSummaryContinue}>
+                              <Text style={styles.nextButtonText}>{t.summaryContinue}</Text>
+                            </TouchableOpacity>
+                          </>
                         ) : (
                           currentScenario.choices.map((choice, index) => {
                             const choiceCopy = splitChoiceText(choice.text[lang]);
@@ -1236,20 +1293,20 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                     ) : null}
                   </ScrollView>
                 </View>
-              </View>
+              </View> : null}
 
               {showResult && selectedChoice && (() => {
                 const resultCardData = buildResultCardData(selectedChoice, lang, currentScenario.tip);
+                const resultToneColor =
+                  resultCardData.resultTone === 'good'
+                    ? '#66D980'
+                    : resultCardData.resultTone === 'bad'
+                      ? '#FF7B86'
+                      : '#F4C542';
 
                 return (
                   <View style={styles.resultOverlayStack}>
                     <View style={[styles.resultContainer, { borderLeftColor: getFeedbackBorderColor(selectedChoice) }]}>
-                      <View style={styles.resultHeaderRow}>
-                        <View style={styles.resultHeaderLine} />
-                        <Text style={styles.resultHeaderTitle}>{t.resultTitle}</Text>
-                        <View style={styles.resultHeaderLine} />
-                      </View>
-
                       <View style={styles.resultInfoBlock}>
                         <View style={styles.resultInfoLabelRow}>
                           <MaterialCommunityIcons name="checkbox-marked-circle-outline" size={18} color="#64B1FF" />
@@ -1262,10 +1319,12 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
 
                       <View style={styles.resultInfoBlock}>
                         <View style={styles.resultInfoLabelRow}>
-                          <MaterialCommunityIcons name="comment-check-outline" size={18} color="#66D980" />
-                          <Text style={[styles.resultInfoLabel, styles.resultInfoLabelFeedback]}>{t.resultFeedbackLabel}</Text>
+                          <MaterialCommunityIcons name="star-circle-outline" size={18} color={resultToneColor} />
+                          <Text style={[styles.resultInfoLabel, { color: resultToneColor }]}>
+                            {t.resultSummaryLabel} · {resultCardData.resultLabel}
+                          </Text>
                         </View>
-                        <Text style={styles.resultInfoText}>{resultCardData.feedbackText}</Text>
+                        <Text style={styles.resultInfoText}>{resultCardData.resultSummary}</Text>
                       </View>
 
                       <View style={styles.resultInfoDivider} />
@@ -1276,45 +1335,101 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                           <Text style={[styles.resultInfoLabel, styles.resultInfoLabelValues]}>{t.resultValuesLabel}</Text>
                         </View>
                         <View style={styles.resultStatsRow}>
-                          {resultCardData.changedStats.map((entry) => (
-                            <ResultStatItem
-                              key={`${selectedChoice.nextScenarioId}-${entry.statKey}`}
-                              statKey={entry.statKey}
-                              value={entry.value}
-                              label={
-                                entry.statKey === 'funds'
-                                  ? t.fundsLabel
-                                  : entry.statKey === 'mental'
-                                    ? t.mentalHpLabel
-                                    : entry.statKey === 'english'
-                                      ? t.englishLabel
-                                      : entry.statKey === 'insight'
-                                        ? t.insightLabel
-                                        : entry.statKey === 'stamina'
-                                          ? t.staminaLabel
-                                          : t.relationLabel
-                              }
-                            />
-                          ))}
+                          {resultCardData.changedStats.length ? (
+                            resultCardData.changedStats.map((entry) => (
+                              <ResultStatItem
+                                key={`${selectedChoice.nextScenarioId}-${entry.statKey}`}
+                                statKey={entry.statKey}
+                                value={entry.value}
+                                label={
+                                  entry.statKey === 'funds'
+                                    ? t.fundsLabel
+                                    : entry.statKey === 'mental'
+                                      ? t.mentalHpLabel
+                                      : entry.statKey === 'english'
+                                        ? t.englishLabel
+                                        : entry.statKey === 'insight'
+                                          ? t.insightLabel
+                                          : entry.statKey === 'stamina'
+                                            ? t.staminaLabel
+                                            : t.relationLabel
+                                }
+                              />
+                            ))
+                          ) : (
+                            <Text style={styles.resultNoChangesText}>{t.noStatChanges}</Text>
+                          )}
                         </View>
                       </View>
                     </View>
 
-                    {resultCardData.tipText ? (
-                      <View style={styles.resultTipCard}>
-                        <MaterialCommunityIcons
-                          name="lightbulb-on-outline"
-                          size={20}
-                          color="#F4C542"
-                          style={styles.resultTipIcon}
-                        />
-                        <Text style={styles.resultTipText}>{resultCardData.tipText}</Text>
-                      </View>
-                    ) : null}
+                    <View style={styles.resultActionRow}>
+                      <TouchableOpacity
+                        style={styles.resultFeedbackButton}
+                        onPress={() => setShowFeedbackModal(true)}
+                      >
+                        <Text style={styles.resultFeedbackButtonText}>{t.feedbackButton}</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={[styles.nextButton, styles.resultContinueButton]} onPress={proceedToNextScenario}>
+                        <Text style={styles.nextButtonText}>{t.nextBtn}</Text>
+                      </TouchableOpacity>
+                    </View>
 
-                    <TouchableOpacity style={styles.nextButton} onPress={proceedToNextScenario}>
-                      <Text style={styles.nextButtonText}>{t.nextBtn}</Text>
-                    </TouchableOpacity>
+                    <Modal
+                      visible={showFeedbackModal}
+                      transparent
+                      animationType="fade"
+                      statusBarTranslucent
+                      onRequestClose={() => setShowFeedbackModal(false)}
+                    >
+                      <SafeAreaView style={styles.feedbackModalOverlay} edges={['top', 'bottom']}>
+                        <View style={styles.feedbackModalCard}>
+                          <View style={styles.feedbackModalHeader}>
+                            <Text style={styles.feedbackModalTitle}>{t.feedbackModalTitle}</Text>
+                            <TouchableOpacity
+                              style={styles.feedbackModalCloseIcon}
+                              onPress={() => setShowFeedbackModal(false)}
+                            >
+                              <MaterialCommunityIcons name="close" size={20} color="#D8E8FF" />
+                            </TouchableOpacity>
+                          </View>
+
+                          <ScrollView
+                            style={styles.feedbackModalScroll}
+                            contentContainerStyle={styles.feedbackModalContent}
+                            showsVerticalScrollIndicator={false}
+                          >
+                            <Text style={styles.feedbackModalSectionTitle}>{t.feedbackExplanation}</Text>
+                            <Text style={styles.feedbackModalText}>{resultCardData.feedbackText}</Text>
+
+                            {resultCardData.tipText ? (
+                              <View style={styles.feedbackTipSection}>
+                                <View style={styles.feedbackTipHeading}>
+                                  <MaterialCommunityIcons name="lightbulb-on-outline" size={19} color="#F4C542" />
+                                  <Text style={styles.feedbackModalSectionTitle}>{t.feedbackTip}</Text>
+                                </View>
+                                <Text style={styles.feedbackModalText}>{resultCardData.tipText}</Text>
+                              </View>
+                            ) : null}
+                          </ScrollView>
+
+                          <View style={styles.feedbackModalActions}>
+                            <TouchableOpacity
+                              style={styles.feedbackModalCloseButton}
+                              onPress={() => setShowFeedbackModal(false)}
+                            >
+                              <Text style={styles.feedbackModalCloseButtonText}>{t.closeButton}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={styles.feedbackModalContinueButton}
+                              onPress={proceedToNextScenario}
+                            >
+                              <Text style={styles.feedbackModalContinueButtonText}>{t.nextBtn}</Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      </SafeAreaView>
+                    </Modal>
                   </View>
                 );
               })()}
@@ -1451,13 +1566,14 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
 
                 <View style={styles.stampGrid}>
                   {roadmapNodes.map((node, index) => {
+                    const hasCheckpoint = Boolean(checkpoints[node.scenarioId]);
                     const state =
-                      node.scenarioId < currentScenarioId
-                        ? 'completed'
-                        : node.scenarioId === currentScenarioId
-                          ? 'current'
+                      node.scenarioId === currentScenarioId
+                        ? 'current'
+                        : hasCheckpoint
+                          ? 'completed'
                           : 'locked';
-                    const isAvailable = state !== 'locked' && Boolean(checkpoints[node.scenarioId]);
+                    const isAvailable = hasCheckpoint;
                     const stampColor = ROADMAP_STAMP_COLORS[index % ROADMAP_STAMP_COLORS.length];
                     const rotation = index % 2 === 0 ? '-9deg' : '8deg';
 
@@ -1503,7 +1619,7 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                                 { color: state === 'locked' ? '#9C8D7B' : stampColor },
                               ]}
                             >
-                              {`DAY ${String(node.day).padStart(2, '0')} · EP ${String(node.episode).padStart(2, '0')}`}
+                              {node.progressLabel}
                             </Text>
                             <Text
                               style={[
@@ -2084,18 +2200,18 @@ const styles = StyleSheet.create({
   },
   resultOverlayStack: {
     marginHorizontal: 14,
-    marginTop: 12,
-    gap: 12,
+    marginTop: 0,
+    gap: 10,
   },
   resultContainer: {
-    backgroundColor: 'rgba(6, 19, 41, 0.86)',
-    borderRadius: 24,
+    backgroundColor: 'rgba(6, 19, 41, 0.92)',
+    borderRadius: 20,
     borderWidth: 1.1,
     borderColor: 'rgba(123, 186, 255, 0.7)',
     borderLeftWidth: 2.2,
     paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 16,
+    paddingTop: 15,
+    paddingBottom: 15,
     shadowColor: '#70B6FF',
     shadowOpacity: 0.18,
     shadowRadius: 18,
@@ -2147,8 +2263,8 @@ const styles = StyleSheet.create({
     color: '#B184FF',
   },
   resultInfoText: {
-    fontSize: 15,
-    lineHeight: 23,
+    fontSize: 14,
+    lineHeight: 21,
     color: '#F2F6FC',
     fontWeight: '700',
   },
@@ -2160,11 +2276,11 @@ const styles = StyleSheet.create({
   resultStatsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 9,
     paddingTop: 2,
   },
   resultStatItem: {
-    minWidth: 82,
+    minWidth: 76,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
@@ -2185,6 +2301,40 @@ const styles = StyleSheet.create({
   },
   resultStatValueNegative: {
     color: '#FF8F8F',
+  },
+  resultNoChangesText: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: 'rgba(230, 238, 249, 0.72)',
+    fontWeight: '700',
+  },
+  summaryTipCard: {
+    marginTop: 2,
+    paddingHorizontal: 13,
+    paddingVertical: 11,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(123, 186, 255, 0.52)',
+    backgroundColor: 'rgba(6, 19, 41, 0.8)',
+  },
+  summaryTipHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+  },
+  summaryTipLabel: {
+    fontSize: 13,
+    lineHeight: 17,
+    fontWeight: '900',
+    color: '#F4C542',
+    letterSpacing: 0.5,
+  },
+  summaryTipText: {
+    marginTop: 7,
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#EDF4FF',
+    fontWeight: '700',
   },
   badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginBottom: 16 },
   badge: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 5, paddingHorizontal: 11, borderRadius: 20 },
@@ -2214,6 +2364,136 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: '#EDF4FF',
     fontWeight: '700',
+  },
+  resultActionRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  resultFeedbackButton: {
+    flex: 1,
+    minHeight: 48,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(100, 177, 255, 0.74)',
+    backgroundColor: 'rgba(8, 31, 65, 0.92)',
+  },
+  resultFeedbackButtonText: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#BFDFFF',
+  },
+  resultContinueButton: {
+    flex: 1,
+    minHeight: 48,
+    marginTop: 0,
+  },
+  feedbackModalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(2, 8, 20, 0.76)',
+  },
+  feedbackModalCard: {
+    width: '100%',
+    maxHeight: '72%',
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(105, 173, 255, 0.72)',
+    backgroundColor: 'rgba(5, 19, 43, 0.98)',
+    paddingHorizontal: 18,
+    paddingTop: 16,
+    paddingBottom: 16,
+    shadowColor: '#4FA3FF',
+    shadowOpacity: 0.22,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 15,
+  },
+  feedbackModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(139, 181, 233, 0.2)',
+  },
+  feedbackModalTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#F5F8FC',
+  },
+  feedbackModalCloseIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(105, 173, 255, 0.12)',
+  },
+  feedbackModalScroll: {
+    flexShrink: 1,
+  },
+  feedbackModalContent: {
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  feedbackModalSectionTitle: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#78BEFF',
+  },
+  feedbackModalText: {
+    marginTop: 7,
+    fontSize: 15,
+    lineHeight: 23,
+    fontWeight: '600',
+    color: '#E7EDF7',
+  },
+  feedbackTipSection: {
+    marginTop: 18,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(139, 181, 233, 0.2)',
+  },
+  feedbackTipHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+  },
+  feedbackModalActions: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingTop: 14,
+  },
+  feedbackModalCloseButton: {
+    flex: 1,
+    minHeight: 48,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 181, 233, 0.36)',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  feedbackModalCloseButtonText: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#C9D6E8',
+  },
+  feedbackModalContinueButton: {
+    flex: 1,
+    minHeight: 48,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#D9E9FF',
+  },
+  feedbackModalContinueButtonText: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#16385F',
   },
   nextButton: {
     backgroundColor: 'rgba(225, 240, 255, 0.98)',

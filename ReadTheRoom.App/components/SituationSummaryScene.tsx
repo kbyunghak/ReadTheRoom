@@ -57,7 +57,7 @@ export default function SituationSummaryScene({ lang, summary, onContinue }: Pro
     expression: lang === 'ko' ? '영어 표현' : 'Expression',
     english: lang === 'ko' ? '영어 실력' : 'English',
     adaptation: lang === 'ko' ? '적응도' : 'Adaptation',
-    continue: lang === 'ko' ? '다음 상황 보기' : 'Continue',
+    continue: lang === 'ko' ? '계속하기' : 'Continue',
     scrollHint: lang === 'ko' ? '아래 내용을 더 확인해보세요' : 'Scroll for more',
   };
 

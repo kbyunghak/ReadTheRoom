@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { buildResultCardData, buildSelectedChoiceText, getChangedStatEntries } from '../utils/resultCard.ts';
+import { buildResultCardData, buildSelectedChoiceText, getChangedStatEntries, getResultTone } from '../utils/resultCard.ts';
 import { choiceWithPositiveChanges, choiceWithZeroChanges } from './fixtures/choices.ts';
 import { tipScenarioNode } from './fixtures/scenarios.ts';
 
@@ -43,4 +43,11 @@ test('buildResultCardData uses only the current language tip text', () => {
 test('buildResultCardData omits tip text when there is no tip', () => {
   const result = buildResultCardData(choiceWithPositiveChanges, 'ko');
   assert.equal(result.tipText, null);
+});
+
+test('result tone and summary are derived without exposing full feedback', () => {
+  const result = buildResultCardData(choiceWithPositiveChanges, 'ko');
+  assert.equal(getResultTone(choiceWithPositiveChanges.statChanges), 'good');
+  assert.equal(result.resultLabel, '성공');
+  assert.notEqual(result.resultSummary, result.feedbackText);
 });
