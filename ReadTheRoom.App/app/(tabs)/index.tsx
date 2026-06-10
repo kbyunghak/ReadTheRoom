@@ -1,26 +1,72 @@
 import React, { useEffect, useState } from 'react';
 import SplashScreen from '../../components/SplashScreen';
 import WarningScreen from '../../components/WarningScreen';
-import CharacterSelectScreen, { Character } from '../../components/CharacterSelectScreen';
+import CharacterSelectScreen, {
+  Character,
+} from '../../components/CharacterSelectScreen';
 import CharacterDetailScreen from '../../components/CharacterDetailScreen';
 import GameScreen from './GameScreen';
-import { getScenarioBundle, hasScenarioForCharacter } from '../../utils/scenarioRegistry';
-import { clearSavedGame, loadSavedGame, type SavedGameSession } from '../../utils/gamePersistence';
+import {
+  getScenarioBundle,
+  hasScenarioForCharacter,
+} from '../../utils/scenarioRegistry';
+import {
+  clearSavedGame,
+  loadSavedGame,
+  type SavedGameSession,
+} from '../../utils/gamePersistence';
 import { playBgm, stopBgm, type BgmTrack } from '../../utils/bgmPlayer';
 
-type Screen = 'splash' | 'warning' | 'characterSelect' | 'characterDetail' | 'game';
+type Screen =
+  | 'splash'
+  | 'warning'
+  | 'characterSelect'
+  | 'characterDetail'
+  | 'game';
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('splash');
-  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
+    null,
+  );
   const [lang, setLang] = useState<'en' | 'ko'>('ko');
-  const [savedSession, setSavedSession] = useState<SavedGameSession | null>(null);
-  const [savedSituationTitle, setSavedSituationTitle] = useState<string | null>(null);
+  const [savedSession, setSavedSession] = useState<SavedGameSession | null>(
+    null,
+  );
+  const [savedSituationTitle, setSavedSituationTitle] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     setSavedSession(null);
     setSavedSituationTitle(null);
   }, []);
+
+  const loadCharacterProgress = async (character: Character) => {
+    const restored = await loadSavedGame(character.id);
+    let situationTitle: string | null = null;
+
+    if (restored) {
+      const scenarios = getScenarioBundle(character.id).scenarios;
+      const scenario = scenarios?.[String(restored.currentScenarioId)];
+      situationTitle =
+        typeof scenario?.situation === 'object' && scenario?.situation
+          ? scenario.situation[lang]
+          : lang === 'ko'
+            ? typeof scenario?.situation === 'string'
+              ? scenario.situation
+              : scenario?.situationEN || null
+            : scenario?.situationEN ||
+              (typeof scenario?.situation === 'string'
+                ? scenario.situation
+                : null);
+    }
+
+    setSavedSession(restored);
+    setSavedSituationTitle(situationTitle);
+
+    return restored;
+  };
 
   useEffect(() => {
     const track: BgmTrack =
@@ -31,11 +77,7 @@ export default function App() {
           : 'main';
 
     const fadeDurationMs =
-      screen === 'splash'
-        ? 0
-        : screen === 'warning'
-          ? 150
-          : 700;
+      screen === 'splash' ? 0 : screen === 'warning' ? 150 : 700;
 
     void playBgm(track, fadeDurationMs);
   }, [screen]);
@@ -58,31 +100,23 @@ export default function App() {
     return (
       <CharacterSelectScreen
         lang={lang}
-        onToggleLanguage={() => setLang((prev) => (prev === 'ko' ? 'en' : 'ko'))}
-        onSelectCharacter={(char) => {
-          setSelectedCharacter(char);
-          void (async () => {
-            const restored = await loadSavedGame(char.id);
-            setSavedSession(restored);
-
-            if (restored) {
-              const scenarios = getScenarioBundle(char.id).scenarios;
-              const scenario = scenarios?.[String(restored.currentScenarioId)];
-              const title: string | null =
-                typeof scenario?.situation === 'object' && scenario?.situation
-                  ? scenario.situation[lang]
-                  : lang === 'ko'
-                    ? typeof scenario?.situation === 'string'
-                      ? scenario.situation
-                      : scenario?.situationEN || null
-                    : scenario?.situationEN || (typeof scenario?.situation === 'string' ? scenario.situation : null);
-              setSavedSituationTitle(title);
-            } else {
-              setSavedSituationTitle(null);
-            }
-
+        onToggleLanguage={() =>
+          setLang((prev) => (prev === 'ko' ? 'en' : 'ko'))
+        }
+        onViewDetails={(character) => {
+          setSelectedCharacter(character);
+          void loadCharacterProgress(character).then(() => {
             setScreen('characterDetail');
-          })();
+          });
+        }}
+        onStartCharacter={(character) => {
+          setSelectedCharacter(character);
+          void loadCharacterProgress(character).then((restored) => {
+            if (restored) {
+              setLang(restored.lang);
+            }
+            setScreen('game');
+          });
         }}
       />
     );
@@ -94,7 +128,11 @@ export default function App() {
         character={selectedCharacter}
         lang={lang}
         isPlayable={hasScenarioForCharacter(selectedCharacter.id)}
-        savedSession={savedSession?.characterId === selectedCharacter.id ? savedSession : null}
+        savedSession={
+          savedSession?.characterId === selectedCharacter.id
+            ? savedSession
+            : null
+        }
         savedSituationTitle={savedSituationTitle}
         onBack={() => setScreen('characterSelect')}
         onConfirm={(char, mode) => {

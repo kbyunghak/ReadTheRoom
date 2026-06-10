@@ -4,9 +4,15 @@ export const en = {
   characterSelect: {
     subtitle: 'Choose your story',
     title: 'Select Character',
-    hint: 'Tap a card to view details',
+    description: 'Each character has a different background and story.',
     languageToggle: '한국어',
     comingSoon: 'Coming Soon',
+    recommended: 'Recommended',
+    playAs: (name: string) => `Start as ${name}`,
+    guideTitle: 'Selection Guide',
+    guideDescription:
+      'Your selected character changes the story flow and the events you can experience.',
+    settingsHint: 'You can change your character later in settings.',
   },
   characterDetail: {
     back: 'Back',
@@ -25,7 +31,8 @@ export const en = {
     ok: 'OK',
     continueSave: 'Continue Save',
     savedRunTitle: (name: string) => `A saved run for ${name} was found`,
-    currentSituation: (title: string) => `Current situation: ${title}\nDo you want to continue?`,
+    currentSituation: (title: string) =>
+      `Current situation: ${title}\nDo you want to continue?`,
     startOver: 'Start Over',
     continue: 'Continue',
     cancel: 'Cancel',
