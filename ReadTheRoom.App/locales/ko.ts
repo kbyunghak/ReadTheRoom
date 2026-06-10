@@ -4,7 +4,7 @@ export const ko = {
   characterSelect: {
     subtitle: '당신의 이야기를 골라보세요',
     title: '캐릭터 선택',
-    description: '각 캐릭터는 다른 배경과 스토리를 가지고 있어요.',
+    description: '각 캐릭터마다 다른 시작점과 선택지가 있어요.',
     languageToggle: 'English',
     comingSoon: '곧 추가 예정',
     recommended: '추천',

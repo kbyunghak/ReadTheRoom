@@ -113,10 +113,11 @@ export default function CharacterSelectScreen({
   lang,
   onToggleLanguage,
 }: Props) {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const text = locales[lang].characterSelect;
   const contentWidth = Math.min(width - SCREEN_PADDING * 2, MAX_CONTENT_WIDTH);
-  const imageWidth = Math.min(164, Math.max(116, contentWidth * 0.37));
+  const cardHeight = Math.min(165, Math.max(140, height * 0.18));
+  const imageWidth = Math.min(130, Math.max(105, height * 0.13));
   const useCompactCard = contentWidth < 330;
 
   const renderCharacterCard = (character: Character) => {
@@ -125,23 +126,22 @@ export default function CharacterSelectScreen({
     );
 
     return (
-      <View key={character.id} style={styles.card}>
-        <View style={[styles.cardImageFrame, { width: imageWidth }]}>
+      <View key={character.id} style={[styles.card, { height: cardHeight }]}>
+        <View
+          style={[
+            styles.cardImageFrame,
+            {
+              width: imageWidth,
+              height: cardHeight,
+            },
+          ]}
+        >
           <Image
-            source={character.cardImage}
+            source={character.image}
             style={styles.cardImage}
-            contentFit="cover"
-            contentPosition="top center"
+            contentFit="contain"
+            contentPosition="bottom center"
           />
-
-          {character.id === 'ken' ? (
-            <View style={styles.recommendedBadge}>
-              <MaterialCommunityIcons name="star" size={11} color="#172033" />
-              <Text style={styles.recommendedBadgeText}>
-                {text.recommended}
-              </Text>
-            </View>
-          ) : null}
         </View>
 
         <View
@@ -162,33 +162,34 @@ export default function CharacterSelectScreen({
                   {character.name.en}
                 </Text>
               ) : null}
+              {character.id === 'ken' ? (
+                <View style={styles.recommendedBadge}>
+                  <MaterialCommunityIcons
+                    name="star-outline"
+                    size={10}
+                    color="#74542F"
+                  />
+                  <Text style={styles.recommendedBadgeText} numberOfLines={1}>
+                    {text.recommended}
+                  </Text>
+                </View>
+              ) : null}
             </View>
-
-            <TouchableOpacity
-              style={styles.detailsButton}
-              onPress={() => onViewDetails(character)}
-              accessibilityRole="button"
-              accessibilityLabel={
-                lang === 'ko'
-                  ? `${character.name.ko} 자세히 보기`
-                  : `View ${character.name.en} details`
-              }
-              hitSlop={8}
-              activeOpacity={0.72}
-            >
-              <MaterialCommunityIcons
-                name="magnify"
-                size={18}
-                color="#AAB4CA"
-              />
-            </TouchableOpacity>
           </View>
 
           <Text style={styles.characterMeta} numberOfLines={2}>
             {character.age[lang]} · {character.jobTitle[lang]}
           </Text>
 
-          <Text style={styles.characterDescription} numberOfLines={2}>
+          <Text
+            style={[
+              styles.characterDescription,
+              {
+                minHeight: 14,
+              },
+            ]}
+            numberOfLines={1}
+          >
             {character.description[lang][0]}
           </Text>
 
@@ -201,49 +202,68 @@ export default function CharacterSelectScreen({
                   key={`${character.id}-${stat.key}`}
                   style={styles.statItem}
                 >
-                  <View style={styles.statLabelRow}>
-                    <MaterialCommunityIcons
-                      name={meta.icon}
-                      size={13}
-                      color={meta.color}
-                    />
-                    <Text style={styles.statLabel} numberOfLines={1}>
-                      {stat.label[lang]}
-                    </Text>
-                  </View>
+                  <MaterialCommunityIcons
+                    name={meta.icon}
+                    size={12}
+                    color={meta.color}
+                  />
+                  <Text style={styles.statLabel} numberOfLines={1}>
+                    {stat.label[lang]}
+                  </Text>
                   <Text style={styles.statValue}>{stat.value}</Text>
                 </View>
               );
             })}
           </View>
 
-          <TouchableOpacity
-            style={[
-              styles.startButton,
-              useCompactCard && {
-                paddingHorizontal: 8,
-              },
-            ]}
-            onPress={() => onStartCharacter(character)}
-            accessibilityRole="button"
-            accessibilityLabel={text.playAs(character.name[lang])}
-            activeOpacity={0.88}
-          >
-            <Text
+          <View style={styles.cardActionRow}>
+            <TouchableOpacity
               style={[
-                styles.startButtonText,
-                useCompactCard && { fontSize: 12 },
+                styles.startButton,
+                useCompactCard && {
+                  paddingHorizontal: 8,
+                },
               ]}
-              numberOfLines={1}
+              onPress={() => onStartCharacter(character)}
+              accessibilityRole="button"
+              accessibilityLabel={text.playAs(character.name[lang])}
+              activeOpacity={0.88}
             >
-              {text.playAs(character.name[lang])}
-            </Text>
-            <MaterialCommunityIcons
-              name="chevron-right"
-              size={20}
-              color="#172033"
-            />
-          </TouchableOpacity>
+              <Text
+                style={[
+                  styles.startButtonText,
+                  useCompactCard && { fontSize: 12 },
+                ]}
+                numberOfLines={1}
+              >
+                {text.playAs(character.name[lang])}
+              </Text>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={18}
+                color="#172033"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.detailsButton}
+              onPress={() => onViewDetails(character)}
+              accessibilityRole="button"
+              accessibilityLabel={
+                lang === 'ko'
+                  ? `${character.name.ko} 자세히 보기`
+                  : `View ${character.name.en} details`
+              }
+              hitSlop={8}
+              activeOpacity={0.78}
+            >
+              <MaterialCommunityIcons
+                name="information-outline"
+                size={19}
+                color="#78684F"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -282,24 +302,12 @@ export default function CharacterSelectScreen({
             {BETA_CHARACTERS.map(renderCharacterCard)}
           </View>
 
-          <View style={styles.guideCard}>
-            <View style={styles.guideIcon}>
-              <MaterialCommunityIcons
-                name="book-open-page-variant"
-                size={22}
-                color="#FFE681"
-              />
-            </View>
-            <View style={styles.guideCopy}>
-              <Text style={styles.guideTitle}>{text.guideTitle}</Text>
-              <Text style={styles.guideDescription}>
-                {text.guideDescription}
-              </Text>
-            </View>
-          </View>
-
           <View style={styles.footerHint}>
-            <MaterialCommunityIcons name="lock" size={13} color="#697188" />
+            <MaterialCommunityIcons
+              name="information-outline"
+              size={13}
+              color="#697188"
+            />
             <Text style={styles.footerHintText}>{text.settingsHint}</Text>
           </View>
         </View>
@@ -318,14 +326,15 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingTop: 14,
+    paddingBottom: 12,
     paddingHorizontal: SCREEN_PADDING,
   },
   content: {
     alignSelf: 'center',
   },
   headerBlock: {
-    marginBottom: 18,
+    marginBottom: 12,
   },
   headerSub: {
     fontSize: 13,
@@ -348,9 +357,9 @@ const styles = StyleSheet.create({
     letterSpacing: -0.6,
   },
   headerDescription: {
-    marginTop: 7,
-    fontSize: 13,
-    lineHeight: 19,
+    marginTop: 4,
+    fontSize: 12,
+    lineHeight: 17,
     color: '#B6B8C7',
   },
   languageButton: {
@@ -370,10 +379,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   cardList: {
-    gap: 12,
+    gap: 9,
   },
   card: {
-    minHeight: 232,
     flexDirection: 'row',
     overflow: 'hidden',
     borderRadius: 18,
@@ -382,8 +390,10 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.12)',
   },
   cardImageFrame: {
-    alignSelf: 'stretch',
+    alignSelf: 'flex-end',
     position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
     overflow: 'hidden',
     backgroundColor: '#24283B',
   },
@@ -392,28 +402,30 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   recommendedBadge: {
-    position: 'absolute',
-    top: 9,
-    left: 8,
+    flexShrink: 0,
+    maxWidth: 54,
+    height: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
+    gap: 2,
     borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    backgroundColor: '#FFC52E',
+    paddingHorizontal: 6,
+    backgroundColor: '#F7E8BF',
+    borderWidth: 1,
+    borderColor: 'rgba(151,111,62,0.55)',
   },
   recommendedBadgeText: {
-    color: '#172033',
-    fontSize: 10,
-    lineHeight: 12,
-    fontWeight: '900',
+    flexShrink: 1,
+    color: '#74542F',
+    fontSize: 9,
+    lineHeight: 11,
+    fontWeight: '800',
   },
   cardBody: {
     flex: 1,
     minWidth: 0,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
+    paddingHorizontal: 11,
+    paddingVertical: 8,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -431,72 +443,80 @@ const styles = StyleSheet.create({
   characterName: {
     flexShrink: 1,
     color: '#FFFFFF',
-    fontSize: 20,
-    lineHeight: 25,
+    fontSize: 18,
+    lineHeight: 21,
     fontWeight: '800',
   },
   characterEnglishName: {
     flexShrink: 1,
     color: '#A9ADBD',
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 12,
+    lineHeight: 16,
     fontWeight: '600',
   },
   detailsButton: {
-    width: 30,
-    height: 30,
+    width: 34,
+    height: 34,
     flexShrink: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 15,
-    backgroundColor: 'rgba(255,255,255,0.055)',
+    borderRadius: 17,
+    backgroundColor: 'rgba(255,248,232,0.82)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(122,82,39,0.3)',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 2,
+    elevation: 2,
   },
   characterMeta: {
-    marginTop: 2,
+    marginTop: 3,
     color: '#B3B7C7',
     fontSize: 12,
-    lineHeight: 17,
+    lineHeight: 15,
   },
   characterDescription: {
-    marginTop: 9,
-    minHeight: 38,
+    marginTop: 5,
     color: '#D4D6DF',
     fontSize: 12,
-    lineHeight: 19,
+    lineHeight: 14,
   },
   statsRow: {
     flexDirection: 'row',
-    marginTop: 10,
-    gap: 7,
+    marginTop: 6,
+    gap: 5,
   },
   statItem: {
     flex: 1,
     minWidth: 0,
-  },
-  statLabelRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
+    gap: 2,
   },
   statLabel: {
     flexShrink: 1,
     color: '#9297AA',
     fontSize: 10,
-    lineHeight: 14,
+    lineHeight: 12,
   },
   statValue: {
-    marginTop: 2,
+    marginLeft: 'auto',
     color: '#FFFFFF',
-    fontSize: 14,
-    lineHeight: 17,
+    fontSize: 12,
+    lineHeight: 14,
     fontWeight: '800',
   },
+  cardActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 7,
+  },
   startButton: {
-    minHeight: 42,
-    marginTop: 11,
-    paddingHorizontal: 14,
+    flex: 1,
+    minHeight: 38,
+    paddingHorizontal: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -507,47 +527,12 @@ const styles = StyleSheet.create({
   startButtonText: {
     flexShrink: 1,
     color: '#172033',
-    fontSize: 14,
-    lineHeight: 18,
+    fontSize: 13,
+    lineHeight: 16,
     fontWeight: '900',
   },
-  guideCard: {
-    marginTop: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 14,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.035)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.09)',
-  },
-  guideIcon: {
-    width: 42,
-    height: 42,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 21,
-    backgroundColor: 'rgba(255,211,67,0.12)',
-  },
-  guideCopy: {
-    flex: 1,
-  },
-  guideTitle: {
-    color: '#F5F5FA',
-    fontSize: 14,
-    lineHeight: 19,
-    fontWeight: '800',
-  },
-  guideDescription: {
-    marginTop: 2,
-    color: '#A5A9B9',
-    fontSize: 12,
-    lineHeight: 18,
-  },
   footerHint: {
-    marginTop: 14,
+    marginTop: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

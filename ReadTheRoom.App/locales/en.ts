@@ -4,7 +4,8 @@ export const en = {
   characterSelect: {
     subtitle: 'Choose your story',
     title: 'Select Character',
-    description: 'Each character has a different background and story.',
+    description:
+      'Each character has a different starting point and set of choices.',
     languageToggle: '한국어',
     comingSoon: 'Coming Soon',
     recommended: 'Recommended',
