@@ -20,6 +20,7 @@ const CORE_GAME_VISUALS = [
   require('../assets/images/background/observatory_nature.png'),
   require('../assets/images/background/partyroom_lonely.png'),
   require('../assets/images/background/mart.png'),
+  require('../assets/images/paper.png'),
   require('../assets/images/characters/ken.png'),
   require('../assets/images/characters/amy.png'),
   require('../assets/images/characters/sora.png'),
@@ -38,7 +39,9 @@ let launchVisualPromise: Promise<void> | null = null;
 let coreVisualPromise: Promise<void> | null = null;
 
 export const preloadAssetSources = async (sources: ImageSourcePropType[]) => {
-  await Promise.all(sources.map((source) => Asset.loadAsync(source as string | number)));
+  await Promise.all(
+    sources.map((source) => Asset.loadAsync(source as string | number)),
+  );
 };
 
 export const preloadLaunchVisualAssets = async () => {
@@ -47,6 +50,9 @@ export const preloadLaunchVisualAssets = async () => {
 };
 
 export const preloadCoreVisualAssets = async () => {
-  coreVisualPromise ??= preloadAssetSources([...LAUNCH_VISUALS, ...CORE_GAME_VISUALS]);
+  coreVisualPromise ??= preloadAssetSources([
+    ...LAUNCH_VISUALS,
+    ...CORE_GAME_VISUALS,
+  ]);
   await coreVisualPromise;
 };

@@ -6,6 +6,7 @@ import {
   ImageBackground,
   ImageSourcePropType,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,14 +14,25 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { Tabs } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Character } from '../../components/CharacterSelectScreen';
 import EndingScene from '../../components/EndingScene';
 import SituationSummaryScene from '../../components/SituationSummaryScene';
-import { applyStatChanges, isGameOverFromStats, type GameStats, type StatChanges } from '../../utils/gameStats';
-import { getConditionSummary, getStatusDetailTone } from '../../utils/conditionSummary';
+import {
+  applyStatChanges,
+  isGameOverFromStats,
+  type GameStats,
+  type StatChanges,
+} from '../../utils/gameStats';
+import {
+  getConditionSummary,
+  getStatusDetailTone,
+} from '../../utils/conditionSummary';
 import { preloadAssetSources } from '../../utils/assetPreload';
 import { buildResultCardData, splitChoiceText } from '../../utils/resultCard';
 import {
@@ -29,7 +41,10 @@ import {
   type Scenario,
   type ScenarioChoice,
 } from '../../utils/scenarioRegistry';
-import { buildSituationSummary, type SituationSummary } from '../../utils/situationSummary';
+import {
+  buildSituationSummary,
+  type SituationSummary,
+} from '../../utils/situationSummary';
 import { shouldShowSituationSummary } from '../../utils/questProgress';
 import { saveGame, type SavedGameSession } from '../../utils/gamePersistence';
 import { playBgm } from '../../utils/bgmPlayer';
@@ -37,7 +52,10 @@ import {
   getRoadmapProgressLabel,
   isRoadmapMainScenario,
 } from '../../utils/scenarioProgress';
-import { getScenarioDisplayTitle, getScenarioHeaderTitle } from '../../utils/scenarioDisplay';
+import {
+  getScenarioDisplayTitle,
+  getScenarioHeaderTitle,
+} from '../../utils/scenarioDisplay';
 
 type Choice = {
   text: LocalizedText;
@@ -53,6 +71,7 @@ type PlayedChoice = {
 
 type RoadmapNode = {
   scenarioId: number;
+  week: number;
   day: number;
   progressLabel: string;
   title: LocalizedText;
@@ -179,6 +198,7 @@ const UI_TEXT = {
     roadmapCurrent: 'YOU ARE HERE',
     roadmapRewind: 'TAP TO REWIND',
     roadmapPageHeader: 'VISA / VISAS - PAGE 1',
+    roadmapWeekLocked: 'This week is not unlocked yet.',
     resultSelectedLabel: 'Choice',
     resultSummaryLabel: 'Result',
     resultValuesLabel: 'Changes',
@@ -208,6 +228,7 @@ const UI_TEXT = {
     roadmapCurrent: '현재 위치',
     roadmapRewind: '여기서 돌아가기',
     roadmapPageHeader: 'VISA / VISAS - PAGE 1',
+    roadmapWeekLocked: '아직 열리지 않은 Week입니다.',
     resultSelectedLabel: '선택',
     resultSummaryLabel: '결과',
     resultValuesLabel: '결과값',
@@ -221,7 +242,19 @@ const UI_TEXT = {
   },
 } as const;
 
-const ROADMAP_STAMP_COLORS = ['#C9645A', '#5A8FCA', '#6B9E74', '#A270C6'] as const;
+const ROADMAP_STAMP_COLORS = [
+  '#C9645A',
+  '#5A8FCA',
+  '#6B9E74',
+  '#A270C6',
+] as const;
+const ROADMAP_WEEKS = [
+  { week: 1, dayStart: 1, dayEnd: 6 },
+  { week: 2, dayStart: 7, dayEnd: 12 },
+  { week: 3, dayStart: 13, dayEnd: 18 },
+  { week: 4, dayStart: 19, dayEnd: 24 },
+  { week: 5, dayStart: 25, dayEnd: 30 },
+] as const;
 const ROADMAP_STOP_WORDS = new Set([
   'AT',
   'THE',
@@ -266,14 +299,37 @@ const STAT_CONFIG = {
   relation: { color: '#D9E6F7', icon: 'account-group-outline' },
 } as const;
 
-const StatChangeBadge = ({ statKey, value, label }: { statKey: keyof typeof STAT_CONFIG; value: number; label: string }) => {
+const StatChangeBadge = ({
+  statKey,
+  value,
+  label,
+}: {
+  statKey: keyof typeof STAT_CONFIG;
+  value: number;
+  label: string;
+}) => {
   if (value === 0) return null;
   const isPositive = value > 0;
 
   return (
-    <View style={[styles.badge, isPositive ? styles.badgePositive : styles.badgeNegative]}>
-      <View style={[styles.badgeDot, { backgroundColor: STAT_CONFIG[statKey].color }]} />
-      <Text style={[styles.badgeText, isPositive ? styles.badgeTextPositive : styles.badgeTextNegative]}>
+    <View
+      style={[
+        styles.badge,
+        isPositive ? styles.badgePositive : styles.badgeNegative,
+      ]}
+    >
+      <View
+        style={[
+          styles.badgeDot,
+          { backgroundColor: STAT_CONFIG[statKey].color },
+        ]}
+      />
+      <Text
+        style={[
+          styles.badgeText,
+          isPositive ? styles.badgeTextPositive : styles.badgeTextNegative,
+        ]}
+      >
         {label} {isPositive ? `+${value}` : value}
       </Text>
     </View>
@@ -294,9 +350,20 @@ const ResultStatItem = ({
 
   return (
     <View style={styles.resultStatItem}>
-      <MaterialCommunityIcons name={STAT_CONFIG[statKey].icon} size={20} color={STAT_CONFIG[statKey].color} />
+      <MaterialCommunityIcons
+        name={STAT_CONFIG[statKey].icon}
+        size={20}
+        color={STAT_CONFIG[statKey].color}
+      />
       <Text style={styles.resultStatLabel}>{label}</Text>
-      <Text style={[styles.resultStatValue, isPositive ? styles.resultStatValuePositive : styles.resultStatValueNegative]}>
+      <Text
+        style={[
+          styles.resultStatValue,
+          isPositive
+            ? styles.resultStatValuePositive
+            : styles.resultStatValueNegative,
+        ]}
+      >
         {isPositive ? `+${value}` : value}
       </Text>
     </View>
@@ -311,46 +378,80 @@ type Props = {
   onClearSavedGame?: () => void;
 };
 
-export default function GameScreen({ character, initialLang = 'en', initialSession = null, onGoToCharacterSelect, onClearSavedGame }: Props) {
+export default function GameScreen({
+  character,
+  initialLang = 'en',
+  initialSession = null,
+  onGoToCharacterSelect,
+  onClearSavedGame,
+}: Props) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const activeInitialSession = initialSession?.characterId === character?.id ? initialSession : null;
+  const activeInitialSession =
+    initialSession?.characterId === character?.id ? initialSession : null;
   const initialStats = useMemo(
     () => ({
-      funds: activeInitialSession ? activeInitialSession.stats.funds : character?.startingStats.funds ?? 1000,
-      mental: activeInitialSession ? activeInitialSession.stats.mental : character?.startingStats.mental ?? 100,
-      english: activeInitialSession ? activeInitialSession.stats.english : character?.startingStats.english ?? 30,
-      insight: activeInitialSession ? activeInitialSession.stats.insight : character?.startingStats.insight ?? 50,
-      stamina: activeInitialSession ? activeInitialSession.stats.stamina : character?.startingStats.stamina ?? 100,
-      relation: activeInitialSession ? activeInitialSession.stats.relation : character?.startingStats.relation ?? 50,
+      funds: activeInitialSession
+        ? activeInitialSession.stats.funds
+        : (character?.startingStats.funds ?? 1000),
+      mental: activeInitialSession
+        ? activeInitialSession.stats.mental
+        : (character?.startingStats.mental ?? 100),
+      english: activeInitialSession
+        ? activeInitialSession.stats.english
+        : (character?.startingStats.english ?? 30),
+      insight: activeInitialSession
+        ? activeInitialSession.stats.insight
+        : (character?.startingStats.insight ?? 50),
+      stamina: activeInitialSession
+        ? activeInitialSession.stats.stamina
+        : (character?.startingStats.stamina ?? 100),
+      relation: activeInitialSession
+        ? activeInitialSession.stats.relation
+        : (character?.startingStats.relation ?? 50),
     }),
-    [activeInitialSession, character?.startingStats.english, character?.startingStats.funds, character?.startingStats.insight, character?.startingStats.mental, character?.startingStats.relation, character?.startingStats.stamina],
+    [
+      activeInitialSession,
+      character?.startingStats.english,
+      character?.startingStats.funds,
+      character?.startingStats.insight,
+      character?.startingStats.mental,
+      character?.startingStats.relation,
+      character?.startingStats.stamina,
+    ],
   );
   const storyScrollRef = useRef<ScrollView | null>(null);
   const roadmapScrollRef = useRef<ScrollView | null>(null);
   const statusCardFlipAnim = useRef(new Animated.Value(0)).current;
   const [sceneAssetsReady, setSceneAssetsReady] = useState(false);
   const [lang, setLang] = useState<'en' | 'ko'>(initialLang);
-  const scenarioBundle = useMemo(() => getScenarioBundle(character?.id), [character?.id]);
+  const scenarioBundle = useMemo(
+    () => getScenarioBundle(character?.id),
+    [character?.id],
+  );
   const startScenarioId = scenarioBundle.startScenarioId;
   const scenarios = scenarioBundle.scenarios;
   const [currentScenarioId, setCurrentScenarioId] = useState<number>(
-    activeInitialSession ? activeInitialSession.currentScenarioId : startScenarioId,
+    activeInitialSession
+      ? activeInitialSession.currentScenarioId
+      : startScenarioId,
   );
   const [stats, setStats] = useState<GameStats>(initialStats);
   const [showResult, setShowResult] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedChoice, setSelectedChoice] = useState<Choice | null>(null);
-  const [endingType, setEndingType] = useState<'success' | 'failure' | null>(null);
-  const [isStatusCardFlipped, setIsStatusCardFlipped] = useState(false);
-  const [currentSituationChoices, setCurrentSituationChoices] = useState<ScenarioChoice[]>(
-    activeInitialSession ? activeInitialSession.currentSituationChoices : [],
+  const [endingType, setEndingType] = useState<'success' | 'failure' | null>(
+    null,
   );
+  const [isStatusCardFlipped, setIsStatusCardFlipped] = useState(false);
+  const [currentSituationChoices, setCurrentSituationChoices] = useState<
+    ScenarioChoice[]
+  >(activeInitialSession ? activeInitialSession.currentSituationChoices : []);
   const [playHistory, setPlayHistory] = useState<PlayedChoice[]>(
     activeInitialSession ? activeInitialSession.playHistory : [],
   );
   const [showRoadmap, setShowRoadmap] = useState(false);
-  const [showRoadmapHint, setShowRoadmapHint] = useState(false);
+  const [selectedRoadmapWeek, setSelectedRoadmapWeek] = useState(1);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [pendingSummary, setPendingSummary] = useState<{
     summary: SituationSummary;
@@ -380,16 +481,30 @@ export default function GameScreen({ character, initialLang = 'en', initialSessi
   const storyContentPaddingBottom = Math.max(insets.bottom + 4, 4);
   const scenarioOverlap = Math.round(characterHeight * 0.38);
   const scenarioPanelBottom = Math.max(insets.bottom, 8);
-  const scenarioPanelMaxHeight = Math.min(460, Math.max(360, Math.round(height * 0.42)));
+  const scenarioPanelMaxHeight = Math.min(
+    460,
+    Math.max(360, Math.round(height * 0.42)),
+  );
   const roadmapPanelWidth = Math.min(Math.round(width * 0.92), 520);
-  const roadmapPanelMaxHeight = Math.max(320, height - insets.top - insets.bottom - 32);
+  const roadmapPanelMaxHeight = Math.max(
+    320,
+    height - insets.top - insets.bottom - 32,
+  );
 
   useEffect(() => {
     setLang(activeInitialSession ? activeInitialSession.lang : initialLang);
-    setCurrentScenarioId(activeInitialSession ? activeInitialSession.currentScenarioId : startScenarioId);
+    setCurrentScenarioId(
+      activeInitialSession
+        ? activeInitialSession.currentScenarioId
+        : startScenarioId,
+    );
     setStats(initialStats);
-    setCurrentSituationChoices(activeInitialSession ? activeInitialSession.currentSituationChoices : []);
-    setPlayHistory(activeInitialSession ? activeInitialSession.playHistory : []);
+    setCurrentSituationChoices(
+      activeInitialSession ? activeInitialSession.currentSituationChoices : [],
+    );
+    setPlayHistory(
+      activeInitialSession ? activeInitialSession.playHistory : [],
+    );
     setShowRoadmap(false);
     setShowLanguageMenu(false);
     setShowResult(false);
@@ -439,7 +554,8 @@ export default function GameScreen({ character, initialLang = 'en', initialSessi
       },
     [scenarios, startScenarioId],
   );
-  const currentScenario: Scenario = scenarios[String(currentScenarioId)] ?? fallbackScenario;
+  const currentScenario: Scenario =
+    scenarios[String(currentScenarioId)] ?? fallbackScenario;
   const isSummaryScenario = currentScenario.type === 'SUMMARY';
 
   const resolvedBackgroundKey: BackgroundKey = currentScenario.backgroundKey
@@ -469,26 +585,32 @@ export default function GameScreen({ character, initialLang = 'en', initialSessi
     };
   }, [currentBackground, currentCharacterOverlay]);
 
-const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
-  const dayNumber =
-    typeof currentScenario.day === 'number' && currentScenario.day > 0
-      ? currentScenario.day
-      : undefined;
-  if (dayNumber) {
-    return currentLang === 'ko' ? `${dayNumber}일차` : `Day ${dayNumber}`;
-  }
+  const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
+    const dayNumber =
+      typeof currentScenario.day === 'number' && currentScenario.day > 0
+        ? currentScenario.day
+        : undefined;
+    if (dayNumber) {
+      return currentLang === 'ko' ? `${dayNumber}일차` : `Day ${dayNumber}`;
+    }
 
-  const situationNumber = Number(quest?.split('-')[0] ?? '1');
-  const weekNumber = Number.isFinite(situationNumber) && situationNumber > 0 ? situationNumber : 1;
-  const startDay = (weekNumber - 1) * 6 + 1;
-  const endDay = weekNumber * 6;
+    const situationNumber = Number(quest?.split('-')[0] ?? '1');
+    const weekNumber =
+      Number.isFinite(situationNumber) && situationNumber > 0
+        ? situationNumber
+        : 1;
+    const startDay = (weekNumber - 1) * 6 + 1;
+    const endDay = weekNumber * 6;
     return currentLang === 'ko'
       ? `${weekNumber}주차: Day ${startDay} - ${endDay}`
       : `Week ${weekNumber}: Day ${startDay} - ${endDay}`;
   };
 
   const usesMainEpisodeProgress = useMemo(
-    () => Object.values(scenarios).some((scenario) => typeof scenario.mainEpisode === 'number'),
+    () =>
+      Object.values(scenarios).some(
+        (scenario) => typeof scenario.mainEpisode === 'number',
+      ),
     [scenarios],
   );
   const headerTitle = getScenarioHeaderTitle(currentScenario, lang);
@@ -512,11 +634,13 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
       })
       .filter((entry) => entry.impact < 0)
       .sort((a, b) => a.impact - b.impact)
-      .reduce<{
-        title: LocalizedText;
-        detail: LocalizedText;
-        dedupeKey: string;
-      }[]>((items, entry) => {
+      .reduce<
+        {
+          title: LocalizedText;
+          detail: LocalizedText;
+          dedupeKey: string;
+        }[]
+      >((items, entry) => {
         const dedupeKey = `${entry.situationTitle.ko}::${entry.choice.feedback.ko}`;
         if (items.some((item) => item.dedupeKey === dedupeKey)) {
           return items;
@@ -549,17 +673,20 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
   }, [playHistory]);
   const roadmapNodes = useMemo(() => {
     return Object.values(scenarios)
-      .filter((scenario) => !usesMainEpisodeProgress || isRoadmapMainScenario(scenario))
-      .sort(
-        (a, b) =>
-          usesMainEpisodeProgress
-            ? (a.week ?? 1) - (b.week ?? 1) ||
-              (a.day ?? 1) - (b.day ?? 1) ||
-              (a.mainEpisode ?? 0) - (b.mainEpisode ?? 0)
-            : a.id - b.id,
+      .filter(
+        (scenario) =>
+          !usesMainEpisodeProgress || isRoadmapMainScenario(scenario),
+      )
+      .sort((a, b) =>
+        usesMainEpisodeProgress
+          ? (a.week ?? 1) - (b.week ?? 1) ||
+            (a.day ?? 1) - (b.day ?? 1) ||
+            (a.mainEpisode ?? 0) - (b.mainEpisode ?? 0)
+          : a.id - b.id,
       )
       .map((scenario) => ({
         scenarioId: scenario.id,
+        week: scenario.week ?? Math.ceil((scenario.day ?? 1) / 6),
         day: scenario.day ?? 1,
         progressLabel: usesMainEpisodeProgress
           ? getRoadmapProgressLabel(scenario)
@@ -568,11 +695,45 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
             ).padStart(2, '0')}`,
         title: {
           ko: getScenarioDisplayTitle(scenario, 'ko') || `상황 ${scenario.id}`,
-          en: getScenarioDisplayTitle(scenario, 'en') || `Situation ${scenario.id}`,
+          en:
+            getScenarioDisplayTitle(scenario, 'en') ||
+            `Situation ${scenario.id}`,
         },
-        stampLabel: getRoadmapStampLabel(getScenarioDisplayTitle(scenario, 'en') || `Step ${scenario.id}`, scenario.id),
+        stampLabel: getRoadmapStampLabel(
+          getScenarioDisplayTitle(scenario, 'en') || `Step ${scenario.id}`,
+          scenario.id,
+        ),
       }));
   }, [scenarios, usesMainEpisodeProgress]);
+  const currentRoadmapWeek =
+    currentScenario.week ?? Math.ceil((currentScenario.day ?? 1) / 6);
+  const unlockedRoadmapWeeks = useMemo(() => {
+    const weeks = new Set<number>([currentRoadmapWeek]);
+
+    roadmapNodes.forEach((node) => {
+      if (checkpoints[node.scenarioId]) {
+        weeks.add(node.week);
+      }
+    });
+
+    return weeks;
+  }, [checkpoints, currentRoadmapWeek, roadmapNodes]);
+  const selectedWeekRoadmapNodes = useMemo(
+    () => roadmapNodes.filter((node) => node.week === selectedRoadmapWeek),
+    [roadmapNodes, selectedRoadmapWeek],
+  );
+  const selectedRoadmapWeekMeta =
+    ROADMAP_WEEKS.find((item) => item.week === selectedRoadmapWeek) ??
+    ROADMAP_WEEKS[0];
+  const roadmapLocationTitle =
+    selectedRoadmapWeek === currentRoadmapWeek
+      ? `W${currentRoadmapWeek} · Day ${currentScenario.day ?? 1}. ${situationTitle}`
+      : `W${selectedRoadmapWeek} · Day ${String(
+          selectedRoadmapWeekMeta.dayStart,
+        ).padStart(
+          2,
+          '0',
+        )}–${String(selectedRoadmapWeekMeta.dayEnd).padStart(2, '0')}`;
 
   useEffect(() => {
     setCheckpoints((prev) => {
@@ -601,36 +762,36 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
   useEffect(() => {
     if (!showRoadmap) return;
 
-    const exactCurrentIndex = roadmapNodes.findIndex((node) => node.scenarioId === currentScenarioId);
+    setSelectedRoadmapWeek(currentRoadmapWeek);
+  }, [currentRoadmapWeek, showRoadmap]);
+
+  useEffect(() => {
+    if (!showRoadmap) return;
+
+    const exactCurrentIndex = selectedWeekRoadmapNodes.findIndex(
+      (node) => node.scenarioId === currentScenarioId,
+    );
     const currentIndex =
       exactCurrentIndex >= 0
         ? exactCurrentIndex
-        : roadmapNodes.reduce(
-            (lastIndex, node, index) => (checkpoints[node.scenarioId] ? index : lastIndex),
+        : selectedWeekRoadmapNodes.reduce(
+            (lastIndex, node, index) =>
+              checkpoints[node.scenarioId] ? index : lastIndex,
             -1,
           );
-    if (currentIndex < 0) return;
 
     const timer = setTimeout(() => {
       roadmapScrollRef.current?.scrollTo({
-        y: Math.max(0, Math.floor(currentIndex / 2) * 176 - 18),
+        y:
+          currentIndex < 0
+            ? 0
+            : Math.max(0, Math.floor(currentIndex / 2) * 176 - 18),
         animated: true,
       });
     }, 80);
 
     return () => clearTimeout(timer);
-  }, [checkpoints, currentScenarioId, roadmapNodes, showRoadmap]);
-
-  useEffect(() => {
-    if (!showRoadmap) {
-      setShowRoadmapHint(false);
-      return;
-    }
-
-    setShowRoadmapHint(true);
-    const timer = setTimeout(() => setShowRoadmapHint(false), 2600);
-    return () => clearTimeout(timer);
-  }, [showRoadmap]);
+  }, [checkpoints, currentScenarioId, selectedWeekRoadmapNodes, showRoadmap]);
 
   useEffect(() => {
     if (!character?.id) return;
@@ -646,7 +807,18 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
       checkpoints,
       updatedAt: new Date().toISOString(),
     });
-  }, [character?.id, checkpoints, currentScenarioId, currentSituationChoices, endingType, lang, pendingSummary, playHistory, showResult, stats]);
+  }, [
+    character?.id,
+    checkpoints,
+    currentScenarioId,
+    currentSituationChoices,
+    endingType,
+    lang,
+    pendingSummary,
+    playHistory,
+    showResult,
+    stats,
+  ]);
 
   const setLanguageAndClose = (nextLang: 'en' | 'ko') => {
     setLang(nextLang);
@@ -682,7 +854,9 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
     }
 
     if (currentScenario.statChanges) {
-      setStats((prev) => applyStatChanges(prev, currentScenario.statChanges ?? {}));
+      setStats((prev) =>
+        applyStatChanges(prev, currentScenario.statChanges ?? {}),
+      );
     }
 
     setCurrentSituationChoices([]);
@@ -706,11 +880,15 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
         return;
       }
 
-      const completedSituationChoices = [...currentSituationChoices, selectedChoice];
+      const completedSituationChoices = [
+        ...currentSituationChoices,
+        selectedChoice,
+      ];
       const nextScenarioId = selectedChoice.nextScenarioId;
       const nextScenario = scenarios[String(nextScenarioId)];
       const shouldTriggerSummary =
-        currentScenario.isPhaseEnd ?? shouldShowSituationSummary(currentScenario.id);
+        currentScenario.isPhaseEnd ??
+        shouldShowSituationSummary(currentScenario.id);
 
       if (currentScenario.isEnding) {
         setCurrentSituationChoices([]);
@@ -784,17 +962,62 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
   };
 
   const getFeedbackBorderColor = (choice: Choice) => {
-    const total = Object.values(choice.statChanges).reduce((a, b) => a + (b ?? 0), 0);
+    const total = Object.values(choice.statChanges).reduce(
+      (a, b) => a + (b ?? 0),
+      0,
+    );
     return total >= 0 ? '#40C057' : '#228BE6';
   };
 
   const statusItems = [
-    { key: 'funds', icon: STAT_CONFIG.funds.icon, label: t.fundsLabel, value: stats.funds, max: 1000, color: '#F0D44E' },
-    { key: 'mental', icon: STAT_CONFIG.mental.icon, label: t.mentalHpLabel, value: stats.mental, max: 100, color: '#4F8DFF' },
-    { key: 'relation', icon: STAT_CONFIG.relation.icon, label: t.relationLabel, value: stats.relation, max: 100, color: '#9C7CFF' },
-    { key: 'english', icon: STAT_CONFIG.english.icon, label: t.englishLabel, value: stats.english, max: 100, color: '#F26F97' },
-    { key: 'stamina', icon: STAT_CONFIG.stamina.icon, label: t.staminaLabel, value: stats.stamina, max: 100, color: '#4CC26A' },
-    { key: 'insight', icon: STAT_CONFIG.insight.icon, label: t.insightLabel, value: stats.insight, max: 100, color: '#F0BE63' },
+    {
+      key: 'funds',
+      icon: STAT_CONFIG.funds.icon,
+      label: t.fundsLabel,
+      value: stats.funds,
+      max: 1000,
+      color: '#F0D44E',
+    },
+    {
+      key: 'mental',
+      icon: STAT_CONFIG.mental.icon,
+      label: t.mentalHpLabel,
+      value: stats.mental,
+      max: 100,
+      color: '#4F8DFF',
+    },
+    {
+      key: 'relation',
+      icon: STAT_CONFIG.relation.icon,
+      label: t.relationLabel,
+      value: stats.relation,
+      max: 100,
+      color: '#9C7CFF',
+    },
+    {
+      key: 'english',
+      icon: STAT_CONFIG.english.icon,
+      label: t.englishLabel,
+      value: stats.english,
+      max: 100,
+      color: '#F26F97',
+    },
+    {
+      key: 'stamina',
+      icon: STAT_CONFIG.stamina.icon,
+      label: t.staminaLabel,
+      value: stats.stamina,
+      max: 100,
+      color: '#4CC26A',
+    },
+    {
+      key: 'insight',
+      icon: STAT_CONFIG.insight.icon,
+      label: t.insightLabel,
+      value: stats.insight,
+      max: 100,
+      color: '#F0BE63',
+    },
   ] as const;
   const statusDetailTone = useMemo(
     () => getStatusDetailTone(stats, isKorean ? 'ko' : 'en'),
@@ -809,7 +1032,10 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
       }),
     [currentScenario.episode, isKorean, stats],
   );
-  const statusCardWidth = Math.min(Math.round(width * (isNarrow ? 0.39 : 0.33)), 188);
+  const statusCardWidth = Math.min(
+    Math.round(width * (isNarrow ? 0.39 : 0.33)),
+    188,
+  );
   const statusCardFrontRotate = statusCardFlipAnim.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '180deg'],
@@ -837,7 +1063,9 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
         variant={endingType}
         characterId={character?.id}
         failureRecap={failureRecap}
-        onContinueAfterAd={endingType === 'failure' ? continueAfterFailure : undefined}
+        onContinueAfterAd={
+          endingType === 'failure' ? continueAfterFailure : undefined
+        }
         onTryAnotherChoice={() => {
           restartGame();
           onClearSavedGame?.();
@@ -869,7 +1097,9 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
   if (!sceneAssetsReady) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <Tabs.Screen options={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
+        <Tabs.Screen
+          options={{ headerShown: false, tabBarStyle: { display: 'none' } }}
+        />
         <View style={styles.scenePlaceholder} />
       </SafeAreaView>
     );
@@ -877,12 +1107,27 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <Tabs.Screen options={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
-      <ImageBackground source={currentBackground} style={styles.backgroundImage} imageStyle={styles.backgroundImageStyle}>
+      <Tabs.Screen
+        options={{ headerShown: false, tabBarStyle: { display: 'none' } }}
+      />
+      <ImageBackground
+        source={currentBackground}
+        style={styles.backgroundImage}
+        imageStyle={styles.backgroundImageStyle}
+      >
         <View style={styles.backgroundScrim} />
         {currentCharacterOverlay && (
-          <View style={[styles.characterOverlayWrap, { top: characterTop, height: characterHeight }]}>
-            <Image source={currentCharacterOverlay} style={[styles.characterOverlay, { width: characterWidth }]} resizeMode="contain" />
+          <View
+            style={[
+              styles.characterOverlayWrap,
+              { top: characterTop, height: characterHeight },
+            ]}
+          >
+            <Image
+              source={currentCharacterOverlay}
+              style={[styles.characterOverlay, { width: characterWidth }]}
+              resizeMode="contain"
+            />
           </View>
         )}
         <View style={styles.container}>
@@ -906,232 +1151,311 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                 paddingHorizontal: headerHorizontalPadding,
               }}
             >
-                <TouchableOpacity
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 11,
-                    borderWidth: 1,
-                    borderColor: 'rgba(255,255,255,0.14)',
-                    backgroundColor: 'rgba(8, 19, 38, 0.28)',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                  onPress={() => {
-                    setShowRoadmap(true);
-                  }}
-                >
-                  <MaterialCommunityIcons name="map-outline" size={20} color="#F1F1EF" />
-                </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 11,
+                  borderWidth: 1,
+                  borderColor: 'rgba(255,255,255,0.14)',
+                  backgroundColor: 'rgba(8, 19, 38, 0.28)',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onPress={() => {
+                  setShowRoadmap(true);
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="map-outline"
+                  size={20}
+                  color="#F1F1EF"
+                />
+              </TouchableOpacity>
 
-                <TouchableOpacity
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  left: 56,
+                  right: 56,
+                  top: 0,
+                  bottom: 0,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                activeOpacity={0.82}
+                onPress={() => {
+                  Alert.alert(
+                    isKorean ? '장면 제목' : 'Scene Title',
+                    headerTitle,
+                  );
+                }}
+              >
+                <Text
                   style={{
-                    position: 'absolute',
-                    left: 56,
-                    right: 56,
-                    top: 0,
-                    bottom: 0,
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    fontSize: 14,
+                    lineHeight: 18,
+                    fontWeight: '700',
+                    color: '#FFFFFF',
+                    letterSpacing: -0.2,
+                    textAlign: 'center',
+                    textShadowColor: 'rgba(3, 10, 19, 0.24)',
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 6,
                   }}
-                  activeOpacity={0.82}
-                  onPress={() => {
-                    Alert.alert(
-                      isKorean ? '장면 제목' : 'Scene Title',
-                      headerTitle,
-                    );
-                  }}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
                 >
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      lineHeight: 18,
-                      fontWeight: '700',
-                      color: '#FFFFFF',
-                      letterSpacing: -0.2,
-                      textAlign: 'center',
-                      textShadowColor: 'rgba(3, 10, 19, 0.24)',
-                      textShadowOffset: { width: 0, height: 2 },
-                      textShadowRadius: 6,
-                    }}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {headerTitle}
-                  </Text>
-                </TouchableOpacity>
+                  {headerTitle}
+                </Text>
+              </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 11,
-                    borderWidth: 1,
-                    borderColor: 'rgba(255,255,255,0.14)',
-                    backgroundColor: 'rgba(8, 19, 38, 0.28)',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                  onPress={() => {
-                    setShowLanguageMenu((prev) => !prev);
-                  }}
-                >
-                  <MaterialCommunityIcons name="translate" size={20} color="#F1F1EF" />
-                </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 11,
+                  borderWidth: 1,
+                  borderColor: 'rgba(255,255,255,0.14)',
+                  backgroundColor: 'rgba(8, 19, 38, 0.28)',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onPress={() => {
+                  setShowLanguageMenu((prev) => !prev);
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="translate"
+                  size={20}
+                  color="#F1F1EF"
+                />
+              </TouchableOpacity>
             </View>
             {showLanguageMenu ? (
-              <View style={[styles.languageMenu, { top: headerHeight + 4, right: headerHorizontalPadding }]}>
-                <TouchableOpacity style={styles.languageMenuItem} onPress={() => setLanguageAndClose('ko')}>
-                  <Text style={[styles.languageMenuText, isKorean && styles.languageMenuTextActive]}>한국어</Text>
+              <View
+                style={[
+                  styles.languageMenu,
+                  { top: headerHeight + 4, right: headerHorizontalPadding },
+                ]}
+              >
+                <TouchableOpacity
+                  style={styles.languageMenuItem}
+                  onPress={() => setLanguageAndClose('ko')}
+                >
+                  <Text
+                    style={[
+                      styles.languageMenuText,
+                      isKorean && styles.languageMenuTextActive,
+                    ]}
+                  >
+                    한국어
+                  </Text>
                 </TouchableOpacity>
                 <View style={styles.languageMenuDivider} />
-                <TouchableOpacity style={styles.languageMenuItem} onPress={() => setLanguageAndClose('en')}>
-                  <Text style={[styles.languageMenuText, !isKorean && styles.languageMenuTextActive]}>English</Text>
+                <TouchableOpacity
+                  style={styles.languageMenuItem}
+                  onPress={() => setLanguageAndClose('en')}
+                >
+                  <Text
+                    style={[
+                      styles.languageMenuText,
+                      !isKorean && styles.languageMenuTextActive,
+                    ]}
+                  >
+                    English
+                  </Text>
                 </TouchableOpacity>
               </View>
             ) : null}
-            {!showResult ? <TouchableOpacity
-              activeOpacity={0.96}
-              onPress={toggleStatusCard}
-              style={[
-                styles.statusFloatingCardWrap,
-                {
-                  width: statusCardWidth,
-                  right: headerHorizontalPadding,
-                  top: headerHeight + 8,
-                },
-              ]}
-            >
-              <View
-                style={{
-                  width: '100%',
-                  height: isStatusCardFlipped ? 356 : undefined,
-                  minHeight: 0,
-                }}
+            {!showResult ? (
+              <TouchableOpacity
+                activeOpacity={0.96}
+                onPress={toggleStatusCard}
+                style={[
+                  styles.statusFloatingCardWrap,
+                  {
+                    width: statusCardWidth,
+                    right: headerHorizontalPadding,
+                    top: headerHeight + 8,
+                  },
+                ]}
               >
-                <Animated.View
-                  style={[
-                    {
-                      position: 'relative',
-                      width: '100%',
-                      minHeight: 0,
-                      paddingHorizontal: 11,
-                      paddingTop: 8,
-                      paddingBottom: 7,
-                      borderRadius: 16,
-                      borderWidth: 1.1,
-                      borderColor: 'rgba(207,226,255,0.46)',
-                      backgroundColor: 'rgba(9, 21, 45, 0.88)',
-                      shadowColor: '#071224',
-                      shadowOpacity: 0.2,
-                      shadowRadius: 14,
-                      shadowOffset: { width: 0, height: 6 },
-                      elevation: 5,
-                      backfaceVisibility: 'hidden',
-                    },
-                    {
-                      transform: [{ perspective: 1000 }, { rotateY: statusCardFrontRotate }],
-                    },
-                  ]}
+                <View
+                  style={{
+                    width: '100%',
+                    height: isStatusCardFlipped ? 356 : undefined,
+                    minHeight: 0,
+                  }}
                 >
-                  <View
-                    style={{
-                      width: '100%',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
+                  <Animated.View
+                    style={[
+                      {
+                        position: 'relative',
+                        width: '100%',
+                        minHeight: 0,
+                        paddingHorizontal: 11,
+                        paddingTop: 8,
+                        paddingBottom: 7,
+                        borderRadius: 16,
+                        borderWidth: 1.1,
+                        borderColor: 'rgba(207,226,255,0.46)',
+                        backgroundColor: 'rgba(9, 21, 45, 0.88)',
+                        shadowColor: '#071224',
+                        shadowOpacity: 0.2,
+                        shadowRadius: 14,
+                        shadowOffset: { width: 0, height: 6 },
+                        elevation: 5,
+                        backfaceVisibility: 'hidden',
+                      },
+                      {
+                        transform: [
+                          { perspective: 1000 },
+                          { rotateY: statusCardFrontRotate },
+                        ],
+                      },
+                    ]}
                   >
                     <View
                       style={{
-                        flex: 1,
-                        minWidth: 0,
+                        width: '100%',
                         flexDirection: 'row',
                         alignItems: 'center',
-                        gap: 7,
+                        justifyContent: 'space-between',
                       }}
                     >
-                      <View style={[styles.statusFloatingBadge, { borderColor: conditionSummary.color }]}>
-                        <MaterialCommunityIcons
-                          name={conditionSummary.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                          size={17}
-                          color={conditionSummary.color}
-                        />
-                      </View>
-                      <View style={styles.statusFloatingHeadingText}>
-                        <Text
-                          style={[styles.statusFloatingHeadingAccent, { color: conditionSummary.color }]}
-                          numberOfLines={1}
+                      <View
+                        style={{
+                          flex: 1,
+                          minWidth: 0,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 7,
+                        }}
+                      >
+                        <View
+                          style={[
+                            styles.statusFloatingBadge,
+                            { borderColor: conditionSummary.color },
+                          ]}
                         >
-                          {conditionSummary.title}
-                        </Text>
-                      </View>
-                    </View>
-                    <MaterialCommunityIcons
-                      name="cards-outline"
-                      size={14}
-                      color="rgba(232,241,255,0.68)"
-                      style={{ marginLeft: 8, flexShrink: 0, opacity: 0.82 }}
-                    />
-                  </View>
-                  <View
-                    style={{
-                      height: 1,
-                      marginTop: 5,
-                      backgroundColor: 'rgba(207,226,255,0.18)',
-                    }}
-                  />
-                  <Text
-                    style={{
-                      marginTop: 5,
-                      marginBottom: 0,
-                      padding: 0,
-                      fontSize: 10,
-                      lineHeight: 14,
-                      color: 'rgba(228,234,244,0.82)',
-                      fontWeight: '700',
-                    }}
-                    numberOfLines={2}
-                  >
-                    {conditionSummary.description}
-                  </Text>
-                </Animated.View>
-
-                <Animated.View
-                  style={[
-                    styles.statusFloatingCard,
-                    styles.statusFloatingCardFace,
-                    styles.statusFloatingCardBack,
-                    {
-                      transform: [{ perspective: 1000 }, { rotateY: statusCardBackRotate }],
-                    },
-                  ]}
-                >
-                  <Text style={styles.statusBackTitle}>{isKorean ? '상태 보기' : 'Status'}</Text>
-                  <View style={styles.statusFloatingDivider} />
-                  <View style={styles.statusBackGrid}>
-                    {statusItems.map((item) => (
-                    <View key={`status-back-${item.key}`} style={styles.statusBackItem}>
-                      <MaterialCommunityIcons name={item.icon as keyof typeof MaterialCommunityIcons.glyphMap} size={20} color={item.color} />
-                      <View style={styles.statusBackItemText}>
-                        <View style={styles.statusBackTopRow}>
-                          <Text style={styles.statusBackLabel}>{item.label}</Text>
-                          <Text style={styles.statusBackValue}>
-                            {item.value}
-                            {' / '}
-                            {item.max}
+                          <MaterialCommunityIcons
+                            name={
+                              conditionSummary.icon as keyof typeof MaterialCommunityIcons.glyphMap
+                            }
+                            size={17}
+                            color={conditionSummary.color}
+                          />
+                        </View>
+                        <View style={styles.statusFloatingHeadingText}>
+                          <Text
+                            style={[
+                              styles.statusFloatingHeadingAccent,
+                              { color: conditionSummary.color },
+                            ]}
+                            numberOfLines={1}
+                          >
+                            {conditionSummary.title}
                           </Text>
                         </View>
-                        <View style={[styles.statusBackTonePill, { borderColor: `${item.color}55`, backgroundColor: `${item.color}18` }]}>
-                          <Text style={[styles.statusBackTone, { color: item.color }]}>{statusDetailTone[item.key]}</Text>
-                        </View>
                       </View>
+                      <MaterialCommunityIcons
+                        name="cards-outline"
+                        size={14}
+                        color="rgba(232,241,255,0.68)"
+                        style={{ marginLeft: 8, flexShrink: 0, opacity: 0.82 }}
+                      />
                     </View>
-                    ))}
-                  </View>
-                </Animated.View>
-              </View>
-            </TouchableOpacity> : null}
+                    <View
+                      style={{
+                        height: 1,
+                        marginTop: 5,
+                        backgroundColor: 'rgba(207,226,255,0.18)',
+                      }}
+                    />
+                    <Text
+                      style={{
+                        marginTop: 5,
+                        marginBottom: 0,
+                        padding: 0,
+                        fontSize: 10,
+                        lineHeight: 14,
+                        color: 'rgba(228,234,244,0.82)',
+                        fontWeight: '700',
+                      }}
+                      numberOfLines={2}
+                    >
+                      {conditionSummary.description}
+                    </Text>
+                  </Animated.View>
+
+                  <Animated.View
+                    style={[
+                      styles.statusFloatingCard,
+                      styles.statusFloatingCardFace,
+                      styles.statusFloatingCardBack,
+                      {
+                        transform: [
+                          { perspective: 1000 },
+                          { rotateY: statusCardBackRotate },
+                        ],
+                      },
+                    ]}
+                  >
+                    <Text style={styles.statusBackTitle}>
+                      {isKorean ? '상태 보기' : 'Status'}
+                    </Text>
+                    <View style={styles.statusFloatingDivider} />
+                    <View style={styles.statusBackGrid}>
+                      {statusItems.map((item) => (
+                        <View
+                          key={`status-back-${item.key}`}
+                          style={styles.statusBackItem}
+                        >
+                          <MaterialCommunityIcons
+                            name={
+                              item.icon as keyof typeof MaterialCommunityIcons.glyphMap
+                            }
+                            size={20}
+                            color={item.color}
+                          />
+                          <View style={styles.statusBackItemText}>
+                            <View style={styles.statusBackTopRow}>
+                              <Text style={styles.statusBackLabel}>
+                                {item.label}
+                              </Text>
+                              <Text style={styles.statusBackValue}>
+                                {item.value}
+                                {' / '}
+                                {item.max}
+                              </Text>
+                            </View>
+                            <View
+                              style={[
+                                styles.statusBackTonePill,
+                                {
+                                  borderColor: `${item.color}55`,
+                                  backgroundColor: `${item.color}18`,
+                                },
+                              ]}
+                            >
+                              <Text
+                                style={[
+                                  styles.statusBackTone,
+                                  { color: item.color },
+                                ]}
+                              >
+                                {statusDetailTone[item.key]}
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+                  </Animated.View>
+                </View>
+              </TouchableOpacity>
+            ) : null}
           </View>
 
           <ScrollView
@@ -1180,264 +1504,384 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                     }
               }
             >
-              {!showResult ? <View
-                style={{
-                  width: '100%',
-                  marginTop: showResult ? -scenarioOverlap : 0,
-                  marginBottom: 4,
-                  overflow: 'visible',
-                }}
-              >
-                <View style={styles.scenarioTab}>
-                  <Text style={styles.scenarioTabText}>
-                    {isSummaryScenario ? t.daySummaryLabel : isKorean ? '상황 설명' : 'Situation'}
-                  </Text>
-                </View>
+              {!showResult ? (
                 <View
                   style={{
                     width: '100%',
-                    maxHeight: showResult ? undefined : scenarioPanelMaxHeight - 18,
-                    overflow: 'hidden',
-                    backgroundColor: 'rgba(7, 18, 38, 0.74)',
-                    borderRadius: 18,
-                    borderWidth: 1.2,
-                    borderColor: 'rgba(99, 154, 235, 0.46)',
-                    paddingHorizontal: 16,
-                    paddingTop: 14,
-                    paddingBottom: 16,
+                    marginTop: showResult ? -scenarioOverlap : 0,
+                    marginBottom: 4,
+                    overflow: 'visible',
                   }}
                 >
-                  <ScrollView
+                  <View style={styles.scenarioTab}>
+                    <Text style={styles.scenarioTabText}>
+                      {isSummaryScenario
+                        ? t.daySummaryLabel
+                        : isKorean
+                          ? '상황 설명'
+                          : 'Situation'}
+                    </Text>
+                  </View>
+                  <View
                     style={{
                       width: '100%',
-                      maxHeight: showResult ? undefined : scenarioPanelMaxHeight - 50,
+                      maxHeight: showResult
+                        ? undefined
+                        : scenarioPanelMaxHeight - 18,
+                      overflow: 'hidden',
+                      backgroundColor: 'rgba(7, 18, 38, 0.74)',
+                      borderRadius: 18,
+                      borderWidth: 1.2,
+                      borderColor: 'rgba(99, 154, 235, 0.46)',
+                      paddingHorizontal: 16,
+                      paddingTop: 14,
+                      paddingBottom: 16,
                     }}
-                    contentContainerStyle={{
-                      flexDirection: 'column',
-                      paddingBottom: 2,
-                    }}
-                    nestedScrollEnabled
-                    scrollEnabled={!showResult}
-                    showsVerticalScrollIndicator={false}
-                    bounces={false}
                   >
-                    <View
+                    <ScrollView
                       style={{
                         width: '100%',
-                        flexGrow: 0,
-                        flexShrink: 0,
-                        marginBottom: 6,
+                        maxHeight: showResult
+                          ? undefined
+                          : scenarioPanelMaxHeight - 50,
                       }}
+                      contentContainerStyle={{
+                        flexDirection: 'column',
+                        paddingBottom: 2,
+                      }}
+                      nestedScrollEnabled
+                      scrollEnabled={!showResult}
+                      showsVerticalScrollIndicator={false}
+                      bounces={false}
                     >
-                      <Text
-                        style={styles.scenarioText}
-                        numberOfLines={isSummaryScenario ? 3 : undefined}
-                      >
-                        {currentScenario.description[lang]}
-                      </Text>
-                    </View>
-                    {!showResult ? (
                       <View
                         style={{
                           width: '100%',
                           flexGrow: 0,
                           flexShrink: 0,
-                          flexDirection: 'column',
-                          gap: 8,
-                          overflow: 'visible',
+                          marginBottom: 6,
                         }}
                       >
-                        {isSummaryScenario ? (
-                          <>
-                            {currentScenario.tip?.[lang] ? (
-                              <View style={styles.summaryTipCard}>
-                                <View style={styles.summaryTipHeader}>
-                                  <MaterialCommunityIcons
-                                    name="lightbulb-on-outline"
-                                    size={19}
-                                    color="#F4C542"
-                                  />
-                                  <Text style={styles.summaryTipLabel}>TIP</Text>
+                        <Text
+                          style={styles.scenarioText}
+                          numberOfLines={isSummaryScenario ? 3 : undefined}
+                        >
+                          {currentScenario.description[lang]}
+                        </Text>
+                      </View>
+                      {!showResult ? (
+                        <View
+                          style={{
+                            width: '100%',
+                            flexGrow: 0,
+                            flexShrink: 0,
+                            flexDirection: 'column',
+                            gap: 8,
+                            overflow: 'visible',
+                          }}
+                        >
+                          {isSummaryScenario ? (
+                            <>
+                              {currentScenario.tip?.[lang] ? (
+                                <View style={styles.summaryTipCard}>
+                                  <View style={styles.summaryTipHeader}>
+                                    <MaterialCommunityIcons
+                                      name="lightbulb-on-outline"
+                                      size={19}
+                                      color="#F4C542"
+                                    />
+                                    <Text style={styles.summaryTipLabel}>
+                                      TIP
+                                    </Text>
+                                  </View>
+                                  <Text style={styles.summaryTipText}>
+                                    {currentScenario.tip[lang]}
+                                  </Text>
                                 </View>
-                                <Text style={styles.summaryTipText}>{currentScenario.tip[lang]}</Text>
-                              </View>
-                            ) : null}
-                            <TouchableOpacity style={styles.nextButton} onPress={handleSummaryContinue}>
-                              <Text style={styles.nextButtonText}>{t.summaryContinue}</Text>
-                            </TouchableOpacity>
-                          </>
-                        ) : (
-                          currentScenario.choices.map((choice, index) => {
-                            const choiceCopy = splitChoiceText(choice.text[lang]);
-
-                            return (
+                              ) : null}
                               <TouchableOpacity
-                                key={index}
-                                style={styles.choiceButton}
-                                onPress={() => handleChoice(choice)}
+                                style={styles.nextButton}
+                                onPress={handleSummaryContinue}
                               >
-                                <View style={styles.choiceContentRow}>
-                                  <View style={styles.choiceIndexBubble}>
-                                    <Text style={styles.choiceIndexText}>{index + 1}</Text>
-                                  </View>
-                                  <View style={styles.choiceTextWrap}>
-                                    {choiceCopy.cue ? <Text style={styles.choiceCueText}>{choiceCopy.cue}</Text> : null}
-                                    <Text style={styles.choiceText}>{choiceCopy.body}</Text>
-                                  </View>
-                                </View>
+                                <Text style={styles.nextButtonText}>
+                                  {t.summaryContinue}
+                                </Text>
                               </TouchableOpacity>
-                            );
-                          })
-                        )}
-                      </View>
-                    ) : null}
-                  </ScrollView>
-                </View>
-              </View> : null}
-
-              {showResult && selectedChoice && (() => {
-                const resultCardData = buildResultCardData(selectedChoice, lang, currentScenario.tip);
-                const resultToneColor =
-                  resultCardData.resultTone === 'good'
-                    ? '#66D980'
-                    : resultCardData.resultTone === 'bad'
-                      ? '#FF7B86'
-                      : '#F4C542';
-
-                return (
-                  <View style={styles.resultOverlayStack}>
-                    <View style={[styles.resultContainer, { borderLeftColor: getFeedbackBorderColor(selectedChoice) }]}>
-                      <View style={styles.resultInfoBlock}>
-                        <View style={styles.resultInfoLabelRow}>
-                          <MaterialCommunityIcons name="checkbox-marked-circle-outline" size={18} color="#64B1FF" />
-                          <Text style={[styles.resultInfoLabel, styles.resultInfoLabelChoice]}>{t.resultSelectedLabel}</Text>
-                        </View>
-                        <Text style={styles.resultInfoText}>{resultCardData.selectedText}</Text>
-                      </View>
-
-                      <View style={styles.resultInfoDivider} />
-
-                      <View style={styles.resultInfoBlock}>
-                        <View style={styles.resultInfoLabelRow}>
-                          <MaterialCommunityIcons name="star-circle-outline" size={18} color={resultToneColor} />
-                          <Text style={[styles.resultInfoLabel, { color: resultToneColor }]}>
-                            {t.resultSummaryLabel} · {resultCardData.resultLabel}
-                          </Text>
-                        </View>
-                        <Text style={styles.resultInfoText}>{resultCardData.resultSummary}</Text>
-                      </View>
-
-                      <View style={styles.resultInfoDivider} />
-
-                      <View style={styles.resultInfoBlock}>
-                        <View style={styles.resultInfoLabelRow}>
-                          <MaterialCommunityIcons name="chart-line-variant" size={18} color="#B184FF" />
-                          <Text style={[styles.resultInfoLabel, styles.resultInfoLabelValues]}>{t.resultValuesLabel}</Text>
-                        </View>
-                        <View style={styles.resultStatsRow}>
-                          {resultCardData.changedStats.length ? (
-                            resultCardData.changedStats.map((entry) => (
-                              <ResultStatItem
-                                key={`${selectedChoice.nextScenarioId}-${entry.statKey}`}
-                                statKey={entry.statKey}
-                                value={entry.value}
-                                label={
-                                  entry.statKey === 'funds'
-                                    ? t.fundsLabel
-                                    : entry.statKey === 'mental'
-                                      ? t.mentalHpLabel
-                                      : entry.statKey === 'english'
-                                        ? t.englishLabel
-                                        : entry.statKey === 'insight'
-                                          ? t.insightLabel
-                                          : entry.statKey === 'stamina'
-                                            ? t.staminaLabel
-                                            : t.relationLabel
-                                }
-                              />
-                            ))
+                            </>
                           ) : (
-                            <Text style={styles.resultNoChangesText}>{t.noStatChanges}</Text>
+                            currentScenario.choices.map((choice, index) => {
+                              const choiceCopy = splitChoiceText(
+                                choice.text[lang],
+                              );
+
+                              return (
+                                <TouchableOpacity
+                                  key={index}
+                                  style={styles.choiceButton}
+                                  onPress={() => handleChoice(choice)}
+                                >
+                                  <View style={styles.choiceContentRow}>
+                                    <View style={styles.choiceIndexBubble}>
+                                      <Text style={styles.choiceIndexText}>
+                                        {index + 1}
+                                      </Text>
+                                    </View>
+                                    <View style={styles.choiceTextWrap}>
+                                      {choiceCopy.cue ? (
+                                        <Text style={styles.choiceCueText}>
+                                          {choiceCopy.cue}
+                                        </Text>
+                                      ) : null}
+                                      <Text style={styles.choiceText}>
+                                        {choiceCopy.body}
+                                      </Text>
+                                    </View>
+                                  </View>
+                                </TouchableOpacity>
+                              );
+                            })
                           )}
                         </View>
-                      </View>
-                    </View>
+                      ) : null}
+                    </ScrollView>
+                  </View>
+                </View>
+              ) : null}
 
-                    <View style={styles.resultActionRow}>
-                      <TouchableOpacity
-                        style={styles.resultFeedbackButton}
-                        onPress={() => setShowFeedbackModal(true)}
+              {showResult &&
+                selectedChoice &&
+                (() => {
+                  const resultCardData = buildResultCardData(
+                    selectedChoice,
+                    lang,
+                    currentScenario.tip,
+                  );
+                  const resultToneColor =
+                    resultCardData.resultTone === 'good'
+                      ? '#66D980'
+                      : resultCardData.resultTone === 'bad'
+                        ? '#FF7B86'
+                        : '#F4C542';
+
+                  return (
+                    <View style={styles.resultOverlayStack}>
+                      <View
+                        style={[
+                          styles.resultContainer,
+                          {
+                            borderLeftColor:
+                              getFeedbackBorderColor(selectedChoice),
+                          },
+                        ]}
                       >
-                        <Text style={styles.resultFeedbackButtonText}>{t.feedbackButton}</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={[styles.nextButton, styles.resultContinueButton]} onPress={proceedToNextScenario}>
-                        <Text style={styles.nextButtonText}>{t.nextBtn}</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    <Modal
-                      visible={showFeedbackModal}
-                      transparent
-                      animationType="fade"
-                      statusBarTranslucent
-                      onRequestClose={() => setShowFeedbackModal(false)}
-                    >
-                      <SafeAreaView style={styles.feedbackModalOverlay} edges={['top', 'bottom']}>
-                        <View style={styles.feedbackModalCard}>
-                          <View style={styles.feedbackModalHeader}>
-                            <Text style={styles.feedbackModalTitle}>{t.feedbackModalTitle}</Text>
-                            <TouchableOpacity
-                              style={styles.feedbackModalCloseIcon}
-                              onPress={() => setShowFeedbackModal(false)}
+                        <View style={styles.resultInfoBlock}>
+                          <View style={styles.resultInfoLabelRow}>
+                            <MaterialCommunityIcons
+                              name="checkbox-marked-circle-outline"
+                              size={18}
+                              color="#64B1FF"
+                            />
+                            <Text
+                              style={[
+                                styles.resultInfoLabel,
+                                styles.resultInfoLabelChoice,
+                              ]}
                             >
-                              <MaterialCommunityIcons name="close" size={20} color="#D8E8FF" />
-                            </TouchableOpacity>
+                              {t.resultSelectedLabel}
+                            </Text>
                           </View>
+                          <Text style={styles.resultInfoText}>
+                            {resultCardData.selectedText}
+                          </Text>
+                        </View>
 
-                          <ScrollView
-                            style={styles.feedbackModalScroll}
-                            contentContainerStyle={styles.feedbackModalContent}
-                            showsVerticalScrollIndicator={false}
-                          >
-                            <Text style={styles.feedbackModalSectionTitle}>{t.feedbackExplanation}</Text>
-                            <Text style={styles.feedbackModalText}>{resultCardData.feedbackText}</Text>
+                        <View style={styles.resultInfoDivider} />
 
-                            {resultCardData.tipText ? (
-                              <View style={styles.feedbackTipSection}>
-                                <View style={styles.feedbackTipHeading}>
-                                  <MaterialCommunityIcons name="lightbulb-on-outline" size={19} color="#F4C542" />
-                                  <Text style={styles.feedbackModalSectionTitle}>{t.feedbackTip}</Text>
-                                </View>
-                                <Text style={styles.feedbackModalText}>{resultCardData.tipText}</Text>
-                              </View>
-                            ) : null}
-                          </ScrollView>
-
-                          <View style={styles.feedbackModalActions}>
-                            <TouchableOpacity
-                              style={styles.feedbackModalCloseButton}
-                              onPress={() => setShowFeedbackModal(false)}
+                        <View style={styles.resultInfoBlock}>
+                          <View style={styles.resultInfoLabelRow}>
+                            <MaterialCommunityIcons
+                              name="star-circle-outline"
+                              size={18}
+                              color={resultToneColor}
+                            />
+                            <Text
+                              style={[
+                                styles.resultInfoLabel,
+                                { color: resultToneColor },
+                              ]}
                             >
-                              <Text style={styles.feedbackModalCloseButtonText}>{t.closeButton}</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              style={styles.feedbackModalContinueButton}
-                              onPress={proceedToNextScenario}
+                              {t.resultSummaryLabel} ·{' '}
+                              {resultCardData.resultLabel}
+                            </Text>
+                          </View>
+                          <Text style={styles.resultInfoText}>
+                            {resultCardData.resultSummary}
+                          </Text>
+                        </View>
+
+                        <View style={styles.resultInfoDivider} />
+
+                        <View style={styles.resultInfoBlock}>
+                          <View style={styles.resultInfoLabelRow}>
+                            <MaterialCommunityIcons
+                              name="chart-line-variant"
+                              size={18}
+                              color="#B184FF"
+                            />
+                            <Text
+                              style={[
+                                styles.resultInfoLabel,
+                                styles.resultInfoLabelValues,
+                              ]}
                             >
-                              <Text style={styles.feedbackModalContinueButtonText}>{t.nextBtn}</Text>
-                            </TouchableOpacity>
+                              {t.resultValuesLabel}
+                            </Text>
+                          </View>
+                          <View style={styles.resultStatsRow}>
+                            {resultCardData.changedStats.length ? (
+                              resultCardData.changedStats.map((entry) => (
+                                <ResultStatItem
+                                  key={`${selectedChoice.nextScenarioId}-${entry.statKey}`}
+                                  statKey={entry.statKey}
+                                  value={entry.value}
+                                  label={
+                                    entry.statKey === 'funds'
+                                      ? t.fundsLabel
+                                      : entry.statKey === 'mental'
+                                        ? t.mentalHpLabel
+                                        : entry.statKey === 'english'
+                                          ? t.englishLabel
+                                          : entry.statKey === 'insight'
+                                            ? t.insightLabel
+                                            : entry.statKey === 'stamina'
+                                              ? t.staminaLabel
+                                              : t.relationLabel
+                                  }
+                                />
+                              ))
+                            ) : (
+                              <Text style={styles.resultNoChangesText}>
+                                {t.noStatChanges}
+                              </Text>
+                            )}
                           </View>
                         </View>
-                      </SafeAreaView>
-                    </Modal>
-                  </View>
-                );
-              })()}
+                      </View>
+
+                      <View style={styles.resultActionRow}>
+                        <TouchableOpacity
+                          style={styles.resultFeedbackButton}
+                          onPress={() => setShowFeedbackModal(true)}
+                        >
+                          <Text style={styles.resultFeedbackButtonText}>
+                            {t.feedbackButton}
+                          </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[
+                            styles.nextButton,
+                            styles.resultContinueButton,
+                          ]}
+                          onPress={proceedToNextScenario}
+                        >
+                          <Text style={styles.nextButtonText}>{t.nextBtn}</Text>
+                        </TouchableOpacity>
+                      </View>
+
+                      <Modal
+                        visible={showFeedbackModal}
+                        transparent
+                        animationType="fade"
+                        statusBarTranslucent
+                        onRequestClose={() => setShowFeedbackModal(false)}
+                      >
+                        <SafeAreaView
+                          style={styles.feedbackModalOverlay}
+                          edges={['top', 'bottom']}
+                        >
+                          <View style={styles.feedbackModalCard}>
+                            <View style={styles.feedbackModalHeader}>
+                              <Text style={styles.feedbackModalTitle}>
+                                {t.feedbackModalTitle}
+                              </Text>
+                              <TouchableOpacity
+                                style={styles.feedbackModalCloseIcon}
+                                onPress={() => setShowFeedbackModal(false)}
+                              >
+                                <MaterialCommunityIcons
+                                  name="close"
+                                  size={20}
+                                  color="#D8E8FF"
+                                />
+                              </TouchableOpacity>
+                            </View>
+
+                            <ScrollView
+                              style={styles.feedbackModalScroll}
+                              contentContainerStyle={
+                                styles.feedbackModalContent
+                              }
+                              showsVerticalScrollIndicator={false}
+                            >
+                              <Text style={styles.feedbackModalSectionTitle}>
+                                {t.feedbackExplanation}
+                              </Text>
+                              <Text style={styles.feedbackModalText}>
+                                {resultCardData.feedbackText}
+                              </Text>
+
+                              {resultCardData.tipText ? (
+                                <View style={styles.feedbackTipSection}>
+                                  <View style={styles.feedbackTipHeading}>
+                                    <MaterialCommunityIcons
+                                      name="lightbulb-on-outline"
+                                      size={19}
+                                      color="#F4C542"
+                                    />
+                                    <Text
+                                      style={styles.feedbackModalSectionTitle}
+                                    >
+                                      {t.feedbackTip}
+                                    </Text>
+                                  </View>
+                                  <Text style={styles.feedbackModalText}>
+                                    {resultCardData.tipText}
+                                  </Text>
+                                </View>
+                              ) : null}
+                            </ScrollView>
+
+                            <View style={styles.feedbackModalActions}>
+                              <TouchableOpacity
+                                style={styles.feedbackModalCloseButton}
+                                onPress={() => setShowFeedbackModal(false)}
+                              >
+                                <Text
+                                  style={styles.feedbackModalCloseButtonText}
+                                >
+                                  {t.closeButton}
+                                </Text>
+                              </TouchableOpacity>
+                              <TouchableOpacity
+                                style={styles.feedbackModalContinueButton}
+                                onPress={proceedToNextScenario}
+                              >
+                                <Text
+                                  style={styles.feedbackModalContinueButtonText}
+                                >
+                                  {t.nextBtn}
+                                </Text>
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+                        </SafeAreaView>
+                      </Modal>
+                    </View>
+                  );
+                })()}
             </View>
           </ScrollView>
-
         </View>
-
       </ImageBackground>
 
       <Modal
@@ -1447,211 +1891,273 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
         statusBarTranslucent={false}
         onRequestClose={() => setShowRoadmap(false)}
       >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(5, 10, 22, 0.72)',
-            paddingTop: insets.top + 16,
-            paddingBottom: insets.bottom + 16,
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-            elevation: 1000,
-          }}
+        <ImageBackground
+          source={BACKGROUND_IMAGES.airport}
+          style={styles.roadmapModalBackground}
+          imageStyle={styles.roadmapModalBackgroundImage}
         >
+          <View style={styles.roadmapModalScrim} />
           <View
-            style={{
-              width: roadmapPanelWidth,
-              maxHeight: roadmapPanelMaxHeight,
-              flexShrink: 1,
-              backgroundColor: '#E9DEC9',
-              borderRadius: 24,
-              paddingHorizontal: 14,
-              paddingTop: 14,
-              paddingBottom: 12,
-              borderWidth: 1,
-              borderColor: 'rgba(255,255,255,0.55)',
-              shadowColor: '#000000',
-              shadowOpacity: 0.32,
-              shadowRadius: 24,
-              shadowOffset: { width: 0, height: 12 },
-              elevation: 1001,
-              overflow: 'hidden',
-            }}
+            style={[
+              styles.roadmapModalSafeArea,
+              {
+                paddingTop: insets.top + 16,
+                paddingBottom: insets.bottom + 16,
+              },
+            ]}
           >
             <View
-              style={{
-                flexShrink: 0,
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                justifyContent: 'space-between',
-                paddingBottom: 12,
-              }}
+              style={[
+                styles.roadmapModalCard,
+                {
+                  width: roadmapPanelWidth,
+                  height: roadmapPanelMaxHeight,
+                  maxHeight: roadmapPanelMaxHeight,
+                },
+              ]}
             >
-              <View style={{ flex: 1, minWidth: 0, paddingRight: 12 }}>
-                <Text style={styles.roadmapTitle}>{isKorean ? '로드맵' : 'Roadmap'}</Text>
-                <Text
-                  style={{
-                    marginTop: 4,
-                    fontSize: 15,
-                    lineHeight: 20,
-                    fontWeight: '900',
-                    color: '#5F4B3B',
-                  }}
-                  numberOfLines={2}
-                >
-                  {`Day ${currentScenario.day ?? 1}. ${situationTitle}`}
-                </Text>
+              <View style={styles.roadmapFixedHeader}>
+                <View style={styles.roadmapHeaderRow}>
+                  <View style={styles.roadmapHeaderCopy}>
+                    <Text style={styles.roadmapTitle}>{t.roadmapTitle}</Text>
+                    <Text style={styles.roadmapLocationTitle} numberOfLines={2}>
+                      {roadmapLocationTitle}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.roadmapCloseButton}
+                    onPress={() => setShowRoadmap(false)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t.closeButton}
+                  >
+                    <MaterialCommunityIcons
+                      name="close"
+                      size={21}
+                      color="#5B4C40"
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.roadmapPersistentHint}>
+                  <MaterialCommunityIcons
+                    name="information-outline"
+                    size={15}
+                    color="#FFF5E5"
+                  />
+                  <Text style={styles.roadmapPersistentHintText}>
+                    {t.roadmapHint}
+                  </Text>
+                </View>
               </View>
-              <TouchableOpacity
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: 19,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: 'rgba(255,255,255,0.72)',
-                  borderWidth: 1,
-                  borderColor: 'rgba(95,75,59,0.16)',
-                  zIndex: 1003,
-                  elevation: 1003,
-                }}
-                onPress={() => setShowRoadmap(false)}
-              >
-                <MaterialCommunityIcons name="close" size={21} color="#5B4C40" />
-              </TouchableOpacity>
-            </View>
 
-            {showRoadmapHint ? (
-              <View
-                pointerEvents="none"
-                style={{
-                  flexShrink: 0,
-                  marginBottom: 10,
-                  paddingHorizontal: 12,
-                  paddingVertical: 9,
-                  borderRadius: 12,
-                  backgroundColor: 'rgba(72, 54, 42, 0.9)',
-                  zIndex: 1002,
-                  elevation: 1002,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 12,
-                    lineHeight: 17,
-                    color: '#FFF8EC',
-                    fontWeight: '700',
-                    textAlign: 'center',
-                  }}
+              <View style={styles.roadmapBody}>
+                <ImageBackground
+                  source={require('../../assets/images/paper.png')}
+                  style={styles.roadmapPaperFrame}
+                  imageStyle={styles.roadmapPaperTexture}
                 >
-                  {t.roadmapHint}
-                </Text>
-              </View>
-            ) : null}
+                  <ScrollView
+                    ref={roadmapScrollRef}
+                    style={[
+                      styles.roadmapEpisodeScroll,
+                      Platform.OS === 'web'
+                        ? ({
+                            scrollbarWidth: 'thin',
+                            scrollbarColor: '#A16CC1 transparent',
+                          } as never)
+                        : null,
+                    ]}
+                    showsVerticalScrollIndicator={Platform.OS === 'web'}
+                    nestedScrollEnabled
+                    bounces={false}
+                    contentContainerStyle={styles.roadmapEpisodeContent}
+                  >
+                    <View style={styles.passportPage}>
+                      <Text style={styles.passportPageHeader}>
+                        {`VISA / VISAS · WEEK ${selectedRoadmapWeek}`}
+                      </Text>
+                      <View style={styles.passportHeaderRule} />
 
-            <ScrollView
-              ref={roadmapScrollRef}
-              style={{ flexShrink: 1 }}
-              showsVerticalScrollIndicator
-              nestedScrollEnabled
-              bounces={false}
-              contentContainerStyle={{
-                paddingBottom: Math.max(10, insets.bottom),
-              }}
-            >
-              <View style={styles.passportPage}>
-                <Text style={styles.passportPageHeader}>{t.roadmapPageHeader}</Text>
-                <View style={styles.passportHeaderRule} />
+                      <View style={styles.stampGrid}>
+                        {selectedWeekRoadmapNodes.map((node, index) => {
+                          const hasCheckpoint = Boolean(
+                            checkpoints[node.scenarioId],
+                          );
+                          const state =
+                            node.scenarioId === currentScenarioId
+                              ? 'current'
+                              : hasCheckpoint
+                                ? 'completed'
+                                : 'locked';
+                          const isAvailable = state === 'completed';
+                          const stampColor =
+                            ROADMAP_STAMP_COLORS[
+                              index % ROADMAP_STAMP_COLORS.length
+                            ];
+                          const rotation = index % 2 === 0 ? '-9deg' : '8deg';
 
-                <View style={styles.stampGrid}>
-                  {roadmapNodes.map((node, index) => {
-                    const hasCheckpoint = Boolean(checkpoints[node.scenarioId]);
-                    const state =
-                      node.scenarioId === currentScenarioId
-                        ? 'current'
-                        : hasCheckpoint
-                          ? 'completed'
-                          : 'locked';
-                    const isAvailable = hasCheckpoint;
-                    const stampColor = ROADMAP_STAMP_COLORS[index % ROADMAP_STAMP_COLORS.length];
-                    const rotation = index % 2 === 0 ? '-9deg' : '8deg';
+                          return (
+                            <View
+                              key={`roadmap-${node.scenarioId}`}
+                              style={styles.stampSlot}
+                            >
+                              <TouchableOpacity
+                                activeOpacity={isAvailable ? 0.88 : 1}
+                                disabled={!isAvailable}
+                                onPress={() => jumpToRoadmapNode(node)}
+                                style={[
+                                  styles.stampFrame,
+                                  state === 'locked' && { opacity: 0.7 },
+                                ]}
+                              >
+                                <View
+                                  style={[
+                                    styles.stampTape,
+                                    index % 2 === 0
+                                      ? styles.stampTapeBlue
+                                      : styles.stampTapePeach,
+                                  ]}
+                                />
+                                <View
+                                  style={[
+                                    styles.stampBody,
+                                    {
+                                      borderColor: stampColor,
+                                      transform: [{ rotate: rotation }],
+                                    },
+                                    state === 'current' &&
+                                      styles.stampBodyCurrent,
+                                    state === 'locked' &&
+                                      styles.stampBodyLocked,
+                                  ]}
+                                >
+                                  {state === 'locked' ? (
+                                    <MaterialCommunityIcons
+                                      name="lock-outline"
+                                      size={17}
+                                      color="#9C8D7B"
+                                    />
+                                  ) : null}
+                                  <Text
+                                    style={[
+                                      styles.stampPlace,
+                                      {
+                                        color:
+                                          state === 'locked'
+                                            ? '#8F806F'
+                                            : stampColor,
+                                      },
+                                    ]}
+                                  >
+                                    {state === 'locked'
+                                      ? 'LOCKED'
+                                      : node.stampLabel}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      styles.stampDate,
+                                      {
+                                        color:
+                                          state === 'locked'
+                                            ? '#9C8D7B'
+                                            : stampColor,
+                                      },
+                                    ]}
+                                  >
+                                    {node.progressLabel}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      styles.stampMeta,
+                                      {
+                                        color:
+                                          state === 'locked'
+                                            ? '#AA9A88'
+                                            : stampColor,
+                                      },
+                                    ]}
+                                  >
+                                    {state === 'current'
+                                      ? t.roadmapCurrent
+                                      : state === 'completed'
+                                        ? t.roadmapRewind
+                                        : t.roadmapLocked}
+                                  </Text>
+                                </View>
+                                <Text
+                                  style={[
+                                    styles.stampCaption,
+                                    state === 'locked' && { color: '#887866' },
+                                  ]}
+                                  numberOfLines={2}
+                                >
+                                  {node.title[lang]}
+                                </Text>
+                              </TouchableOpacity>
+                            </View>
+                          );
+                        })}
+                      </View>
+                    </View>
+                  </ScrollView>
+                </ImageBackground>
+
+                <View style={styles.roadmapWeekTabs}>
+                  {ROADMAP_WEEKS.map((weekMeta) => {
+                    const isSelected = selectedRoadmapWeek === weekMeta.week;
+                    const isUnlocked = unlockedRoadmapWeeks.has(weekMeta.week);
 
                     return (
-                      <View key={`roadmap-${node.scenarioId}`} style={styles.stampSlot}>
-                        <TouchableOpacity
-                          activeOpacity={isAvailable ? 0.88 : 1}
-                          disabled={!isAvailable}
-                          onPress={() => jumpToRoadmapNode(node)}
-                          style={[
-                            styles.stampFrame,
-                            state === 'locked' && { opacity: 0.74 },
-                          ]}
-                        >
-                          <View
-                            style={[
-                              styles.stampTape,
-                              index % 2 === 0 ? styles.stampTapeBlue : styles.stampTapePeach,
-                            ]}
-                          />
-                          <View
-                            style={[
-                              styles.stampBody,
-                              {
-                                borderColor: stampColor,
-                                transform: [{ rotate: rotation }],
-                              },
-                              state === 'current' && styles.stampBodyCurrent,
-                              state === 'locked' && styles.stampBodyLocked,
-                            ]}
-                          >
-                            <Text
-                              style={[
-                                styles.stampPlace,
-                                { color: state === 'locked' ? '#8F806F' : stampColor },
-                              ]}
-                            >
-                              {state === 'locked' ? 'LOCKED' : node.stampLabel}
-                            </Text>
-                            <Text
-                              style={[
-                                styles.stampDate,
-                                { color: state === 'locked' ? '#9C8D7B' : stampColor },
-                              ]}
-                            >
-                              {node.progressLabel}
-                            </Text>
-                            <Text
-                              style={[
-                                styles.stampMeta,
-                                { color: state === 'locked' ? '#AA9A88' : stampColor },
-                              ]}
-                            >
-                              {state === 'current'
-                                ? t.roadmapCurrent
-                                : state === 'completed'
-                                  ? t.roadmapRewind
-                                  : t.roadmapLocked}
-                            </Text>
-                          </View>
+                      <TouchableOpacity
+                        key={`roadmap-week-${weekMeta.week}`}
+                        style={[
+                          styles.roadmapWeekTab,
+                          isSelected && styles.roadmapWeekTabSelected,
+                          !isUnlocked && styles.roadmapWeekTabLocked,
+                        ]}
+                        activeOpacity={isUnlocked ? 0.82 : 1}
+                        onPress={() => {
+                          if (!isUnlocked) {
+                            Alert.alert(t.roadmapTitle, t.roadmapWeekLocked);
+                            return;
+                          }
+
+                          setSelectedRoadmapWeek(weekMeta.week);
+                        }}
+                      >
+                        <View style={styles.roadmapWeekTabTopRow}>
                           <Text
                             style={[
-                              styles.stampCaption,
-                              state === 'locked' && { color: '#887866' },
+                              styles.roadmapWeekTabTitle,
+                              isSelected && styles.roadmapWeekTabTitleSelected,
                             ]}
-                            numberOfLines={2}
                           >
-                            {node.title[lang]}
+                            {`W${weekMeta.week}`}
                           </Text>
-                        </TouchableOpacity>
-                      </View>
+                          {!isUnlocked ? (
+                            <MaterialCommunityIcons
+                              name="lock-outline"
+                              size={11}
+                              color="#A99884"
+                            />
+                          ) : null}
+                        </View>
+                        <Text
+                          style={[
+                            styles.roadmapWeekTabRange,
+                            isSelected && styles.roadmapWeekTabRangeSelected,
+                          ]}
+                        >
+                          {`${weekMeta.dayStart}–${weekMeta.dayEnd}`}
+                        </Text>
+                      </TouchableOpacity>
                     );
                   })}
                 </View>
               </View>
-            </ScrollView>
+            </View>
           </View>
-        </View>
+        </ImageBackground>
       </Modal>
     </SafeAreaView>
   );
@@ -2028,7 +2534,12 @@ const styles = StyleSheet.create({
   compactGaugeFill: {
     height: '100%',
   },
-  statBox: { width: '31%', alignItems: 'center', marginHorizontal: 0, marginBottom: 2 },
+  statBox: {
+    width: '31%',
+    alignItems: 'center',
+    marginHorizontal: 0,
+    marginBottom: 2,
+  },
   statIconTile: {
     width: 52,
     height: 52,
@@ -2336,8 +2847,21 @@ const styles = StyleSheet.create({
     color: '#EDF4FF',
     fontWeight: '700',
   },
-  badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginBottom: 16 },
-  badge: { flexDirection: 'row', alignItems: 'center', gap: 5, paddingVertical: 5, paddingHorizontal: 11, borderRadius: 20 },
+  badgeRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 11,
+    borderRadius: 20,
+  },
   badgePositive: { backgroundColor: '#F0FFF4' },
   badgeNegative: { backgroundColor: '#FFF0F0' },
   badgeDot: { width: 7, height: 7, borderRadius: 4 },
@@ -2508,7 +3032,167 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 0 },
     elevation: 6,
   },
-  nextButtonText: { color: '#274A72', fontSize: 16, fontWeight: '900', letterSpacing: 0.6 },
+  nextButtonText: {
+    color: '#274A72',
+    fontSize: 16,
+    fontWeight: '900',
+    letterSpacing: 0.6,
+  },
+  roadmapModalBackground: {
+    flex: 1,
+  },
+  roadmapModalBackgroundImage: {
+    resizeMode: 'cover',
+  },
+  roadmapModalScrim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(3, 9, 20, 0.78)',
+  },
+  roadmapModalSafeArea: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+  },
+  roadmapModalCard: {
+    flexShrink: 1,
+    overflow: 'hidden',
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.58)',
+    backgroundColor: '#E9DEC9',
+    paddingHorizontal: 12,
+    paddingTop: 12,
+    paddingBottom: 12,
+    shadowColor: '#070B12',
+    shadowOpacity: 0.42,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 14 },
+    elevation: 30,
+  },
+  roadmapFixedHeader: {
+    flexShrink: 0,
+    paddingBottom: 10,
+  },
+  roadmapHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  roadmapHeaderCopy: {
+    flex: 1,
+    minWidth: 0,
+    paddingRight: 10,
+  },
+  roadmapLocationTitle: {
+    marginTop: 1,
+    fontSize: 14,
+    lineHeight: 19,
+    fontWeight: '900',
+    color: '#5F4B3B',
+  },
+  roadmapPersistentHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    marginTop: 9,
+    borderRadius: 12,
+    backgroundColor: 'rgba(71, 54, 43, 0.94)',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  roadmapPersistentHintText: {
+    flex: 1,
+    color: '#FFF8EC',
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '700',
+  },
+  roadmapBody: {
+    flex: 1,
+    minHeight: 0,
+    flexDirection: 'row',
+    alignItems: 'stretch',
+  },
+  roadmapPaperFrame: {
+    flex: 1,
+    minWidth: 0,
+    overflow: 'hidden',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(112, 83, 58, 0.2)',
+    backgroundColor: '#F2E7D5',
+  },
+  roadmapPaperTexture: {
+    resizeMode: 'cover',
+    opacity: 0.46,
+  },
+  roadmapEpisodeScroll: {
+    flex: 1,
+    minHeight: 0,
+  },
+  roadmapEpisodeContent: {
+    paddingRight: 7,
+    paddingBottom: 12,
+  },
+  roadmapWeekTabs: {
+    width: 48,
+    marginLeft: 5,
+    gap: 4,
+  },
+  roadmapWeekTab: {
+    flex: 1,
+    minHeight: 42,
+    maxHeight: 64,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderColor: '#CDBA9C',
+    borderTopRightRadius: 9,
+    borderBottomRightRadius: 9,
+    backgroundColor: '#E7D5B9',
+    paddingHorizontal: 5,
+    paddingVertical: 5,
+  },
+  roadmapWeekTabSelected: {
+    borderColor: '#8D4BB3',
+    backgroundColor: '#9B59B6',
+    shadowColor: '#7B3A9E',
+    shadowOpacity: 0.24,
+    shadowRadius: 7,
+    shadowOffset: { width: 2, height: 2 },
+    elevation: 4,
+  },
+  roadmapWeekTabLocked: {
+    opacity: 0.58,
+    backgroundColor: '#E1D4C0',
+  },
+  roadmapWeekTabTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+  },
+  roadmapWeekTabTitle: {
+    color: '#725F4C',
+    fontSize: 12,
+    lineHeight: 15,
+    fontWeight: '900',
+  },
+  roadmapWeekTabTitleSelected: {
+    color: '#FFFFFF',
+  },
+  roadmapWeekTabRange: {
+    marginTop: 2,
+    color: '#9B866F',
+    fontSize: 8,
+    lineHeight: 11,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  roadmapWeekTabRangeSelected: {
+    color: '#F6EAFE',
+  },
   roadmapOverlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(10, 15, 27, 0.42)',
@@ -2563,7 +3247,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   passportPage: {
-    backgroundColor: '#F6EAD9',
+    backgroundColor: 'rgba(246, 234, 217, 0.86)',
     borderRadius: 6,
     borderTopRightRadius: 24,
     borderBottomRightRadius: 24,
