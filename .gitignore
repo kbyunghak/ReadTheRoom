@@ -1,0 +1,5 @@
+# Local historical documents
+/docs/**/archive/
+
+# Generated Expo debug export
+/ReadTheRoom.App/dist-debug-two/
