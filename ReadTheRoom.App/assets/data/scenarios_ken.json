@@ -157,26 +157,26 @@
           "text": { "ko": "(인싸가 되고 싶어!) 쿨하게 한 모금 피운다.", "en": "Take a hit to look cool." },
           "feedback": { "ko": "기침을 하며 앓아누웠습니다. 룸메이트는 비웃고, 몸은 만신창이입니다.", "en": "Coughing and sick. The roommate laughs, and your body is a mess." },
           "statChanges": { "funds": 0, "mental": -50, "english": 0, "insight": -30, "stamina": -80, "relation": -10 },
-          "nextScenarioId": 11
+          "nextScenarioId": 6
         },
         {
           "type": "STABLE",
           "text": { "ko": "(정중하게) \"아뇨, 전 안 피워요.\"", "en": "\"No thanks. I don't smoke.\"" },
           "feedback": { "ko": "룸메이트는 쿨하게 자기 할 일을 합니다. 평화롭게 방어했습니다.", "en": "Roommate shrugs and goes back to gaming. Peaceful defense." },
           "statChanges": { "funds": 0, "mental": 10, "english": 5, "insight": 20, "stamina": 0, "relation": 10 },
-          "nextScenarioId": 11
+          "nextScenarioId": 6
         },
         {
           "type": "GROWTH",
           "text": { "ko": "(경악하며) \"이거 불법 아냐? 경찰 부를 거야!\"", "en": "\"Is this illegal? I'm calling the police!\"" },
           "feedback": { "ko": "룸메이트가 어이없어하며 켄을 찌질이 취급합니다. 앞날이 깜깜하네요.", "en": "Roommate thinks you're a loser. The future of this dorm life looks grim." },
           "statChanges": { "funds": 0, "mental": -40, "english": 10, "insight": -50, "stamina": 0, "relation": -40 },
-          "nextScenarioId": 11
+          "nextScenarioId": 6
         }
       ]
     },
-    "11": {
-      "id": 11,
+    "6": {
+      "id": 6,
       "type": "NORMAL",
       "day": 1,
       "episode": 6,
@@ -192,26 +192,26 @@
           "text": { "ko": "손가락으로 메뉴를 가리키며 \"This one.\"", "en": "Point at the menu: \"This one.\"" },
           "feedback": { "ko": "주문은 성공했지만 직원이 답답해합니다. 영어 스탯이 깎이는 소리가 들리네요.", "en": "Order success, but the staff is annoyed. You hear your English stat dropping." },
           "statChanges": { "funds": -10, "mental": -5, "english": -10, "insight": -10, "stamina": 10, "relation": 0 },
-          "nextScenarioId": 12
+          "nextScenarioId": 7
         },
         {
           "type": "GROWTH",
           "text": { "ko": "\"Double Double이랑 보스턴 크림 도넛 주세요.\"", "en": "\"Double Double and a Boston Cream, please.\"" },
           "feedback": { "ko": "완벽한 로컬 주문! 직원의 손놀림이 빨라집니다. 자신감 상승!", "en": "Perfect local order! The staff moves fast. Confidence boost!" },
           "statChanges": { "funds": -10, "mental": 10, "english": 20, "insight": 20, "stamina": 15, "relation": 10 },
-          "nextScenarioId": 12
+          "nextScenarioId": 7
         },
         {
           "type": "STABLE",
           "text": { "ko": "\"아이스 아메리카노 라지 사이즈...\"", "en": "\"Iced Americano, Large size...\"" },
           "feedback": { "ko": "직원이 되묻습니다. \"아이스 커피 말하는 거야?\" 식은땀이 흐릅니다.", "en": "Staff asks: \"You mean Iced Coffee?\" Cold sweat begins to pour." },
           "statChanges": { "funds": -10, "mental": -20, "english": -10, "insight": 0, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 12
+          "nextScenarioId": 7
         }
       ]
     },
-    "12": {
-      "id": 12,
+    "7": {
+      "id": 7,
       "type": "NORMAL",
       "day": 1,
       "episode": 7,
@@ -227,26 +227,26 @@
           "text": { "ko": "동전은 주머니에 다 쑤셔 넣고 도망친다.", "en": "Stuff coins in pocket and run." },
           "feedback": { "ko": "주머니가 짤랑거려 걷기 불편하지만, 민망함은 피했습니다.", "en": "Pockets are clinking and uncomfortable, but at least the embarrassment is over." },
           "statChanges": { "funds": 44, "mental": 5, "english": 0, "insight": 0, "stamina": -5, "relation": 0 },
-          "nextScenarioId": 13
+          "nextScenarioId": 8
         },
         {
           "type": "GROWTH",
           "text": { "ko": "눈치 보지 않고 천천히 동전을 세어본다.", "en": "Take your time and count the coins." },
           "feedback": { "ko": "뒤에서 백인 아저씨가 한숨을 크게 쉽니다. 멘탈이 바스라집니다.", "en": "A man behind you sighs loudly. Your mental state crumbles." },
           "statChanges": { "funds": 44, "mental": -20, "english": 0, "insight": 10, "stamina": 0, "relation": -30 },
-          "nextScenarioId": 13
+          "nextScenarioId": 8
         },
         {
           "type": "REALIST",
           "text": { "ko": "\"Keep the change.\" (잔돈은 가지세요)", "en": "\"Keep the change.\"" },
           "feedback": { "ko": "패스트푸드점에서 40달러를 팁으로 준 전설의 호구가 되었습니다. 직원이 환호하네요.", "en": "You became a legendary sucker by tipping $40 at a cafe. The staff is cheering." },
           "statChanges": { "funds": 0, "mental": 0, "english": 5, "insight": -10, "stamina": 0, "relation": 50 },
-          "nextScenarioId": 13
+          "nextScenarioId": 8
         }
       ]
     },
-    "13": {
-      "id": 13,
+    "8": {
+      "id": 8,
       "type": "NORMAL",
       "day": 1,
       "episode": 8,
@@ -262,26 +262,26 @@
           "text": { "ko": "아까 받은 동전을 모두 털어준다.", "en": "Give him all the coins you just got." },
           "feedback": { "ko": "다른 노숙자들까지 몰려오기 시작합니다. 잠시 타겟이 된 것 같네요.", "en": "Other homeless people start swarming. You've become a target." },
           "statChanges": { "funds": -5, "mental": -20, "english": 0, "insight": -20, "stamina": -5, "relation": 10 },
-          "nextScenarioId": 14
+          "nextScenarioId": 9
         },
         {
           "type": "GROWTH",
           "text": { "ko": "\"Sorry\" 하고 눈을 피하며 지나간다.", "en": "Say \"Sorry\" and walk past." },
           "feedback": { "ko": "가장 표준적인 대처법입니다. 무사히 상황을 모면했습니다.", "en": "The standard response. You successfully moved on." },
           "statChanges": { "funds": 0, "mental": 5, "english": 10, "insight": 20, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 14
+          "nextScenarioId": 9
         },
         {
           "type": "REALIST",
           "text": { "ko": "\"Get a job!\" (일자리나 구해!)", "en": "\"Get a job!\"" },
           "feedback": { "ko": "노숙자가 욕설을 하며 쫓아옵니다. 커피를 쏟고 겨우 도망쳤습니다.", "en": "He screams insults and chases you. You dropped your coffee and barely escaped." },
           "statChanges": { "funds": -5, "mental": -80, "english": 10, "insight": -40, "stamina": -20, "relation": -10 },
-          "nextScenarioId": 14
+          "nextScenarioId": 9
         }
       ]
     },
-    "14": {
-      "id": 14,
+    "9": {
+      "id": 9,
       "type": "NORMAL",
       "day": 1,
       "episode": 9,
@@ -297,26 +297,26 @@
           "text": { "ko": "\"실례지만 제 자리입니다.\"", "en": "\"Excuse me, that's my seat.\"" },
           "feedback": { "ko": "상대방이 사과하며 자리를 비켜줍니다. 정당한 권리 주장 성공!", "en": "They apologize and leave. Success in standing up for your rights!" },
           "statChanges": { "funds": 0, "mental": 20, "english": 15, "insight": 10, "stamina": 0, "relation": 5 },
-          "nextScenarioId": 15
+          "nextScenarioId": 10
         },
         {
           "type": "STABLE",
           "text": { "ko": "말싸움하기 싫어 그냥 다른 자리로 간다.", "en": "Move to another seat to avoid conflict." },
           "feedback": { "ko": "억울하지만 참았습니다. 멘탈이 서서히 갈려 나가는 기분입니다.", "en": "Unfair, but you endured. Your mental state is slowly eroding." },
           "statChanges": { "funds": 0, "mental": -30, "english": 0, "insight": -10, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 15
+          "nextScenarioId": 10
         },
         {
           "type": "REALIST",
           "text": { "ko": "(한국식 분노) \"뭐 하는 거야?!\" 소리를 지른다.", "en": "Scream: \"What are you doing?!\"" },
           "feedback": { "ko": "상대방이 인종차별 욕설을 퍼붓습니다. 주변 시선도 따갑습니다.", "en": "They shout racial slurs back. The surrounding glares are painful." },
           "statChanges": { "funds": 0, "mental": -60, "english": 5, "insight": -40, "stamina": -10, "relation": -30 },
-          "nextScenarioId": 15
+          "nextScenarioId": 10
         }
       ]
     },
-    "15": {
-      "id": 15,
+    "10": {
+      "id": 10,
       "type": "NORMAL",
       "day": 1,
       "episode": 10,
@@ -332,21 +332,21 @@
           "text": { "ko": "학생들에게 다가가 기숙사 길을 묻는다.", "en": "Ask the students for directions to the dorm." },
           "feedback": { "ko": "친절하게 알려줍니다. 실전 영어 자신감이 폭발합니다!", "en": "They kindly explain. Your real-world English confidence explodes!" },
           "statChanges": { "funds": 0, "mental": 20, "english": 30, "insight": 10, "stamina": 0, "relation": 15 },
-          "nextScenarioId": 1001
+          "nextScenarioId": 11
         },
         {
           "type": "STABLE",
           "text": { "ko": "와이파이가 터질 때까지 무작정 걷는다.", "en": "Walk blindly until Wi-Fi connects." },
           "feedback": { "ko": "캠퍼스를 2시간 동안 헤매다 체력이 방전되었습니다.", "en": "Lost in campus for 2 hours. Your stamina is depleted." },
           "statChanges": { "funds": 0, "mental": -40, "english": 0, "insight": -10, "stamina": -80, "relation": 0 },
-          "nextScenarioId": 1001
+          "nextScenarioId": 11
         },
         {
           "type": "REALIST",
           "text": { "ko": "한국인 같은 사람에게 한국말로 묻는다.", "en": "Ask someone who looks Korean in Korean." },
           "feedback": { "ko": "중국계 캐네디언이었습니다. \"한국말 못 해\"라는 차가운 답만 돌아옵니다.", "en": "They were Chinese-Canadian. A cold \"I don't speak Korean\" is all you get." },
           "statChanges": { "funds": 0, "mental": -20, "english": -5, "insight": -30, "stamina": -10, "relation": -10 },
-          "nextScenarioId": 1001
+          "nextScenarioId": 11
         }
       ]
     },
@@ -364,10 +364,13 @@
       "tip": {
         "ko": "오늘의 생존 지식:\n1. 'How's it going'은 안부 인사입니다.\n2. 밴쿠버 마리화나는 합법이지만 한국인은 처벌받습니다.\n3. 팀홀튼 주문 전 메뉴 숙지는 필수입니다.\n4. 모르는 호의는 일단 의심하세요.",
         "en": "Today's Survival Tips:\n1. 'How's it going' is a greeting.\n2. Marijuana is legal in Vancouver, but illegal for Koreans.\n3. Know the Tim Hortons menu before ordering.\n4. Be wary of unsolicited kindness."
-      }
+      },
+      "statChanges": { "funds": 0, "mental": 0, "english": 0, "insight": 0, "stamina": 0, "relation": 0 },
+      "nextScenarioId": 20,
+      "choices": []
     },
-    "16": {
-      "id": 16,
+    "11": {
+      "id": 11,
       "type": "NORMAL",
       "day": 1,
       "episode": 11,
@@ -383,26 +386,26 @@
           "text": { "ko": "더 크게 적힌 숫자가 최종 가격이라 믿고 담는다.", "en": "Trust the larger number and put it in the cart." },
           "feedback": { "ko": "그건 파운드(lb)당 가격이었습니다! 계산대에서 예상보다 2배 넘는 금액이 찍히자 켄의 손이 떨립니다.", "en": "That was the price per pound! At the counter, the price is double what he expected. Ken's hands tremble." },
           "statChanges": { "funds": -40, "mental": -20, "english": 0, "insight": 15, "stamina": -10, "relation": 0 },
-          "nextScenarioId": 17
+          "nextScenarioId": 12
         },
         {
           "type": "GROWTH",
           "text": { "ko": "직원에게 최종 가격을 어떻게 보는지 묻는다.", "en": "Ask the staff how to read the final price." },
           "feedback": { "ko": "친절한 직원이 'lb'와 'kg'의 차이를 설명해 줍니다. 밴쿠버 생존 지식이 +1 상승했습니다!", "en": "A kind staff explains the difference between lb and kg. Vancouver survival knowledge +1!" },
           "statChanges": { "funds": -15, "mental": 10, "english": 15, "insight": 25, "stamina": -5, "relation": 5 },
-          "nextScenarioId": 17
+          "nextScenarioId": 12
         },
         {
           "type": "STABLE",
           "text": { "ko": "가격표를 포기하고 그냥 익숙한 냉동 피자를 집는다.", "en": "Give up and just grab a familiar frozen pizza." },
           "feedback": { "ko": "가장 안전한 선택이지만, 켄은 벌써 한국의 정육점 아줌마가 그리워집니다.", "en": "The safest choice, but Ken already misses the butcher back home." },
           "statChanges": { "funds": -10, "mental": 5, "english": 0, "insight": 5, "stamina": 10, "relation": 0 },
-          "nextScenarioId": 17
+          "nextScenarioId": 12
         }
       ]
     },
-    "17": {
-      "id": 17,
+    "12": {
+      "id": 12,
       "type": "NORMAL",
       "day": 1,
       "episode": 12,
@@ -418,26 +421,26 @@
           "text": { "ko": "당황해서 물건을 들었다 놨다 반복한다.", "en": "Panic and repeatedly lift and replace items." },
           "feedback": { "ko": "기계가 결국 빨간불을 켭니다. 직원이 올 때까지 켄은 죄인처럼 서 있습니다.", "en": "The machine turns red. Ken stands like a criminal until the staff arrives." },
           "statChanges": { "funds": 0, "mental": -40, "english": -5, "insight": 5, "stamina": -10, "relation": 0 },
-          "nextScenarioId": 18
+          "nextScenarioId": 13
         },
         {
           "type": "GROWTH",
           "text": { "ko": "직원을 불러 \"Something is wrong with this machine\"이라고 말한다.", "en": "Call the staff: \"Something is wrong with this machine.\"" },
           "feedback": { "ko": "직원이 쿨하게 해결해 줍니다. 역시 문제는 기계였지 켄의 잘못이 아니었습니다!", "en": "The staff fixes it coolly. It was the machine's fault, not Ken's!" },
           "statChanges": { "funds": 0, "mental": 10, "english": 15, "insight": 10, "stamina": 0, "relation": 5 },
-          "nextScenarioId": 18
+          "nextScenarioId": 13
         },
         {
           "type": "REALIST",
           "text": { "ko": "무시하고 다음 물건을 계속 찍어본다.", "en": "Ignore it and keep scanning the next item." },
           "feedback": { "ko": "기계가 결제를 거부합니다. 결국 처음부터 다시 찍어야 하는 대참사가 벌어집니다.", "en": "The machine refuses payment. A disaster occurs where you have to scan everything again." },
           "statChanges": { "funds": 0, "mental": -30, "english": 0, "insight": 15, "stamina": -20, "relation": 0 },
-          "nextScenarioId": 18
+          "nextScenarioId": 13
         }
       ]
     },
-    "18": {
-      "id": 18,
+    "13": {
+      "id": 13,
       "type": "NORMAL",
       "day": 1,
       "episode": 13,
@@ -453,26 +456,26 @@
           "text": { "ko": "\"아니, 난 제일 싼 기본 플랜만 필요해.\"", "en": "\"No, I only need the cheapest basic plan.\"" },
           "feedback": { "ko": "직원이 실망한 기색을 보이지만 켄은 지갑을 지켰습니다. 합리적인 정착의 시작입니다.", "en": "The staff looks disappointed, but Ken saved his wallet. A rational start to settling in." },
           "statChanges": { "funds": 15, "mental": 5, "english": 10, "insight": 20, "stamina": -5, "relation": 0 },
-          "nextScenarioId": 19
+          "nextScenarioId": 14
         },
         {
           "type": "STABLE",
           "text": { "ko": "(무료라고?) \"좋아, 그걸로 할게!\"", "en": "\"Okay, I'll take that!\"" },
           "feedback": { "ko": "세상에 공짜는 없습니다. 다음 달 고지서에 찍힐 할부금은 켄의 미래가 감당해야 합니다.", "en": "Nothing is free. Next month's bill installment is for Ken's future self to handle." },
           "statChanges": { "funds": -5, "mental": 10, "english": 5, "insight": -10, "stamina": 0, "relation": 10 },
-          "nextScenarioId": 19
+          "nextScenarioId": 14
         },
         {
           "type": "GROWTH",
           "text": { "ko": "약관을 한 줄씩 읽으며 추가 비용을 묻는다.", "en": "Read terms line by line and ask for extra fees." },
           "feedback": { "ko": "직원이 당황하며 숨겨진 수수료를 고백합니다. 켄의 꼼꼼함이 빛을 발했습니다!", "en": "The staff panics and confesses hidden fees. Ken's meticulousness shines!" },
           "statChanges": { "funds": 5, "mental": -10, "english": 20, "insight": 30, "stamina": -15, "relation": 0 },
-          "nextScenarioId": 19
+          "nextScenarioId": 14
         }
       ]
     },
-    "19": {
-      "id": 19,
+    "14": {
+      "id": 14,
       "type": "NORMAL",
       "day": 1,
       "episode": 14,
@@ -488,26 +491,26 @@
           "text": { "ko": "두 계좌의 이율과 출금 제한 차이를 묻는다.", "en": "Ask about interest rates and withdrawal limits." },
           "feedback": { "ko": "★ 대박! 켄은 캐나다 금융 시스템을 꿰뚫었습니다. 텔러도 켄의 명석함에 감탄하네요.", "en": "Amazing! Ken has mastered the Canadian finance system. Even the teller is impressed." },
           "statChanges": { "funds": 0, "mental": 5, "english": 25, "insight": 30, "stamina": -10, "relation": 10 },
-          "nextScenarioId": 20
+          "nextScenarioId": 15
         },
         {
           "type": "REALIST",
           "text": { "ko": "\"일단 다 Checking에 넣어줘.\"", "en": "\"Just put everything in Checking for now.\"" },
           "feedback": { "ko": "가장 편한 방법이지만, 이자가 전혀 붙지 않습니다. 돈을 굴릴 기회를 놓쳤네요.", "en": "Easiest way, but zero interest. You missed a chance to grow your funds." },
           "statChanges": { "funds": -5, "mental": 10, "english": 10, "insight": 10, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 20
+          "nextScenarioId": 15
         },
         {
           "type": "STABLE",
           "text": { "ko": "텔러가 추천하는 신용카드까지 만든다.", "en": "Get the credit card the teller recommends too." },
           "feedback": { "ko": "신용 점수는 쌓이겠지만, 켄의 소비 통제력은 시험대에 오르게 됩니다.", "en": "Credit score will grow, but Ken's spending control is now on trial." },
           "statChanges": { "funds": 0, "mental": 15, "english": 5, "insight": 15, "stamina": -5, "relation": 15 },
-          "nextScenarioId": 20
+          "nextScenarioId": 15
         }
       ]
     },
-    "20": {
-      "id": 20,
+    "15": {
+      "id": 15,
       "type": "NORMAL",
       "day": 1,
       "episode": 15,
@@ -523,26 +526,26 @@
           "text": { "ko": "좋아! 최신 댄스를 가르쳐줄 수 있다고 한다.", "en": "Sure! I can teach the latest dances." },
           "feedback": { "ko": "켄은 순식간에 동아리의 스타가 되었습니다. 하지만 학업을 병행할 수 있을까요?", "en": "Ken became a star in no time. But can he handle the schoolwork?" },
           "statChanges": { "funds": -10, "mental": 30, "english": 15, "insight": 5, "stamina": -30, "relation": 50 },
-          "nextScenarioId": 1001
+          "nextScenarioId": 16
         },
         {
           "type": "STABLE",
           "text": { "ko": "부끄러워하며 전단지만 받고 도망친다.", "en": "Blush and run away with just a flyer." },
           "feedback": { "ko": "켄은 조용히 학교를 다니고 싶습니다. 하지만 마음 한구석은 조금 쓸쓸하네요.", "en": "Ken wants a quiet life. But a corner of his heart feels a bit lonely." },
           "statChanges": { "funds": 0, "mental": 10, "english": -5, "insight": 10, "stamina": 5, "relation": -10 },
-          "nextScenarioId": 1001
+          "nextScenarioId": 16
         },
         {
           "type": "REALIST",
           "text": { "ko": "한국인끼리 뭉치는 건 영어에 도움 안 돼. 거절한다.", "en": "Staying with Koreans won't help my English. Decline." },
           "feedback": { "ko": "켄은 독하게 마음먹었습니다. 하지만 밴쿠버에서 인맥은 곧 정보라는 걸 곧 깨닫게 될 겁니다.", "en": "Ken is determined. But he'll soon realize that networking in Vancouver means info." },
           "statChanges": { "funds": 0, "mental": 5, "english": 5, "insight": 20, "stamina": 0, "relation": -20 },
-          "nextScenarioId": 1001
+          "nextScenarioId": 16
         }
       ]
     },
-    "21": {
-      "id": 21,
+    "16": {
+      "id": 16,
       "type": "NORMAL",
       "day": 1,
       "episode": 16,
@@ -558,26 +561,26 @@
           "text": { "ko": "당당하게 여권을 보여주고 라거 한 잔을 시킨다.", "en": "Show passport and order a lager." },
           "feedback": { "ko": "무사히 주문 성공! 시원한 맥주 한 모금에 하루의 피로가 녹습니다.", "en": "Successful order! A sip of cold beer melts away the day's fatigue." },
           "statChanges": { "funds": -15, "mental": 15, "english": 5, "insight": 10, "stamina": 10, "relation": 0 },
-          "nextScenarioId": 22
+          "nextScenarioId": 17
         },
         {
           "type": "REALIST",
           "text": { "ko": "(당황하며) \"ID? No have...\" 하며 자리를 피한다.", "en": "\"ID? No have...\" and leave flustered." },
           "feedback": { "ko": "여권이 가방에 있다는 걸 잊었습니다. 점원이 수상하게 쳐다보네요. 민망함에 얼굴이 화끈거립니다.", "en": "Forgot the passport in the bag. The server glares suspiciously. Face burns with embarrassment." },
           "statChanges": { "funds": 0, "mental": -30, "english": -10, "insight": -5, "stamina": -10, "relation": 0 },
-          "nextScenarioId": 22
+          "nextScenarioId": 17
         },
         {
           "type": "GROWTH",
           "text": { "ko": "로컬 맥주를 추천해달라고 말을 건다.", "en": "Ask for a local beer recommendation." },
           "feedback": { "ko": "★ 대박! 점원이 신나서 밴쿠버 수제 맥주를 추천해 줍니다. 짧은 대화로 영어 자신감이 붙었습니다.", "en": "Amazing! The server excitedly recommends local craft beers. English confidence boosted." },
           "statChanges": { "funds": -18, "mental": 10, "english": 25, "insight": 20, "stamina": 5, "relation": 15 },
-          "nextScenarioId": 22
+          "nextScenarioId": 17
         }
       ]
     },
-    "22": {
-      "id": 22,
+    "17": {
+      "id": 17,
       "type": "NORMAL",
       "day": 1,
       "episode": 17,
@@ -593,26 +596,26 @@
           "text": { "ko": "\"I'm Korean. And that's not funny.\"", "en": "\"I'm Korean. And that's not funny.\"" },
           "feedback": { "ko": "단호한 태도에 취객이 웅얼거리며 고개를 돌립니다. 주변 사람들도 켄의 용기에 고개를 끄덕입니다.", "en": "The drunkard mumbles and looks away. Others nod at Ken's courage." },
           "statChanges": { "funds": 0, "mental": 10, "english": 20, "insight": 30, "stamina": 0, "relation": 5 },
-          "nextScenarioId": 23
+          "nextScenarioId": 18
         },
         {
           "type": "STABLE",
           "text": { "ko": "못 알아들은 척 맥주만 빠르게 마시고 나간다.", "en": "Pretend not to hear, finish beer quickly and leave." },
           "feedback": { "ko": "싸움은 피했지만 가슴속에 응어리가 남습니다. 밴쿠버의 밤이 갑자기 차갑게 느껴집니다.", "en": "Avoided a fight, but a bitter feeling remains. Vancouver night feels suddenly cold." },
           "statChanges": { "funds": 0, "mental": -10, "english": 0, "insight": 5, "stamina": -5, "relation": 0 },
-          "nextScenarioId": 23
+          "nextScenarioId": 18
         },
         {
           "type": "REALIST",
           "text": { "ko": "(똑같이 비웃으며) \"You look like a potato!\"", "en": "\"You look like a potato!\"" },
           "feedback": { "ko": "유치한 싸움이 붙었습니다. 점원이 와서 둘 다 나가라고 소리칩니다. 최악의 밤입니다.", "en": "An immature fight breaks out. Server kicks both out. The worst night ever." },
           "statChanges": { "funds": 0, "mental": -80, "english": 5, "insight": -20, "stamina": -20, "relation": -30 },
-          "nextScenarioId": 23
+          "nextScenarioId": 18
         }
       ]
     },
-    "23": {
-      "id": 23,
+    "18": {
+      "id": 18,
       "type": "NORMAL",
       "day": 1,
       "episode": 18,
@@ -628,26 +631,26 @@
           "text": { "ko": "벽을 세게 두드리며 \"Keep it down!\" 외친다.", "en": "Bang on the wall and shout \"Keep it down!\"" },
           "feedback": { "ko": "잠시 조용해지는가 싶더니 더 큰 소리로 웃습니다. 켄의 혈압이 상승합니다.", "en": "Quiet for a second, then louder laughter. Ken's blood pressure rises." },
           "statChanges": { "funds": 0, "mental": -40, "english": 10, "insight": 5, "stamina": -20, "relation": -10 },
-          "nextScenarioId": 24
+          "nextScenarioId": 19
         },
         {
           "type": "GROWTH",
           "text": { "ko": "정중하게 문을 두드리고 상황을 설명한다.", "en": "Knock politely and explain the situation." },
           "feedback": { "ko": "상대방이 미안하다며 볼륨을 줄입니다. 갈등을 대화로 해결하는 법을 배웠습니다.", "en": "They apologize and turn it down. Learned to resolve conflict through dialogue." },
           "statChanges": { "funds": 0, "mental": 5, "english": 15, "insight": 20, "stamina": -5, "relation": 10 },
-          "nextScenarioId": 24
+          "nextScenarioId": 19
         },
         {
           "type": "STABLE",
           "text": { "ko": "이어플러그를 꽂고 이불을 뒤집어쓴다.", "en": "Put in earplugs and cover with blankets." },
           "feedback": { "ko": "소음은 여전하지만 포기하면 편합니다. 억지로 잠을 청해봅니다.", "en": "Noise persists, but giving up is easier. Trying to force sleep." },
           "statChanges": { "funds": 0, "mental": 10, "english": 0, "insight": 5, "stamina": 10, "relation": 0 },
-          "nextScenarioId": 24
+          "nextScenarioId": 19
         }
       ]
     },
-    "24": {
-      "id": 24,
+    "19": {
+      "id": 19,
       "type": "NORMAL",
       "day": 1,
       "episode": 19,
@@ -683,8 +686,8 @@
     }
   },
   "Day2": {
-    "11": {
-      "id": 11,
+    "20": {
+      "id": 20,
       "type": "NORMAL",
       "day": 2,
       "episode": 1,
@@ -704,26 +707,26 @@
           "text": { "ko": "마크에게 영어로 마트 위치를 묻고 혼자 나선다.", "en": "Ask Mark for the mart location in English and go alone." },
           "feedback": { "ko": "★ 성공! 켄은 서툰 영어지만 스스로 길을 묻는 데 성공했습니다. 자신감이 조금씩 쌓입니다.", "en": "★ Success! Ken successfully asked for directions in broken English. Confidence is building." },
           "statChanges": { "funds": 0, "mental": 5, "english": 15, "insight": 10, "stamina": -5, "relation": 5 },
-          "nextScenarioId": 12
+          "nextScenarioId": 21
         },
         {
           "type": "STABLE",
           "text": { "ko": "마크와 함께 마트에 동행해달라고 요청한다.", "en": "Request Mark to accompany you to the mart." },
           "feedback": { "ko": "마크의 친절한 가이드 덕분에 켄은 편안하게 이동합니다. 낯선 도심이 덜 무섭게 느껴지네요.", "en": "Thanks to Mark's kind guidance, Ken travels comfortably. The city feels less scary." },
           "statChanges": { "funds": 0, "mental": 15, "english": 0, "insight": 5, "stamina": 5, "relation": 20 },
-          "nextScenarioId": 12
+          "nextScenarioId": 21
         },
         {
           "type": "REALIST",
           "text": { "ko": "구글 맵으로 가장 저렴한 마트를 검색한다.", "en": "Search for the cheapest mart on Google Maps." },
           "feedback": { "ko": "★ 아차... 너무 싼 곳만 찾다 보니 거리가 너무 멉니다. 켄은 벌써 다리가 아파오기 시작합니다.", "en": "★ Oops... Searching only for cheap spots made the walk too long. Ken's legs already ache." },
           "statChanges": { "funds": 0, "mental": -5, "english": 0, "insight": 25, "stamina": -15, "relation": 0 },
-          "nextScenarioId": 12
+          "nextScenarioId": 21
         }
       ]
     },
-    "12": {
-      "id": 12,
+    "21": {
+      "id": 21,
       "type": "NORMAL",
       "day": 2,
       "episode": 2,
@@ -743,26 +746,26 @@
           "text": { "ko": "직원에게 다가가 세일 품목이 어디인지 묻는다.", "en": "Ask staff where the sale items are." },
           "feedback": { "ko": "★ 대박! 켄은 용기를 내어 묻고 좋은 정보를 얻었습니다. 직원의 빠른 영어가 조금씩 들리기 시작합니다.", "en": "★ Amazing! Ken bravely asked and got great info. He's starting to understand the staff's fast English." },
           "statChanges": { "funds": 20, "mental": 5, "english": 20, "insight": 15, "stamina": -5, "relation": 0 },
-          "nextScenarioId": 13
+          "nextScenarioId": 22
         },
         {
           "type": "STABLE",
           "text": { "ko": "눈에 띄는 생필품부터 조용히 바구니에 담는다.", "en": "Quietly put visible essentials into the basket." },
           "feedback": { "ko": "켄은 눈치껏 남들이 많이 집어가는 물건들을 따라 삽니다. 큰 모험은 없지만 마음은 편하네요.", "en": "Ken follows what others are buying. No big adventure, but his mind is at ease." },
           "statChanges": { "funds": -10, "mental": 10, "english": 0, "insight": 10, "stamina": 5, "relation": 0 },
-          "nextScenarioId": 13
+          "nextScenarioId": 22
         },
         {
           "type": "REALIST",
           "text": { "ko": "PB 상품(자체 브랜드) 위주로 골라 지출을 줄인다.", "en": "Choose store-brand (PB) products to save money." },
           "feedback": { "ko": "★ 성공! 켄의 실속 있는 선택으로 지갑 사정이 조금 나아졌습니다. 밴쿠버 생존의 첫 규칙을 깨우쳤네요.", "en": "★ Success! Ken's practical choice saved his wallet. He learned the first rule of Vancouver survival." },
           "statChanges": { "funds": 40, "mental": 5, "english": 0, "insight": 25, "stamina": -10, "relation": 0 },
-          "nextScenarioId": 13
+          "nextScenarioId": 22
         }
       ]
     },
-    "13": {
-      "id": 13,
+    "22": {
+      "id": 22,
       "type": "NORMAL",
       "day": 2,
       "episode": 3,
@@ -782,26 +785,26 @@
           "text": { "ko": "지금 바로 멤버십을 만들 수 있는지 묻는다.", "en": "Ask if you can join the membership now." },
           "feedback": { "ko": "★ 대박! 켄의 적극적인 태도가 빛을 발합니다. 앞으로의 밴쿠버 생활이 한결 경제적일 것 같네요.", "en": "★ Amazing! Ken's proactive attitude shines. Vancouver life will be more economical from now on." },
           "statChanges": { "funds": 10, "mental": -5, "english": 15, "insight": 30, "stamina": -10, "relation": 5 },
-          "nextScenarioId": 14
+          "nextScenarioId": 23
         },
         {
           "type": "STABLE",
           "text": { "ko": "괜찮다고 말하며 그냥 원래 가격으로 결제한다.", "en": "Say it's okay and pay the original price." },
           "feedback": { "ko": "★ 저런... 영수증을 보니 할인이 하나도 안 됐습니다. 켄은 왠지 모를 뼈아픈 손해를 본 기분입니다.", "en": "★ Oh dear... No discounts at all on the receipt. Ken feels a painful sense of loss." },
           "statChanges": { "funds": -30, "mental": -15, "english": 5, "insight": -10, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 14
+          "nextScenarioId": 23
         },
         {
           "type": "REALIST",
           "text": { "ko": "트래블 카드로 결제를 시도한다.", "en": "Try to pay with a Travel Card." },
           "feedback": { "ko": "★ 매운맛! 기계에서 경고음이 울리며 결제가 거절됩니다. 뒤에 선 사람들의 시선이 켄의 뒤통수를 찌릅니다.", "en": "★ Spicy! The machine beeps and the payment is declined. Glances from those behind pierce Ken." },
           "statChanges": { "funds": 0, "mental": -40, "english": 0, "insight": 10, "stamina": -5, "relation": -10 },
-          "nextScenarioId": 9004
+          "nextScenarioId": 9001
         }
       ]
     },
-    "9004": {
-      "id": 9004,
+    "9001": {
+      "id": 9001,
       "type": "NORMAL",
       "day": 2,
       "episode": 3.1,
@@ -821,26 +824,26 @@
           "text": { "ko": "점원에게 사과하고 빠르게 차단을 해제한다.", "en": "Apologize and quickly unblock the card." },
           "feedback": { "ko": "★ 성공! 켄은 차분하게 상황을 설명하고 결제를 마칩니다. 밴쿠버의 첫 번째 시스템 벽을 넘었습니다.", "en": "★ Success! Ken calmly explains and finishes the payment. He's crossed the first system wall." },
           "statChanges": { "funds": 0, "mental": -10, "english": 15, "insight": 20, "stamina": -10, "relation": 0 },
-          "nextScenarioId": 14
+          "nextScenarioId": 23
         },
         {
           "type": "STABLE",
           "text": { "ko": "뒤에 있는 사람에게 순서를 양보하고 옆으로 비킨다.", "en": "Yield your turn to the person behind and move aside." },
           "feedback": { "ko": "켄은 민망함에 얼굴이 달아오릅니다. 하지만 예의 바른 대처 덕분에 주변 분위기가 조금 부드러워지네요.", "en": "Ken turns red with embarrassment. But his polite response softens the mood." },
           "statChanges": { "funds": 0, "mental": -25, "english": 5, "insight": 15, "stamina": -5, "relation": 10 },
-          "nextScenarioId": 14
+          "nextScenarioId": 23
         },
         {
           "type": "REALIST",
           "text": { "ko": "일부 물건을 덜어내고 현금으로 결제한다.", "en": "Remove some items and pay with cash." },
           "feedback": { "ko": "★ 울컥... 꼭 필요했던 샴푸를 내려놓는 켄의 손이 떨립니다. 현실의 무게가 느껴지는 순간입니다.", "en": "★ Choked up... Ken's hand trembles as he puts back the essential shampoo. He feels the weight of reality." },
           "statChanges": { "funds": 20, "mental": -35, "english": 0, "insight": 25, "stamina": -10, "relation": 0 },
-          "nextScenarioId": 14
+          "nextScenarioId": 23
         }
       ]
     },
-    "14": {
-      "id": 14,
+    "23": {
+      "id": 23,
       "type": "NORMAL",
       "day": 2,
       "episode": 4,
@@ -860,26 +863,26 @@
           "text": { "ko": "가장 저렴한 요금제가 무엇인지 영어로 묻는다.", "en": "Ask in English for the cheapest plan." },
           "feedback": { "ko": "★ 성공! 켄은 꼼꼼하게 질문하며 자신에게 딱 맞는 요금제를 찾아냅니다.", "en": "★ Success! Ken asks detailed questions and finds a plan that fits him perfectly." },
           "statChanges": { "funds": 0, "mental": 5, "english": 20, "insight": 25, "stamina": -10, "relation": 0 },
-          "nextScenarioId": 15
+          "nextScenarioId": 24
         },
         {
           "type": "STABLE",
           "text": { "ko": "한국인 직원이 있는 매장을 찾아 들어간다.", "en": "Find a shop with Korean staff." },
           "feedback": { "ko": "다행히 한국인 직원이 있어 안도의 한숨을 내쉽니다. 복잡한 계약 내용도 이제는 두렵지 않습니다.", "en": "Luckily, there's a Korean staff member. Complex contracts aren't scary anymore." },
           "statChanges": { "funds": 0, "mental": 25, "english": -5, "insight": 10, "stamina": 5, "relation": 15 },
-          "nextScenarioId": 15
+          "nextScenarioId": 24
         },
         {
           "type": "REALIST",
           "text": { "ko": "약정 없는 선불 유심(Prepaid)을 선택한다.", "en": "Choose a no-contract Prepaid SIM." },
           "feedback": { "ko": "★ 아차... 선불 유심은 데이터 용량이 너무 적네요. 켄은 유튜브를 포기해야 할지도 모릅니다.", "en": "★ Oops... Prepaid data is too low. Ken might have to give up YouTube." },
           "statChanges": { "funds": 50, "mental": -15, "english": 5, "insight": 20, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 15
+          "nextScenarioId": 24
         }
       ]
     },
-    "15": {
-      "id": 15,
+    "24": {
+      "id": 24,
       "type": "NORMAL",
       "day": 2,
       "episode": 5,
@@ -899,26 +902,26 @@
           "text": { "ko": "모르는 용어를 하나하나 물어보며 확인한다.", "en": "Clarify every unknown term one by one." },
           "feedback": { "ko": "★ 대박! 켄의 열정에 점원도 감탄하며 친절하게 설명해 줍니다. 영어 공부가 따로 없네요!", "en": "★ Amazing! The clerk is impressed by Ken's passion and explains kindly. It's a real English lesson!" },
           "statChanges": { "funds": 0, "mental": -10, "english": 25, "insight": 30, "stamina": -20, "relation": 5 },
-          "nextScenarioId": 16
+          "nextScenarioId": 25
         },
         {
           "type": "STABLE",
           "text": { "ko": "마크에게 전화를 걸어 조언을 구한다.", "en": "Call Mark to ask for advice." },
           "feedback": { "ko": "마크의 명쾌한 조언 덕분에 켄은 안심하고 서명합니다. 든든한 조력자가 있어 다행입니다.", "en": "Thanks to Mark's clear advice, Ken signs with peace of mind. Glad to have a strong supporter." },
           "statChanges": { "funds": 0, "mental": 15, "english": 5, "insight": 15, "stamina": 0, "relation": 25 },
-          "nextScenarioId": 16
+          "nextScenarioId": 25
         },
         {
           "type": "REALIST",
           "text": { "ko": "가장 기본이 되는 항목만 대충 훑고 서명한다.", "en": "Skim only the basics and sign." },
           "feedback": { "ko": "★ 뼈아픈... 나중에 알고 보니 숨겨진 설치비가 있었습니다. 켄은 자신의 안일함을 자책합니다.", "en": "★ Painful... He later finds hidden setup fees. Ken blames his own carelessness." },
           "statChanges": { "funds": -40, "mental": -25, "english": 0, "insight": -10, "stamina": 5, "relation": 0 },
-          "nextScenarioId": 16
+          "nextScenarioId": 25
         }
       ]
     },
-    "16": {
-      "id": 16,
+    "25": {
+      "id": 25,
       "type": "NORMAL",
       "day": 2,
       "episode": 6,
@@ -934,26 +937,26 @@
           "text": { "ko": "현지 구인 사이트에 내 번호를 업데이트한다.", "en": "Update your number on local job sites." },
           "feedback": { "ko": "★ 대박! 켄은 지체하지 않고 다음 단계를 준비합니다. 그의 추진력에 밴쿠버의 공기도 응원을 보냅니다.", "en": "★ Amazing! Ken prepares for the next step without delay. Even the air of Vancouver cheers his drive." },
           "statChanges": { "funds": 0, "mental": 10, "english": 10, "insight": 25, "stamina": -10, "relation": 0 },
-          "nextScenarioId": 17
+          "nextScenarioId": 26
         },
         {
           "type": "STABLE",
           "text": { "ko": "가장 먼저 한국에 있는 가족에게 연락한다.", "en": "Contact family in Korea first." },
           "feedback": { "ko": "★ 울컥... 가족들의 목소리를 들으니 긴장이 풀리며 눈물이 핑 돕니다. 다시 힘을 낼 이유가 생겼습니다.", "en": "★ Choked up... Hearing family's voices releases the tension. He has a reason to stay strong." },
           "statChanges": { "funds": -5, "mental": 35, "english": 0, "insight": 5, "stamina": 10, "relation": 20 },
-          "nextScenarioId": 17
+          "nextScenarioId": 26
         },
         {
           "type": "REALIST",
           "text": { "ko": "마크에게 개통 소식을 문자로 알린다.", "en": "Text Mark about the activation." },
           "feedback": { "ko": "★ 성공! 마크가 축하한다며 저녁에 맛있는 걸 먹으러 가자고 답장을 보냅니다.", "en": "★ Success! Mark texts back congrats and invites Ken to a nice dinner." },
           "statChanges": { "funds": 0, "mental": 15, "english": 5, "insight": 10, "stamina": 5, "relation": 30 },
-          "nextScenarioId": 17
+          "nextScenarioId": 26
         }
       ]
     },
-    "17": {
-      "id": 17,
+    "26": {
+      "id": 26,
       "type": "NORMAL",
       "day": 2,
       "episode": 7,
@@ -973,26 +976,26 @@
           "text": { "ko": "직원에게 오늘의 추천 메뉴를 영어로 묻는다.", "en": "Ask staff in English for the daily special." },
           "feedback": { "ko": "★ 성공! 켄은 서툰 영어지만 당당하게 주문합니다. 현지인의 입맛에 한 걸음 더 다가갑니다.", "en": "★ Success! Ken orders boldly in broken English. He's one step closer to local tastes." },
           "statChanges": { "funds": -30, "mental": 10, "english": 20, "insight": 15, "stamina": 10, "relation": 10 },
-          "nextScenarioId": 18
+          "nextScenarioId": 27
         },
         {
           "type": "STABLE",
           "text": { "ko": "마크가 추천하는 안전한 메뉴로 주문한다.", "en": "Order a safe menu recommended by Mark." },
           "feedback": { "ko": "켄은 마크의 안목을 믿기로 합니다. 실패 없는 맛집 메뉴 덕분에 기분이 한결 좋아집니다.", "en": "Ken trusts Mark's taste. The reliable choice improves his mood significantly." },
           "statChanges": { "funds": -25, "mental": 25, "english": 5, "insight": 5, "stamina": 15, "relation": 25 },
-          "nextScenarioId": 18
+          "nextScenarioId": 27
         },
         {
           "type": "REALIST",
           "text": { "ko": "가격이 가장 저렴한 에피타이저 위주로 시킨다.", "en": "Order mostly cheap appetizers." },
           "feedback": { "ko": "★ 저런... 배는 여전히 고프고 마크의 눈치도 조금 보입니다. 켄은 자신의 궁핍함에 한숨을 쉽니다.", "en": "★ Oh dear... Still hungry and feeling self-conscious around Mark. Ken sighs at his poverty." },
           "statChanges": { "funds": 0, "mental": -25, "english": 0, "insight": 20, "stamina": -10, "relation": -10 },
-          "nextScenarioId": 18
+          "nextScenarioId": 27
         }
       ]
     },
-    "18": {
-      "id": 18,
+    "27": {
+      "id": 27,
       "type": "NORMAL",
       "day": 2,
       "episode": 8,
@@ -1012,26 +1015,26 @@
           "text": { "ko": "마크에게 적절한 팁 비율이 얼마인지 묻는다.", "en": "Ask Mark for the appropriate tip percentage." },
           "feedback": { "ko": "★ 성공! 켄은 현지 문화를 직접 물으며 배웁니다. 마크는 켄의 진지한 태도를 칭찬합니다.", "en": "★ Success! Ken learns the culture by asking. Mark praises Ken's serious attitude." },
           "statChanges": { "funds": -15, "mental": 10, "english": 10, "insight": 30, "stamina": 0, "relation": 20 },
-          "nextScenarioId": 19
+          "nextScenarioId": 28
         },
         {
           "type": "STABLE",
           "text": { "ko": "가장 무난한 18%를 선택하고 웃으며 인사한다.", "en": "Select the standard 18% and smile." },
           "feedback": { "ko": "켄은 매너 있는 손님이 되기로 합니다. 서버의 친절한 인사가 켄의 마음을 따뜻하게 하네요.", "en": "Ken decides to be a polite guest. The server's kind greeting warms his heart." },
           "statChanges": { "funds": -20, "mental": 20, "english": 5, "insight": 15, "stamina": 5, "relation": 15 },
-          "nextScenarioId": 19
+          "nextScenarioId": 28
         },
         {
           "type": "REALIST",
           "text": { "ko": "용기를 내어 팁 없음(No Tip) 버튼을 누른다.", "en": "Bravely press the No Tip button." },
           "feedback": { "ko": "★ 매운맛! 서버의 표정이 순식간에 굳어집니다. 식당을 나서는 켄의 등 뒤로 차가운 시선이 박힙니다.", "en": "★ Spicy! The server's face hardens instantly. Cold glares hit Ken's back as he leaves." },
           "statChanges": { "funds": 30, "mental": -40, "english": 0, "insight": 10, "stamina": -5, "relation": -20 },
-          "nextScenarioId": 19
+          "nextScenarioId": 28
         }
       ]
     },
-    "19": {
-      "id": 19,
+    "28": {
+      "id": 28,
       "type": "NORMAL",
       "day": 2,
       "episode": 9,
@@ -1047,26 +1050,26 @@
           "text": { "ko": "오늘 배운 표현들을 혼잣말로 복습해 본다.", "en": "Review expressions learned today by talking to yourself." },
           "feedback": { "ko": "★ 대박! 켄은 밤거리에서도 멈추지 않습니다. 그의 노력은 반드시 결실을 맺을 겁니다.", "en": "★ Amazing! Ken doesn't stop even on the night street. His effort will surely bear fruit." },
           "statChanges": { "funds": 0, "mental": 10, "english": 30, "insight": 20, "stamina": -10, "relation": 0 },
-          "nextScenarioId": 20
+          "nextScenarioId": 29
         },
         {
           "type": "STABLE",
           "text": { "ko": "마크에게 오늘 하루 도와줘서 고맙다고 전한다.", "en": "Tell Mark thanks for the help today." },
           "feedback": { "ko": "★ 울컥... 켄의 진심에 마크는 어깨를 툭 칩니다. 이곳에 기댈 사람이 있다는 건 큰 행운입니다.", "en": "★ Choked up... At Ken's sincerity, Mark taps his shoulder. Having someone to lean on is lucky." },
           "statChanges": { "funds": 0, "mental": 30, "english": 5, "insight": 5, "stamina": 10, "relation": 40 },
-          "nextScenarioId": 20
+          "nextScenarioId": 29
         },
         {
           "type": "REALIST",
           "text": { "ko": "핸드폰으로 오늘 쓴 지출을 꼼꼼히 기록한다.", "en": "Thoroughly record expenses in your phone." },
           "feedback": { "ko": "★ 뼈아픈... 예상보다 큰 지출에 켄은 정신이 번쩍 듭니다. 내일부턴 더 허리띠를 졸라매야겠네요.", "en": "★ Painful... The higher-than-expected spending snaps Ken to attention. Tighten the belt tomorrow." },
           "statChanges": { "funds": 0, "mental": -20, "english": 0, "insight": 30, "stamina": -5, "relation": 0 },
-          "nextScenarioId": 20
+          "nextScenarioId": 29
         }
       ]
     },
-    "20": {
-      "id": 20,
+    "29": {
+      "id": 29,
       "type": "NORMAL",
       "day": 2,
       "episode": 10,
@@ -1112,16 +1115,7 @@
         "en": "Ken got a number and had a meal with a tip today. He's slowly adapting to Vancouver's rhythm."
       },
       "statChanges": { "funds": 0, "mental": 35, "english": 0, "insight": 20, "stamina": 60, "relation": 15 },
-      "nextScenarioId": 21,
-      "choices": [
-        {
-          "type": "STABLE",
-          "text": { "ko": "꿈속으로 빠져든다.", "en": "Fall into a dream." },
-          "feedback": { "ko": "켄의 하루가 이렇게 저뭅니다.", "en": "Thus ends Ken's day." },
-          "statChanges": { "funds": 0, "mental": 0, "english": 0, "insight": 0, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 21
-        }
-      ]
+      "choices": []
     }
   }
 }

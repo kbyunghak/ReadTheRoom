@@ -38,6 +38,15 @@ run('SUMMARY nodes from Day bucket data are normalized as phase end nodes', () =
   assert.equal(summaryNode.type, 'SUMMARY');
   assert.equal(summaryNode.isPhaseEnd, true);
   assert.deepEqual(summaryNode.choices, []);
+  assert.equal(summaryNode.nextScenarioId, 2);
+  assert.deepEqual(summaryNode.statChanges, {
+    funds: 0,
+    mental: 10,
+    english: 0,
+    insight: 5,
+    stamina: 20,
+    relation: 0,
+  });
 });
 
 run('Day bucket nodes use title as the fallback situation value', () => {

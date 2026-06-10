@@ -1,5 +1,6 @@
 ﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Alert,
   Animated,
   Image,
   ImageBackground,
@@ -181,6 +182,7 @@ const UI_TEXT = {
     staminaLabel: 'Stamina',
     relationLabel: 'Relation',
     nextBtn: 'NEXT >',
+    summaryContinue: 'Continue',
     roadmapTitle: 'StoryMap',
     roadmapHint: 'Tap a completed card to return to that point.',
     roadmapBack: 'Go Back Here',
@@ -203,6 +205,7 @@ const UI_TEXT = {
     staminaLabel: '체력',
     relationLabel: '관계',
     nextBtn: '다음 >',
+    summaryContinue: '계속하기',
     roadmapTitle: '스토리맵',
     roadmapHint: '완료한 카드를 누르면 그 시점으로 돌아갈 수 있어요.',
     roadmapBack: '이 시점으로 돌아가기',
@@ -434,6 +437,7 @@ export default function GameScreen({ character, initialLang = 'en', initialSessi
     [scenarios, startScenarioId],
   );
   const currentScenario: Scenario = scenarios[String(currentScenarioId)] ?? fallbackScenario;
+  const isSummaryScenario = currentScenario.type === 'SUMMARY';
 
   const resolvedBackgroundKey: BackgroundKey = currentScenario.backgroundKey
     ? (BACKGROUND_KEY_ALIASES[currentScenario.backgroundKey] ?? 'arrival')
@@ -634,6 +638,35 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
     ]);
     setSelectedChoice(choice);
     setShowResult(true);
+  };
+
+  const handleSummaryContinue = () => {
+    if (!isSummaryScenario) return;
+
+    const nextScenarioId = currentScenario.nextScenarioId;
+    if (nextScenarioId !== undefined && !scenarios[String(nextScenarioId)]) {
+      Alert.alert(
+        isKorean ? '시나리오 오류' : 'Scenario Error',
+        isKorean
+          ? `다음 시나리오 ${nextScenarioId}을(를) 찾을 수 없습니다.`
+          : `The next scenario ${nextScenarioId} could not be found.`,
+      );
+      return;
+    }
+
+    if (currentScenario.statChanges) {
+      setStats((prev) => applyStatChanges(prev, currentScenario.statChanges ?? {}));
+    }
+
+    setCurrentSituationChoices([]);
+    setShowResult(false);
+    setSelectedChoice(null);
+
+    if (nextScenarioId !== undefined) {
+      setCurrentScenarioId(nextScenarioId);
+    } else {
+      setEndingType('success');
+    }
   };
 
   const proceedToNextScenario = () => {
@@ -1172,27 +1205,33 @@ const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
                           overflow: 'visible',
                         }}
                       >
-                        {currentScenario.choices.map((choice, index) => {
-                          const choiceCopy = splitChoiceText(choice.text[lang]);
+                        {isSummaryScenario ? (
+                          <TouchableOpacity style={styles.nextButton} onPress={handleSummaryContinue}>
+                            <Text style={styles.nextButtonText}>{t.summaryContinue}</Text>
+                          </TouchableOpacity>
+                        ) : (
+                          currentScenario.choices.map((choice, index) => {
+                            const choiceCopy = splitChoiceText(choice.text[lang]);
 
-                          return (
-                            <TouchableOpacity
-                              key={index}
-                              style={styles.choiceButton}
-                              onPress={() => handleChoice(choice)}
-                            >
-                              <View style={styles.choiceContentRow}>
-                                <View style={styles.choiceIndexBubble}>
-                                  <Text style={styles.choiceIndexText}>{index + 1}</Text>
+                            return (
+                              <TouchableOpacity
+                                key={index}
+                                style={styles.choiceButton}
+                                onPress={() => handleChoice(choice)}
+                              >
+                                <View style={styles.choiceContentRow}>
+                                  <View style={styles.choiceIndexBubble}>
+                                    <Text style={styles.choiceIndexText}>{index + 1}</Text>
+                                  </View>
+                                  <View style={styles.choiceTextWrap}>
+                                    {choiceCopy.cue ? <Text style={styles.choiceCueText}>{choiceCopy.cue}</Text> : null}
+                                    <Text style={styles.choiceText}>{choiceCopy.body}</Text>
+                                  </View>
                                 </View>
-                                <View style={styles.choiceTextWrap}>
-                                  {choiceCopy.cue ? <Text style={styles.choiceCueText}>{choiceCopy.cue}</Text> : null}
-                                  <Text style={styles.choiceText}>{choiceCopy.body}</Text>
-                                </View>
-                              </View>
-                            </TouchableOpacity>
-                          );
-                        })} 
+                              </TouchableOpacity>
+                            );
+                          })
+                        )}
                       </View>
                     ) : null}
                   </ScrollView>

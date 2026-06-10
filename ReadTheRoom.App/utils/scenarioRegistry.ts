@@ -43,6 +43,8 @@ export type Scenario = {
   backgroundKey?: string;
   quest?: string;
   description: LocalizedText;
+  statChanges?: ScenarioStatChanges;
+  nextScenarioId?: number;
   choices: ScenarioChoice[];
 };
 

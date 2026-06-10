@@ -62,6 +62,15 @@ export const summaryScenarioNode: Scenario = {
   },
   isPhaseEnd: true,
   backgroundKey: 'city_night',
+  statChanges: {
+    funds: 0,
+    mental: 10,
+    english: 0,
+    insight: 5,
+    stamina: 20,
+    relation: 0,
+  },
+  nextScenarioId: 2,
   choices: [],
 };
 
@@ -160,6 +169,16 @@ export const dayBucketScenarioFixture = {
         ko: 'Summarize the first day.',
         en: 'Summarize the first day.',
       },
+      statChanges: {
+        funds: 0,
+        mental: 10,
+        english: 0,
+        insight: 5,
+        stamina: 20,
+        relation: 0,
+      },
+      nextScenarioId: 2,
+      choices: [],
     },
   },
 };
