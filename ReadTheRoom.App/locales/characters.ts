@@ -189,3 +189,15 @@ export const CHARACTERS: Character[] = [
     },
   },
 ];
+
+const BETA_CHARACTER_IDS = ['ken', 'amy', 'sora'] as const;
+
+export const BETA_CHARACTERS: Character[] = BETA_CHARACTER_IDS.map((id) => {
+  const character = CHARACTERS.find((candidate) => candidate.id === id);
+
+  if (!character) {
+    throw new Error(`Missing beta character definition: ${id}`);
+  }
+
+  return character;
+});

@@ -9,14 +9,13 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CHARACTERS } from '../locales/characters';
+import { BETA_CHARACTERS } from '../locales/characters';
 import { locales, type AppLanguage } from '../locales';
 import type { Character, CharacterStat, LocalizedText, StartingStats, StatKey } from '../locales/types';
 
 const GRID_PADDING = 20;
 const GRID_GAP = 12;
 const GRID_COLUMNS = 3;
-const GRID_ROWS = 2;
 
 export type { Character, CharacterStat, LocalizedText, StartingStats, StatKey };
 
@@ -88,7 +87,6 @@ export default function CharacterSelectScreen({ onSelectCharacter, lang, onToggl
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const { width } = useWindowDimensions();
   const text = locales[lang].characterSelect;
-  const gridSlots = Array.from({ length: GRID_COLUMNS * GRID_ROWS }, (_, index) => CHARACTERS[index] ?? null);
   const maxGridWidth = Platform.OS === 'web' ? 980 : width;
   const gridWidth = Math.min(width - GRID_PADDING * 2, maxGridWidth);
   const cardWidth = (gridWidth - GRID_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
@@ -148,17 +146,6 @@ export default function CharacterSelectScreen({ onSelectCharacter, lang, onToggl
     </TouchableOpacity>
   );
 
-  const renderEmptyCard = (slotIndex: number) => (
-    <View
-      key={`empty-${slotIndex}`}
-      style={[styles.card, styles.emptyCard, { width: cardWidth, height: cardHeight }]}
-    >
-      <View style={styles.emptyCardContent}>
-        <Text style={styles.emptyCardLabel}>{text.comingSoon}</Text>
-      </View>
-    </View>
-  );
-
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.container}>
@@ -176,15 +163,9 @@ export default function CharacterSelectScreen({ onSelectCharacter, lang, onToggl
 
         <View style={styles.grid}>
           <View style={[styles.gridInner, { width: gridWidth }]}>
-          {Array.from({ length: GRID_ROWS }, (_, rowIndex) => (
-            <View key={`row-${rowIndex}`} style={[styles.row, rowIndex > 0 && styles.bottomRow]}>
-              {gridSlots
-                .slice(rowIndex * GRID_COLUMNS, (rowIndex + 1) * GRID_COLUMNS)
-                .map((char, index) =>
-                  char ? renderCharacterCard(char) : renderEmptyCard(rowIndex * GRID_COLUMNS + index)
-                )}
+            <View style={styles.row}>
+              {BETA_CHARACTERS.map(renderCharacterCard)}
             </View>
-          ))}
           </View>
         </View>
 
@@ -247,9 +228,6 @@ const styles = StyleSheet.create({
     gap: GRID_GAP,
     justifyContent: 'space-between',
   },
-  bottomRow: {
-    marginTop: GRID_GAP,
-  },
   card: {
     borderRadius: 16,
     overflow: 'hidden',
@@ -260,23 +238,6 @@ const styles = StyleSheet.create({
   cardHovered: {
     borderColor: '#F59F00',
     transform: [{ scale: 1.02 }],
-  },
-  emptyCard: {
-    borderStyle: 'dashed',
-    borderColor: 'rgba(255,255,255,0.18)',
-    backgroundColor: 'rgba(255,255,255,0.03)',
-  },
-  emptyCardContent: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 12,
-  },
-  emptyCardLabel: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.45)',
-    letterSpacing: 1,
   },
   cardTextGroup: {
     gap: 3,
