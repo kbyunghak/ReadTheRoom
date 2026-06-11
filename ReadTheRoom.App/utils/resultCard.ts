@@ -1,7 +1,10 @@
-import type { LocalizedText, ScenarioChoice, ScenarioStatChanges } from './scenarioRegistry';
+import type {
+  LocalizedText,
+  ScenarioChoice,
+  ScenarioStatChanges,
+} from './scenarioRegistry';
 
 export type ResultCardLanguage = 'en' | 'ko';
-
 export type ResultStatKey = keyof ScenarioStatChanges;
 
 export type ResultChoiceTextParts = {
@@ -24,28 +27,32 @@ export type ResultCardData = {
   tipText: string | null;
 };
 
-const RESULT_STAT_ORDER: ResultStatKey[] = ['funds', 'mental', 'english', 'insight', 'stamina', 'relation'];
+const RESULT_STAT_ORDER: ResultStatKey[] = [
+  'funds',
+  'mental',
+  'english',
+  'insight',
+  'stamina',
+  'relation',
+];
 
 export const splitChoiceText = (text: string): ResultChoiceTextParts => {
   const trimmed = text.trim();
   const match = trimmed.match(/^(\([^)]+\)|\[[^\]]+\])\s*(.+)$/);
 
   if (!match) {
-    return {
-      cue: null,
-      body: trimmed,
-    };
+    return { cue: null, body: trimmed };
   }
 
-  return {
-    cue: match[1],
-    body: match[2],
-  };
+  return { cue: match[1], body: match[2] };
 };
 
 export const stripChoiceCue = (cue: string | null) => {
   if (!cue) return null;
-  return cue.replace(/^[([]\s*/, '').replace(/\s*[)\]]$/, '').trim();
+  return cue
+    .replace(/^[([]\s*/, '')
+    .replace(/\s*[)\]]$/, '')
+    .trim();
 };
 
 export const buildSelectedChoiceText = (text: string) => {
@@ -54,18 +61,26 @@ export const buildSelectedChoiceText = (text: string) => {
   return cueText ? `${cueText} ${choiceCopy.body}` : choiceCopy.body;
 };
 
-export const getChangedStatEntries = (statChanges: ScenarioStatChanges): ResultStatEntry[] =>
-  RESULT_STAT_ORDER
-    .map((statKey) => ({
-      statKey,
-      value: statChanges[statKey] ?? 0,
-    }))
-    .filter((entry) => entry.value !== 0);
+export const getChangedStatEntries = (
+  statChanges: ScenarioStatChanges,
+): ResultStatEntry[] =>
+  RESULT_STAT_ORDER.map((statKey) => ({
+    statKey,
+    value: statChanges[statKey] ?? 0,
+  })).filter((entry) => entry.value !== 0);
 
-export const getLocalizedTip = (tip: LocalizedText | undefined, lang: ResultCardLanguage) => tip?.[lang] ?? null;
+export const getLocalizedTip = (
+  tip: LocalizedText | undefined,
+  lang: ResultCardLanguage,
+) => tip?.[lang] ?? null;
 
-export const getResultTone = (statChanges: ScenarioStatChanges): ResultCardData['resultTone'] => {
-  const total = Object.values(statChanges).reduce((sum, value) => sum + (value ?? 0), 0);
+export const getResultTone = (
+  statChanges: ScenarioStatChanges,
+): ResultCardData['resultTone'] => {
+  const total = Object.values(statChanges).reduce(
+    (sum, value) => sum + (value ?? 0),
+    0,
+  );
   if (total > 0) return 'good';
   if (total < 0) return 'bad';
   return 'mid';
@@ -73,14 +88,34 @@ export const getResultTone = (statChanges: ScenarioStatChanges): ResultCardData[
 
 const RESULT_COPY = {
   ko: {
-    good: { label: '성공', summary: '상황을 잘 풀어냈어요. 좋은 흐름을 이어가고 있습니다.' },
-    mid: { label: '보통', summary: '무난하게 넘어갔어요. 다음 선택에서 흐름을 바꿀 수 있습니다.' },
-    bad: { label: '아쉬움', summary: '조금 흔들렸지만 괜찮아요. 다음 선택에서 만회할 수 있습니다.' },
+    good: {
+      label: '성공',
+      summary: '상황을 잘 풀어냈어요. 좋은 흐름을 이어가고 있습니다.',
+    },
+    mid: {
+      label: '부분 성공',
+      summary: '의도는 전달됐지만 조금 아쉬움이 남았어요.',
+    },
+    bad: {
+      label: '실패',
+      summary: '상황이 어려워졌지만 다음 선택에서 다시 만회할 수 있어요.',
+    },
   },
   en: {
-    good: { label: 'Success', summary: 'You handled the situation well and kept the momentum going.' },
-    mid: { label: 'Steady', summary: 'You made it through. The next choice can still shift the direction.' },
-    bad: { label: 'Setback', summary: 'That was a difficult moment, but the next choice is another chance.' },
+    good: {
+      label: 'Success',
+      summary:
+        'You handled the situation well and kept the momentum going.',
+    },
+    mid: {
+      label: 'Partial Success',
+      summary: 'Your intent came through, but there is still room to improve.',
+    },
+    bad: {
+      label: 'Failed',
+      summary:
+        'The situation became harder, but the next choice is another chance.',
+    },
   },
 } as const;
 

@@ -192,7 +192,7 @@ const UI_TEXT = {
     nextBtn: 'Continue',
     summaryContinue: 'Continue',
     roadmapTitle: 'StoryMap',
-    roadmapHint: 'Tap a completed card to return to that point.',
+    roadmapHint: 'Tap a completed card to return to that scene.',
     roadmapBack: 'Go Back Here',
     roadmapLocked: 'Locked',
     roadmapCurrent: 'YOU ARE HERE',
@@ -201,10 +201,10 @@ const UI_TEXT = {
     roadmapWeekLocked: 'This week is not unlocked yet.',
     resultSelectedLabel: 'Choice',
     resultSummaryLabel: 'Result',
-    resultValuesLabel: 'Changes',
-    feedbackButton: 'View Feedback',
+    resultValuesLabel: 'Stat Changes',
+    feedbackButton: 'Feedback',
     feedbackModalTitle: 'Feedback',
-    feedbackExplanation: 'Why this happened',
+    feedbackExplanation: 'Result',
     feedbackTip: 'TIP',
     closeButton: 'Close',
     daySummaryLabel: "Today's Summary",
@@ -222,7 +222,7 @@ const UI_TEXT = {
     nextBtn: '계속하기',
     summaryContinue: '계속하기',
     roadmapTitle: '스토리맵',
-    roadmapHint: '완료한 카드를 누르면 그 시점으로 돌아갈 수 있어요.',
+    roadmapHint: '완료한 카드를 누르면 그 장면으로 돌아갈 수 있어요.',
     roadmapBack: '이 시점으로 돌아가기',
     roadmapLocked: '잠금',
     roadmapCurrent: '현재 위치',
@@ -231,10 +231,10 @@ const UI_TEXT = {
     roadmapWeekLocked: '아직 열리지 않은 Week입니다.',
     resultSelectedLabel: '선택',
     resultSummaryLabel: '결과',
-    resultValuesLabel: '결과값',
-    feedbackButton: '피드백 보기',
+    resultValuesLabel: '스탯 변화',
+    feedbackButton: '피드백',
     feedbackModalTitle: '피드백',
-    feedbackExplanation: '결과 해설',
+    feedbackExplanation: '결과',
     feedbackTip: 'TIP',
     closeButton: '닫기',
     daySummaryLabel: '오늘의 정리',
@@ -255,6 +255,11 @@ const ROADMAP_WEEKS = [
   { week: 4, dayStart: 19, dayEnd: 24 },
   { week: 5, dayStart: 25, dayEnd: 30 },
 ] as const;
+
+const getRoadmapLocationLabel = (title: string) => {
+  const withoutInternalNote = title.replace(/\s*\([^)]*\)\s*$/u, '').trim();
+  return withoutInternalNote.split(/[,،]/u)[0]?.trim() || withoutInternalNote;
+};
 const ROADMAP_STOP_WORDS = new Set([
   'AT',
   'THE',
@@ -340,16 +345,23 @@ const ResultStatItem = ({
   statKey,
   value,
   label,
+  compact = false,
 }: {
   statKey: keyof typeof STAT_CONFIG;
   value: number;
   label: string;
+  compact?: boolean;
 }) => {
   if (value === 0) return null;
   const isPositive = value > 0;
 
   return (
-    <View style={styles.resultStatItem}>
+    <View
+      style={[
+        styles.resultStatItem,
+        compact && styles.feedbackStatChip,
+      ]}
+    >
       <MaterialCommunityIcons
         name={STAT_CONFIG[statKey].icon}
         size={20}
@@ -477,9 +489,6 @@ export default function GameScreen({
   const characterTop = headerHeight;
   const characterHeight = Math.round(height * (isNarrow ? 0.58 : 0.6));
   const characterWidth = Math.round(width * 0.72);
-  const storyContentPaddingTop = Math.round(height * (isNarrow ? 0.205 : 0.22));
-  const storyContentPaddingBottom = Math.max(insets.bottom + 4, 4);
-  const scenarioOverlap = Math.round(characterHeight * 0.38);
   const scenarioPanelBottom = Math.max(insets.bottom, 8);
   const scenarioPanelMaxHeight = Math.min(
     460,
@@ -487,8 +496,8 @@ export default function GameScreen({
   );
   const roadmapPanelWidth = Math.min(Math.round(width * 0.92), 520);
   const roadmapPanelMaxHeight = Math.max(
-    320,
-    height - insets.top - insets.bottom - 32,
+    300,
+    height - insets.top - insets.bottom - 28,
   );
 
   useEffect(() => {
@@ -727,7 +736,9 @@ export default function GameScreen({
     ROADMAP_WEEKS[0];
   const roadmapLocationTitle =
     selectedRoadmapWeek === currentRoadmapWeek
-      ? `W${currentRoadmapWeek} · Day ${currentScenario.day ?? 1}. ${situationTitle}`
+      ? `W${currentRoadmapWeek} · Day ${currentScenario.day ?? 1} · ${getRoadmapLocationLabel(
+          situationTitle,
+        )}`
       : `W${selectedRoadmapWeek} · Day ${String(
           selectedRoadmapWeekMeta.dayStart,
         ).padStart(
@@ -836,7 +847,7 @@ export default function GameScreen({
     ]);
     setSelectedChoice(choice);
     setShowResult(true);
-    setShowFeedbackModal(false);
+    setShowFeedbackModal(true);
   };
 
   const handleSummaryContinue = () => {
@@ -959,14 +970,6 @@ export default function GameScreen({
     setEndingType(null);
     setCurrentScenarioId(checkpoint.scenarioId);
     setShowRoadmap(false);
-  };
-
-  const getFeedbackBorderColor = (choice: Choice) => {
-    const total = Object.values(choice.statChanges).reduce(
-      (a, b) => a + (b ?? 0),
-      0,
-    );
-    return total >= 0 ? '#40C057' : '#228BE6';
   };
 
   const statusItems = [
@@ -1460,59 +1463,38 @@ export default function GameScreen({
 
           <ScrollView
             ref={storyScrollRef}
-            style={
-              showResult
-                ? styles.storyScroll
-                : {
-                    position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    bottom: scenarioPanelBottom,
-                    maxHeight: scenarioPanelMaxHeight,
-                    zIndex: 5,
-                    overflow: 'visible',
-                  }
-            }
-            contentContainerStyle={[
-              showResult
-                ? [
-                    styles.storyContent,
-                    {
-                      paddingTop: storyContentPaddingTop,
-                      paddingBottom: storyContentPaddingBottom,
-                      paddingHorizontal: isNarrow ? 14 : 18,
-                    },
-                  ]
-                : {
-                    paddingTop: 18,
-                    paddingHorizontal: isNarrow ? 14 : 18,
-                  },
-            ]}
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: scenarioPanelBottom,
+              maxHeight: scenarioPanelMaxHeight,
+              zIndex: 5,
+              overflow: 'visible',
+            }}
+            contentContainerStyle={{
+              paddingTop: 18,
+              paddingHorizontal: isNarrow ? 14 : 18,
+            }}
             showsVerticalScrollIndicator={false}
             bounces={false}
-            scrollEnabled={showResult}
+            scrollEnabled={false}
             keyboardShouldPersistTaps="handled"
           >
             <View
-              style={
-                showResult
-                  ? styles.storyFrame
-                  : {
-                      width: '100%',
-                      overflow: 'visible',
-                      paddingHorizontal: 2,
-                    }
-              }
+              style={{
+                width: '100%',
+                overflow: 'visible',
+                paddingHorizontal: 2,
+              }}
             >
-              {!showResult ? (
-                <View
-                  style={{
-                    width: '100%',
-                    marginTop: showResult ? -scenarioOverlap : 0,
-                    marginBottom: 4,
-                    overflow: 'visible',
-                  }}
-                >
+              <View
+                style={{
+                  width: '100%',
+                  marginBottom: 4,
+                  overflow: 'visible',
+                }}
+              >
                   <View style={styles.scenarioTab}>
                     <Text style={styles.scenarioTabText}>
                       {isSummaryScenario
@@ -1525,9 +1507,7 @@ export default function GameScreen({
                   <View
                     style={{
                       width: '100%',
-                      maxHeight: showResult
-                        ? undefined
-                        : scenarioPanelMaxHeight - 18,
+                      maxHeight: scenarioPanelMaxHeight - 18,
                       overflow: 'hidden',
                       backgroundColor: 'rgba(7, 18, 38, 0.74)',
                       borderRadius: 18,
@@ -1541,16 +1521,14 @@ export default function GameScreen({
                     <ScrollView
                       style={{
                         width: '100%',
-                        maxHeight: showResult
-                          ? undefined
-                          : scenarioPanelMaxHeight - 50,
+                        maxHeight: scenarioPanelMaxHeight - 50,
                       }}
                       contentContainerStyle={{
                         flexDirection: 'column',
-                        paddingBottom: 2,
+                        paddingBottom: showResult ? 12 : 2,
                       }}
                       nestedScrollEnabled
-                      scrollEnabled={!showResult}
+                      scrollEnabled
                       showsVerticalScrollIndicator={false}
                       bounces={false}
                     >
@@ -1569,17 +1547,16 @@ export default function GameScreen({
                           {currentScenario.description[lang]}
                         </Text>
                       </View>
-                      {!showResult ? (
-                        <View
-                          style={{
-                            width: '100%',
-                            flexGrow: 0,
-                            flexShrink: 0,
-                            flexDirection: 'column',
-                            gap: 8,
-                            overflow: 'visible',
-                          }}
-                        >
+                      <View
+                        style={{
+                          width: '100%',
+                          flexGrow: 0,
+                          flexShrink: 0,
+                          flexDirection: 'column',
+                          gap: 8,
+                          overflow: 'visible',
+                        }}
+                      >
                           {isSummaryScenario ? (
                             <>
                               {currentScenario.tip?.[lang] ? (
@@ -1613,12 +1590,26 @@ export default function GameScreen({
                               const choiceCopy = splitChoiceText(
                                 choice.text[lang],
                               );
+                              const isSelectedChoice =
+                                selectedChoice === choice;
+                              const isInactiveChoice =
+                                showResult && !isSelectedChoice;
 
                               return (
                                 <TouchableOpacity
                                   key={index}
-                                  style={styles.choiceButton}
-                                  onPress={() => handleChoice(choice)}
+                                  style={[
+                                    styles.choiceButton,
+                                    isSelectedChoice &&
+                                      styles.choiceButtonSelected,
+                                    isInactiveChoice &&
+                                      styles.choiceButtonInactive,
+                                  ]}
+                                  disabled={showResult}
+                                  activeOpacity={showResult ? 1 : 0.75}
+                                  onPress={() => {
+                                    if (!showResult) handleChoice(choice);
+                                  }}
                                 >
                                   <View style={styles.choiceContentRow}>
                                     <View style={styles.choiceIndexBubble}>
@@ -1641,134 +1632,10 @@ export default function GameScreen({
                               );
                             })
                           )}
-                        </View>
-                      ) : null}
-                    </ScrollView>
-                  </View>
-                </View>
-              ) : null}
-
-              {showResult &&
-                selectedChoice &&
-                (() => {
-                  const resultCardData = buildResultCardData(
-                    selectedChoice,
-                    lang,
-                    currentScenario.tip,
-                  );
-                  const resultToneColor =
-                    resultCardData.resultTone === 'good'
-                      ? '#66D980'
-                      : resultCardData.resultTone === 'bad'
-                        ? '#FF7B86'
-                        : '#F4C542';
-
-                  return (
-                    <View style={styles.resultOverlayStack}>
-                      <View
-                        style={[
-                          styles.resultContainer,
-                          {
-                            borderLeftColor:
-                              getFeedbackBorderColor(selectedChoice),
-                          },
-                        ]}
-                      >
-                        <View style={styles.resultInfoBlock}>
-                          <View style={styles.resultInfoLabelRow}>
-                            <MaterialCommunityIcons
-                              name="checkbox-marked-circle-outline"
-                              size={18}
-                              color="#64B1FF"
-                            />
-                            <Text
-                              style={[
-                                styles.resultInfoLabel,
-                                styles.resultInfoLabelChoice,
-                              ]}
-                            >
-                              {t.resultSelectedLabel}
-                            </Text>
-                          </View>
-                          <Text style={styles.resultInfoText}>
-                            {resultCardData.selectedText}
-                          </Text>
-                        </View>
-
-                        <View style={styles.resultInfoDivider} />
-
-                        <View style={styles.resultInfoBlock}>
-                          <View style={styles.resultInfoLabelRow}>
-                            <MaterialCommunityIcons
-                              name="star-circle-outline"
-                              size={18}
-                              color={resultToneColor}
-                            />
-                            <Text
-                              style={[
-                                styles.resultInfoLabel,
-                                { color: resultToneColor },
-                              ]}
-                            >
-                              {t.resultSummaryLabel} ·{' '}
-                              {resultCardData.resultLabel}
-                            </Text>
-                          </View>
-                          <Text style={styles.resultInfoText}>
-                            {resultCardData.resultSummary}
-                          </Text>
-                        </View>
-
-                        <View style={styles.resultInfoDivider} />
-
-                        <View style={styles.resultInfoBlock}>
-                          <View style={styles.resultInfoLabelRow}>
-                            <MaterialCommunityIcons
-                              name="chart-line-variant"
-                              size={18}
-                              color="#B184FF"
-                            />
-                            <Text
-                              style={[
-                                styles.resultInfoLabel,
-                                styles.resultInfoLabelValues,
-                              ]}
-                            >
-                              {t.resultValuesLabel}
-                            </Text>
-                          </View>
-                          <View style={styles.resultStatsRow}>
-                            {resultCardData.changedStats.length ? (
-                              resultCardData.changedStats.map((entry) => (
-                                <ResultStatItem
-                                  key={`${selectedChoice.nextScenarioId}-${entry.statKey}`}
-                                  statKey={entry.statKey}
-                                  value={entry.value}
-                                  label={
-                                    entry.statKey === 'funds'
-                                      ? t.fundsLabel
-                                      : entry.statKey === 'mental'
-                                        ? t.mentalHpLabel
-                                        : entry.statKey === 'english'
-                                          ? t.englishLabel
-                                          : entry.statKey === 'insight'
-                                            ? t.insightLabel
-                                            : entry.statKey === 'stamina'
-                                              ? t.staminaLabel
-                                              : t.relationLabel
-                                  }
-                                />
-                              ))
-                            ) : (
-                              <Text style={styles.resultNoChangesText}>
-                                {t.noStatChanges}
-                              </Text>
-                            )}
-                          </View>
-                        </View>
                       </View>
-
-                      <View style={styles.resultActionRow}>
+                    </ScrollView>
+                    {showResult && selectedChoice ? (
+                      <View style={styles.resultActionRowFixed}>
                         <TouchableOpacity
                           style={styles.resultFeedbackButton}
                           onPress={() => setShowFeedbackModal(true)}
@@ -1784,10 +1651,41 @@ export default function GameScreen({
                           ]}
                           onPress={proceedToNextScenario}
                         >
-                          <Text style={styles.nextButtonText}>{t.nextBtn}</Text>
+                          <Text style={styles.nextButtonText}>
+                            {t.nextBtn}
+                          </Text>
                         </TouchableOpacity>
                       </View>
+                    ) : null}
+                  </View>
+              </View>
 
+              {showResult &&
+                selectedChoice &&
+                (() => {
+                  const resultCardData = buildResultCardData(
+                    selectedChoice,
+                    lang,
+                    currentScenario.tip,
+                  );
+                  const resultToneColor =
+                    resultCardData.resultTone === 'good'
+                      ? '#66D980'
+                      : resultCardData.resultTone === 'bad'
+                        ? '#FF7B86'
+                        : '#F4C542';
+                  const resultToneIcon =
+                    resultCardData.resultTone === 'good'
+                      ? 'check-circle-outline'
+                      : resultCardData.resultTone === 'bad'
+                        ? 'close-circle-outline'
+                        : 'alert-circle-outline';
+                  const modalChoiceCopy = splitChoiceText(
+                    selectedChoice.text[lang],
+                  );
+
+                  return (
+                    <>
                       <Modal
                         visible={showFeedbackModal}
                         transparent
@@ -1799,7 +1697,17 @@ export default function GameScreen({
                           style={styles.feedbackModalOverlay}
                           edges={['top', 'bottom']}
                         >
-                          <View style={styles.feedbackModalCard}>
+                          <View
+                            style={[
+                              styles.feedbackModalCard,
+                              {
+                                maxHeight: Math.min(
+                                  height - insets.top - insets.bottom - 28,
+                                  680,
+                                ),
+                              },
+                            ]}
+                          >
                             <View style={styles.feedbackModalHeader}>
                               <Text style={styles.feedbackModalTitle}>
                                 {t.feedbackModalTitle}
@@ -1807,6 +1715,8 @@ export default function GameScreen({
                               <TouchableOpacity
                                 style={styles.feedbackModalCloseIcon}
                                 onPress={() => setShowFeedbackModal(false)}
+                                accessibilityRole="button"
+                                accessibilityLabel={t.closeButton}
                               >
                                 <MaterialCommunityIcons
                                   name="close"
@@ -1822,29 +1732,129 @@ export default function GameScreen({
                                 styles.feedbackModalContent
                               }
                               showsVerticalScrollIndicator={false}
+                              bounces={false}
                             >
-                              <Text style={styles.feedbackModalSectionTitle}>
-                                {t.feedbackExplanation}
-                              </Text>
-                              <Text style={styles.feedbackModalText}>
-                                {resultCardData.feedbackText}
-                              </Text>
+                              <View
+                                style={[
+                                  styles.feedbackModalSection,
+                                  styles.feedbackChoiceSection,
+                                ]}
+                              >
+                                <View style={styles.feedbackSectionHeading}>
+                                  <MaterialCommunityIcons
+                                    name="checkbox-marked-circle-outline"
+                                    size={19}
+                                    color="#64B1FF"
+                                  />
+                                  <Text
+                                    style={[
+                                      styles.feedbackModalSectionTitle,
+                                      styles.feedbackChoiceTitle,
+                                    ]}
+                                  >
+                                    {t.resultSelectedLabel}
+                                  </Text>
+                                </View>
+                                {modalChoiceCopy.cue ? (
+                                  <Text style={styles.feedbackChoiceCue}>
+                                    {modalChoiceCopy.cue}
+                                  </Text>
+                                ) : null}
+                                <Text style={styles.feedbackChoiceText}>
+                                  {modalChoiceCopy.body}
+                                </Text>
+                              </View>
+
+                              <View
+                                style={[
+                                  styles.feedbackModalSection,
+                                  {
+                                    borderColor: `${resultToneColor}66`,
+                                    backgroundColor: `${resultToneColor}12`,
+                                  },
+                                ]}
+                              >
+                                <View style={styles.feedbackSectionHeading}>
+                                  <MaterialCommunityIcons
+                                    name={resultToneIcon}
+                                    size={20}
+                                    color={resultToneColor}
+                                  />
+                                  <Text
+                                    style={[
+                                      styles.feedbackModalSectionTitle,
+                                      { color: resultToneColor },
+                                    ]}
+                                  >
+                                    {t.feedbackExplanation}
+                                  </Text>
+                                </View>
+                                <Text style={styles.feedbackModalText}>
+                                  {resultCardData.feedbackText}
+                                </Text>
+                              </View>
+
+                              {resultCardData.changedStats.length ? (
+                                <View style={styles.feedbackStatsSection}>
+                                  <View style={styles.feedbackSectionHeading}>
+                                    <MaterialCommunityIcons
+                                      name="chart-line-variant"
+                                      size={18}
+                                      color="#B184FF"
+                                    />
+                                    <Text
+                                      style={[
+                                        styles.feedbackModalSectionTitle,
+                                        styles.feedbackStatsTitle,
+                                      ]}
+                                    >
+                                      {t.resultValuesLabel}
+                                    </Text>
+                                  </View>
+                                  <View style={styles.feedbackStatsGrid}>
+                                    {resultCardData.changedStats.map((entry) => (
+                                      <ResultStatItem
+                                        key={`feedback-${selectedChoice.nextScenarioId}-${entry.statKey}`}
+                                        statKey={entry.statKey}
+                                        value={entry.value}
+                                        compact
+                                        label={
+                                          entry.statKey === 'funds'
+                                            ? t.fundsLabel
+                                            : entry.statKey === 'mental'
+                                              ? t.mentalHpLabel
+                                              : entry.statKey === 'english'
+                                                ? t.englishLabel
+                                                : entry.statKey === 'insight'
+                                                  ? t.insightLabel
+                                                  : entry.statKey === 'stamina'
+                                                    ? t.staminaLabel
+                                                    : t.relationLabel
+                                        }
+                                      />
+                                    ))}
+                                  </View>
+                                </View>
+                              ) : null}
 
                               {resultCardData.tipText ? (
                                 <View style={styles.feedbackTipSection}>
-                                  <View style={styles.feedbackTipHeading}>
+                                  <View style={styles.feedbackSectionHeading}>
                                     <MaterialCommunityIcons
                                       name="lightbulb-on-outline"
-                                      size={19}
+                                      size={20}
                                       color="#F4C542"
                                     />
                                     <Text
-                                      style={styles.feedbackModalSectionTitle}
+                                      style={[
+                                        styles.feedbackModalSectionTitle,
+                                        styles.feedbackTipTitle,
+                                      ]}
                                     >
                                       {t.feedbackTip}
                                     </Text>
                                   </View>
-                                  <Text style={styles.feedbackModalText}>
+                                  <Text style={styles.feedbackTipText}>
                                     {resultCardData.tipText}
                                   </Text>
                                 </View>
@@ -1855,6 +1865,8 @@ export default function GameScreen({
                               <TouchableOpacity
                                 style={styles.feedbackModalCloseButton}
                                 onPress={() => setShowFeedbackModal(false)}
+                                accessibilityRole="button"
+                                accessibilityLabel={t.closeButton}
                               >
                                 <Text
                                   style={styles.feedbackModalCloseButtonText}
@@ -1865,6 +1877,8 @@ export default function GameScreen({
                               <TouchableOpacity
                                 style={styles.feedbackModalContinueButton}
                                 onPress={proceedToNextScenario}
+                                accessibilityRole="button"
+                                accessibilityLabel={t.nextBtn}
                               >
                                 <Text
                                   style={styles.feedbackModalContinueButtonText}
@@ -1876,7 +1890,7 @@ export default function GameScreen({
                           </View>
                         </SafeAreaView>
                       </Modal>
-                    </View>
+                    </>
                   );
                 })()}
             </View>
@@ -1901,8 +1915,8 @@ export default function GameScreen({
             style={[
               styles.roadmapModalSafeArea,
               {
-                paddingTop: insets.top + 16,
-                paddingBottom: insets.bottom + 16,
+                paddingTop: insets.top + 14,
+                paddingBottom: insets.bottom + 14,
               },
             ]}
           >
@@ -1920,7 +1934,11 @@ export default function GameScreen({
                 <View style={styles.roadmapHeaderRow}>
                   <View style={styles.roadmapHeaderCopy}>
                     <Text style={styles.roadmapTitle}>{t.roadmapTitle}</Text>
-                    <Text style={styles.roadmapLocationTitle} numberOfLines={2}>
+                    <Text
+                      style={styles.roadmapLocationTitle}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
                       {roadmapLocationTitle}
                     </Text>
                   </View>
@@ -1963,7 +1981,8 @@ export default function GameScreen({
                       Platform.OS === 'web'
                         ? ({
                             scrollbarWidth: 'thin',
-                            scrollbarColor: '#A16CC1 transparent',
+                            scrollbarColor:
+                              'rgba(139, 92, 165, 0.42) transparent',
                           } as never)
                         : null,
                     ]}
@@ -2007,7 +2026,6 @@ export default function GameScreen({
                                 onPress={() => jumpToRoadmapNode(node)}
                                 style={[
                                   styles.stampFrame,
-                                  state === 'locked' && { opacity: 0.7 },
                                 ]}
                               >
                                 <View
@@ -2034,8 +2052,8 @@ export default function GameScreen({
                                   {state === 'locked' ? (
                                     <MaterialCommunityIcons
                                       name="lock-outline"
-                                      size={17}
-                                      color="#9C8D7B"
+                                      size={14}
+                                      color="#A69582"
                                     />
                                   ) : null}
                                   <Text
@@ -2087,7 +2105,8 @@ export default function GameScreen({
                                 <Text
                                   style={[
                                     styles.stampCaption,
-                                    state === 'locked' && { color: '#887866' },
+                                    state === 'locked' &&
+                                      styles.stampCaptionLocked,
                                   ]}
                                   numberOfLines={2}
                                 >
@@ -2665,8 +2684,18 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   choiceButtonSelected: {
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderColor: 'rgba(255,255,255,0.40)',
+    backgroundColor: 'rgba(27, 78, 139, 0.92)',
+    borderColor: '#8CC8FF',
+    shadowColor: '#54A9FF',
+    shadowOpacity: 0.48,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 8,
+  },
+  choiceButtonInactive: {
+    opacity: 0.38,
+    backgroundColor: 'rgba(6, 16, 34, 0.68)',
+    borderColor: 'rgba(110, 145, 190, 0.36)',
   },
   choiceContentRow: {
     flexDirection: 'row',
@@ -2893,15 +2922,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
   },
+  resultActionRowFixed: {
+    flexShrink: 0,
+    flexDirection: 'row',
+    gap: 10,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(99, 154, 235, 0.24)',
+    backgroundColor: 'rgba(5, 16, 35, 0.96)',
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 12,
+  },
   resultFeedbackButton: {
     flex: 1,
-    minHeight: 48,
+    height: 48,
     borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 0,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(100, 177, 255, 0.74)',
-    backgroundColor: 'rgba(8, 31, 65, 0.92)',
+    borderColor: 'rgba(122, 180, 238, 0.56)',
+    backgroundColor: 'rgba(8, 27, 57, 0.9)',
   },
   resultFeedbackButtonText: {
     fontSize: 14,
@@ -2910,25 +2952,29 @@ const styles = StyleSheet.create({
   },
   resultContinueButton: {
     flex: 1,
-    minHeight: 48,
+    height: 48,
     marginTop: 0,
+    paddingHorizontal: 12,
+    paddingVertical: 0,
+    borderRadius: 16,
   },
   feedbackModalOverlay: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    backgroundColor: 'rgba(2, 8, 20, 0.76)',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    backgroundColor: 'rgba(2, 7, 18, 0.84)',
   },
   feedbackModalCard: {
     width: '100%',
-    maxHeight: '72%',
+    maxWidth: 560,
+    maxHeight: '88%',
+    alignSelf: 'center',
+    overflow: 'hidden',
     borderRadius: 24,
     borderWidth: 1,
     borderColor: 'rgba(105, 173, 255, 0.72)',
     backgroundColor: 'rgba(5, 19, 43, 0.98)',
-    paddingHorizontal: 18,
-    paddingTop: 16,
-    paddingBottom: 16,
     shadowColor: '#4FA3FF',
     shadowOpacity: 0.22,
     shadowRadius: 20,
@@ -2939,7 +2985,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(139, 181, 233, 0.2)',
   },
@@ -2958,38 +3005,113 @@ const styles = StyleSheet.create({
   },
   feedbackModalScroll: {
     flexShrink: 1,
+    minHeight: 0,
   },
   feedbackModalContent: {
-    paddingTop: 16,
-    paddingBottom: 8,
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 18,
+  },
+  feedbackModalSection: {
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingHorizontal: 13,
+    paddingVertical: 12,
+  },
+  feedbackChoiceSection: {
+    borderColor: 'rgba(100, 177, 255, 0.32)',
+    backgroundColor: 'rgba(18, 52, 94, 0.26)',
+  },
+  feedbackSectionHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
   },
   feedbackModalSectionTitle: {
     fontSize: 14,
     fontWeight: '900',
     color: '#78BEFF',
   },
+  feedbackChoiceTitle: {
+    color: '#64B1FF',
+  },
+  feedbackChoiceCue: {
+    marginTop: 9,
+    fontSize: 12,
+    lineHeight: 17,
+    color: 'rgba(168, 206, 255, 0.82)',
+    fontWeight: '700',
+  },
+  feedbackChoiceText: {
+    marginTop: 4,
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#F4F8FF',
+    fontWeight: '800',
+  },
   feedbackModalText: {
-    marginTop: 7,
+    marginTop: 9,
     fontSize: 15,
     lineHeight: 23,
-    fontWeight: '600',
-    color: '#E7EDF7',
+    fontWeight: '900',
+    color: '#F5F8FD',
+  },
+  feedbackStatsSection: {
+    borderWidth: 1,
+    borderRadius: 16,
+    borderColor: 'rgba(177, 132, 255, 0.24)',
+    backgroundColor: 'rgba(89, 50, 138, 0.08)',
+    paddingHorizontal: 13,
+    paddingVertical: 11,
+  },
+  feedbackStatsTitle: {
+    color: '#B184FF',
+  },
+  feedbackStatsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 7,
+    marginTop: 9,
+  },
+  feedbackStatChip: {
+    minWidth: 0,
+    flexShrink: 1,
+    borderWidth: 1,
+    borderColor: 'rgba(177, 132, 255, 0.22)',
+    borderRadius: 10,
+    backgroundColor: 'rgba(9, 20, 43, 0.44)',
+    paddingHorizontal: 9,
+    paddingVertical: 7,
   },
   feedbackTipSection: {
-    marginTop: 18,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(139, 181, 233, 0.2)',
+    borderWidth: 1,
+    borderRadius: 16,
+    borderColor: 'rgba(244, 197, 66, 0.46)',
+    backgroundColor: 'rgba(126, 91, 19, 0.15)',
+    paddingHorizontal: 13,
+    paddingVertical: 12,
   },
-  feedbackTipHeading: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
+  feedbackTipTitle: {
+    color: '#F4C542',
+  },
+  feedbackTipText: {
+    marginTop: 8,
+    fontSize: 13,
+    lineHeight: 20,
+    color: '#F7F0D8',
+    fontWeight: '700',
   },
   feedbackModalActions: {
+    flexShrink: 0,
     flexDirection: 'row',
     gap: 10,
-    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(139, 181, 233, 0.18)',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 14,
+    backgroundColor: 'rgba(4, 16, 37, 0.98)',
   },
   feedbackModalCloseButton: {
     flex: 1,
@@ -3097,7 +3219,9 @@ const styles = StyleSheet.create({
     gap: 7,
     marginTop: 9,
     borderRadius: 12,
-    backgroundColor: 'rgba(71, 54, 43, 0.94)',
+    borderWidth: 1,
+    borderColor: 'rgba(126, 91, 62, 0.42)',
+    backgroundColor: 'rgba(91, 62, 43, 0.9)',
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
@@ -3133,11 +3257,11 @@ const styles = StyleSheet.create({
   },
   roadmapEpisodeContent: {
     paddingRight: 7,
-    paddingBottom: 12,
+    paddingBottom: 24,
   },
   roadmapWeekTabs: {
-    width: 48,
-    marginLeft: 5,
+    width: 46,
+    marginLeft: 8,
     gap: 4,
   },
   roadmapWeekTab: {
@@ -3155,13 +3279,13 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   roadmapWeekTabSelected: {
-    borderColor: '#8D4BB3',
-    backgroundColor: '#9B59B6',
+    borderColor: '#8B5AA3',
+    backgroundColor: '#8F62A5',
     shadowColor: '#7B3A9E',
-    shadowOpacity: 0.24,
-    shadowRadius: 7,
+    shadowOpacity: 0.16,
+    shadowRadius: 5,
     shadowOffset: { width: 2, height: 2 },
-    elevation: 4,
+    elevation: 3,
   },
   roadmapWeekTabLocked: {
     opacity: 0.58,
@@ -3331,7 +3455,7 @@ const styles = StyleSheet.create({
   },
   stampBodyLocked: {
     borderStyle: 'dashed',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: 'rgba(255, 250, 240, 0.16)',
     borderColor: '#D1C3AF',
   },
   stampPlace: {
@@ -3368,6 +3492,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   stampCaptionLocked: {
-    color: '#AD9D89',
+    color: '#756554',
+    fontWeight: '700',
   },
 });

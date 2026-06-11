@@ -1,6 +1,15 @@
 import assert from 'node:assert/strict';
-import { buildResultCardData, buildSelectedChoiceText, getChangedStatEntries, getResultTone } from '../utils/resultCard.ts';
-import { choiceWithPositiveChanges, choiceWithZeroChanges } from './fixtures/choices.ts';
+import {
+  buildResultCardData,
+  buildSelectedChoiceText,
+  getChangedStatEntries,
+  getResultTone,
+} from '../utils/resultCard.ts';
+import {
+  choiceWithNegativeChanges,
+  choiceWithPositiveChanges,
+  choiceWithZeroChanges,
+} from './fixtures/choices.ts';
 import { tipScenarioNode } from './fixtures/scenarios.ts';
 
 const test = (name: string, fn: () => void) => {
@@ -14,12 +23,16 @@ const test = (name: string, fn: () => void) => {
 };
 
 test('buildSelectedChoiceText joins cue and body for result display', () => {
-  const text = buildSelectedChoiceText('(Stay calm) Uh... Check the form one more time?');
+  const text = buildSelectedChoiceText(
+    '(Stay calm) Uh... Check the form one more time?',
+  );
   assert.equal(text, 'Stay calm Uh... Check the form one more time?');
 });
 
 test('getChangedStatEntries only returns non-zero stat changes in UI order', () => {
-  const entries = getChangedStatEntries(choiceWithPositiveChanges.statChanges);
+  const entries = getChangedStatEntries(
+    choiceWithPositiveChanges.statChanges,
+  );
   assert.deepEqual(entries, [
     { statKey: 'mental', value: 5 },
     { statKey: 'english', value: 10 },
@@ -33,8 +46,16 @@ test('buildResultCardData hides zero-value stat changes', () => {
 });
 
 test('buildResultCardData uses only the current language tip text', () => {
-  const koResult = buildResultCardData(choiceWithPositiveChanges, 'ko', tipScenarioNode.tip);
-  const enResult = buildResultCardData(choiceWithPositiveChanges, 'en', tipScenarioNode.tip);
+  const koResult = buildResultCardData(
+    choiceWithPositiveChanges,
+    'ko',
+    tipScenarioNode.tip,
+  );
+  const enResult = buildResultCardData(
+    choiceWithPositiveChanges,
+    'en',
+    tipScenarioNode.tip,
+  );
 
   assert.equal(koResult.tipText, tipScenarioNode.tip?.ko ?? null);
   assert.equal(enResult.tipText, tipScenarioNode.tip?.en ?? null);
@@ -50,4 +71,31 @@ test('result tone and summary are derived without exposing full feedback', () =>
   assert.equal(getResultTone(choiceWithPositiveChanges.statChanges), 'good');
   assert.equal(result.resultLabel, '성공');
   assert.notEqual(result.resultSummary, result.feedbackText);
+});
+
+test('summary copy stays shorter than the detailed scenario feedback', () => {
+  const result = buildResultCardData(choiceWithPositiveChanges, 'en');
+  assert.equal(
+    result.resultSummary,
+    'You handled the situation well and kept the momentum going.',
+  );
+  assert.equal(
+    result.feedbackText,
+    choiceWithPositiveChanges.feedback.en,
+  );
+});
+
+test('result labels distinguish success, partial success, and failure', () => {
+  assert.equal(
+    buildResultCardData(choiceWithPositiveChanges, 'ko').resultLabel,
+    '성공',
+  );
+  assert.equal(
+    buildResultCardData(choiceWithZeroChanges, 'ko').resultLabel,
+    '부분 성공',
+  );
+  assert.equal(
+    buildResultCardData(choiceWithNegativeChanges, 'ko').resultLabel,
+    '실패',
+  );
 });
