@@ -192,7 +192,7 @@ const UI_TEXT = {
     nextBtn: 'Continue',
     summaryContinue: 'Continue',
     roadmapTitle: 'StoryMap',
-    roadmapHint: 'Tap a completed card to return to that scene.',
+    roadmapHint: 'Tap a completed scene to return to it.',
     roadmapBack: 'Go Back Here',
     roadmapLocked: 'Locked',
     roadmapCurrent: 'YOU ARE HERE',
@@ -222,7 +222,7 @@ const UI_TEXT = {
     nextBtn: '계속하기',
     summaryContinue: '계속하기',
     roadmapTitle: '스토리맵',
-    roadmapHint: '완료한 카드를 누르면 그 장면으로 돌아갈 수 있어요.',
+    roadmapHint: '완료한 장면은 다시 눌러 돌아갈 수 있어요.',
     roadmapBack: '이 시점으로 돌아가기',
     roadmapLocked: '잠금',
     roadmapCurrent: '현재 위치',
@@ -494,10 +494,11 @@ export default function GameScreen({
     460,
     Math.max(360, Math.round(height * 0.42)),
   );
+  const roadmapVerticalInset = isNarrow ? 12 : 16;
   const roadmapPanelWidth = Math.min(Math.round(width * 0.92), 520);
   const roadmapPanelMaxHeight = Math.max(
     300,
-    height - insets.top - insets.bottom - 28,
+    height - insets.top - insets.bottom - roadmapVerticalInset * 2,
   );
 
   useEffect(() => {
@@ -1915,8 +1916,8 @@ export default function GameScreen({
             style={[
               styles.roadmapModalSafeArea,
               {
-                paddingTop: insets.top + 14,
-                paddingBottom: insets.bottom + 14,
+                paddingTop: insets.top + roadmapVerticalInset,
+                paddingBottom: insets.bottom + roadmapVerticalInset,
               },
             ]}
           >
@@ -1982,7 +1983,7 @@ export default function GameScreen({
                         ? ({
                             scrollbarWidth: 'thin',
                             scrollbarColor:
-                              'rgba(139, 92, 165, 0.42) transparent',
+                              'rgba(139, 92, 165, 0.24) transparent',
                           } as never)
                         : null,
                     ]}
@@ -3220,8 +3221,8 @@ const styles = StyleSheet.create({
     marginTop: 9,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(126, 91, 62, 0.42)',
-    backgroundColor: 'rgba(91, 62, 43, 0.9)',
+    borderColor: 'rgba(130, 94, 64, 0.34)',
+    backgroundColor: 'rgba(104, 73, 50, 0.82)',
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
@@ -3257,11 +3258,11 @@ const styles = StyleSheet.create({
   },
   roadmapEpisodeContent: {
     paddingRight: 7,
-    paddingBottom: 24,
+    paddingBottom: 32,
   },
   roadmapWeekTabs: {
-    width: 46,
-    marginLeft: 8,
+    width: 44,
+    marginLeft: 7,
     gap: 4,
   },
   roadmapWeekTab: {
@@ -3279,11 +3280,11 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   roadmapWeekTabSelected: {
-    borderColor: '#8B5AA3',
-    backgroundColor: '#8F62A5',
+    borderColor: '#9570A6',
+    backgroundColor: '#8A6798',
     shadowColor: '#7B3A9E',
-    shadowOpacity: 0.16,
-    shadowRadius: 5,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
     shadowOffset: { width: 2, height: 2 },
     elevation: 3,
   },
@@ -3492,7 +3493,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   stampCaptionLocked: {
-    color: '#756554',
-    fontWeight: '700',
+    color: '#655442',
+    fontWeight: '800',
   },
 });
