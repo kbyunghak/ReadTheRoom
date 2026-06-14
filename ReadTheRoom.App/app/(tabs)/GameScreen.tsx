@@ -1,16 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
-  Animated,
   Image,
   ImageBackground,
   ImageSourcePropType,
-  Modal,
-  Platform,
   ScrollView,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -19,7 +14,6 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import { Tabs } from 'expo-router';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { Character } from '../../locales/types';
 import EndingScene from '../../components/EndingScene';
 import SituationSummaryScene from '../../components/SituationSummaryScene';
@@ -28,12 +22,7 @@ import {
   type GameStats,
   type StatChanges,
 } from '../../utils/gameStats';
-import {
-  getConditionSummary,
-  getStatusDetailTone,
-} from '../../utils/conditionSummary';
 import { preloadAssetSources } from '../../utils/assetPreload';
-import { buildResultCardData, splitChoiceText } from '../../utils/resultCard';
 import {
   getScenarioBundle,
   type LocalizedText,
@@ -54,9 +43,12 @@ import {
   getScenarioDisplayTitle,
   getScenarioHeaderTitle,
 } from '../../utils/scenarioDisplay';
-import { STAT_METADATA } from '../../domain/stats/config';
 import GameHeaderBar from '../../features/game/components/GameHeaderBar';
-import ResultStatItem from '../../features/game/components/ResultStatItem';
+import StatusCard from '../../features/game/components/StatusCard';
+import ScenarioPanel from '../../features/game/components/ScenarioPanel';
+import RoadmapModal, {
+  type RoadmapNode,
+} from '../../features/game/components/RoadmapModal';
 import {
   resolveChoiceContinuation,
   resolveSummaryContinuation,
@@ -77,15 +69,6 @@ type Choice = {
 type PlayedChoice = {
   situationTitle: LocalizedText;
   choice: Choice;
-};
-
-type RoadmapNode = {
-  scenarioId: number;
-  week: number;
-  day: number;
-  progressLabel: string;
-  title: LocalizedText;
-  stampLabel: string;
 };
 
 type Checkpoint = {
@@ -138,10 +121,10 @@ const UI_TEXT = {
     summaryContinue: '계속하기',
     roadmapTitle: '스토리맵',
     roadmapHint: '완료한 장면은 다시 눌러 돌아갈 수 있어요.',
-    roadmapBack: '이 시점으로 돌아가기',
+    roadmapBack: '이 지점으로 돌아가기',
     roadmapLocked: '잠금',
     roadmapCurrent: '현재 위치',
-    roadmapRewind: '여기서 돌아가기',
+    roadmapRewind: '여기로 돌아가기',
     roadmapPageHeader: 'VISA / VISAS - PAGE 1',
     roadmapWeekLocked: '아직 열리지 않은 Week입니다.',
     resultSelectedLabel: '선택',
@@ -173,7 +156,7 @@ const ROADMAP_WEEKS = [
 
 const getRoadmapLocationLabel = (title: string) => {
   const withoutInternalNote = title.replace(/\s*\([^)]*\)\s*$/u, '').trim();
-  return withoutInternalNote.split(/[,،]/u)[0]?.trim() || withoutInternalNote;
+  return withoutInternalNote.split(/[,?]/u)[0]?.trim() || withoutInternalNote;
 };
 const ROADMAP_STOP_WORDS = new Set([
   'AT',
@@ -209,8 +192,6 @@ const getRoadmapStampLabel = (title: string, scenarioId: number) => {
 
   return `STEP ${scenarioId}`;
 };
-
-const STAT_CONFIG = STAT_METADATA;
 
 type Props = {
   character: Character | null;
@@ -264,7 +245,6 @@ export default function GameScreen({
   );
   const storyScrollRef = useRef<ScrollView | null>(null);
   const roadmapScrollRef = useRef<ScrollView | null>(null);
-  const statusCardFlipAnim = useRef(new Animated.Value(0)).current;
   const [sceneAssetsReady, setSceneAssetsReady] = useState(false);
   const [lang, setLang] = useState<'en' | 'ko'>(initialLang);
   const scenarioBundle = useMemo(
@@ -285,7 +265,6 @@ export default function GameScreen({
   const [endingType, setEndingType] = useState<'success' | 'failure' | null>(
     null,
   );
-  const [isStatusCardFlipped, setIsStatusCardFlipped] = useState(false);
   const [currentSituationChoices, setCurrentSituationChoices] = useState<
     ScenarioChoice[]
   >(activeInitialSession ? activeInitialSession.currentSituationChoices : []);
@@ -364,11 +343,6 @@ export default function GameScreen({
           },
     );
   }, [activeInitialSession, initialLang, initialStats, startScenarioId]);
-
-  useEffect(() => {
-    setIsStatusCardFlipped(false);
-    statusCardFlipAnim.setValue(0);
-  }, [currentScenarioId, statusCardFlipAnim]);
 
   useEffect(() => {
     const track = pendingSummary
@@ -484,7 +458,7 @@ export default function GameScreen({
 
     return {
       title: {
-        ko: '이번 플레이에서 흔들렸던 순간',
+        ko: '?대쾲 ?뚮젅?댁뿉???붾뱾?몃뜕 ?쒓컙',
         en: 'What Hurt This Run',
       },
       items: negativeItems,
@@ -509,11 +483,11 @@ export default function GameScreen({
         day: scenario.day ?? 1,
         progressLabel: usesMainEpisodeProgress
           ? getRoadmapProgressLabel(scenario)
-          : `DAY ${String(scenario.day ?? 1).padStart(2, '0')} · EP ${String(
+          : `DAY ${String(scenario.day ?? 1).padStart(2, '0')} 쨌 EP ${String(
               scenario.episode ?? scenario.id,
             ).padStart(2, '0')}`,
         title: {
-          ko: getScenarioDisplayTitle(scenario, 'ko') || `상황 ${scenario.id}`,
+          ko: getScenarioDisplayTitle(scenario, 'ko') || `?곹솴 ${scenario.id}`,
           en:
             getScenarioDisplayTitle(scenario, 'en') ||
             `Situation ${scenario.id}`,
@@ -546,15 +520,15 @@ export default function GameScreen({
     ROADMAP_WEEKS[0];
   const roadmapLocationTitle =
     selectedRoadmapWeek === currentRoadmapWeek
-      ? `W${currentRoadmapWeek} · Day ${currentScenario.day ?? 1} · ${getRoadmapLocationLabel(
+      ? `W${currentRoadmapWeek} 쨌 Day ${currentScenario.day ?? 1} 쨌 ${getRoadmapLocationLabel(
           situationTitle,
         )}`
-      : `W${selectedRoadmapWeek} · Day ${String(
+      : `W${selectedRoadmapWeek} 쨌 Day ${String(
           selectedRoadmapWeekMeta.dayStart,
         ).padStart(
           2,
           '0',
-        )}–${String(selectedRoadmapWeekMeta.dayEnd).padStart(2, '0')}`;
+        )}??{String(selectedRoadmapWeekMeta.dayEnd).padStart(2, '0')}`;
 
   useEffect(() => {
     setCheckpoints((prev) => {
@@ -673,9 +647,9 @@ export default function GameScreen({
 
     if (continuation.type === 'missing') {
       Alert.alert(
-        isKorean ? '시나리오 오류' : 'Scenario Error',
+        isKorean ? '?쒕굹由ъ삤 ?ㅻ쪟' : 'Scenario Error',
         isKorean
-          ? `다음 시나리오 ${continuation.nextScenarioId}을(를) 찾을 수 없습니다.`
+          ? `?ㅼ쓬 ?쒕굹由ъ삤 ${continuation.nextScenarioId}??瑜? 李얠쓣 ???놁뒿?덈떎.`
           : `The next scenario ${continuation.nextScenarioId} could not be found.`,
       );
       return;
@@ -793,92 +767,10 @@ export default function GameScreen({
     setShowRoadmap(false);
   };
 
-  const statusItems = [
-    {
-      key: 'funds',
-      icon: STAT_CONFIG.funds.icon,
-      label: t.fundsLabel,
-      value: stats.funds,
-      max: 1000,
-      color: STAT_METADATA.funds.statusColor,
-    },
-    {
-      key: 'mental',
-      icon: STAT_CONFIG.mental.icon,
-      label: t.mentalHpLabel,
-      value: stats.mental,
-      max: 100,
-      color: STAT_METADATA.mental.statusColor,
-    },
-    {
-      key: 'relation',
-      icon: STAT_CONFIG.relation.icon,
-      label: t.relationLabel,
-      value: stats.relation,
-      max: 100,
-      color: STAT_METADATA.relation.statusColor,
-    },
-    {
-      key: 'english',
-      icon: STAT_CONFIG.english.icon,
-      label: t.englishLabel,
-      value: stats.english,
-      max: 100,
-      color: STAT_METADATA.english.statusColor,
-    },
-    {
-      key: 'stamina',
-      icon: STAT_CONFIG.stamina.icon,
-      label: t.staminaLabel,
-      value: stats.stamina,
-      max: 100,
-      color: STAT_METADATA.stamina.statusColor,
-    },
-    {
-      key: 'insight',
-      icon: STAT_CONFIG.insight.icon,
-      label: t.insightLabel,
-      value: stats.insight,
-      max: 100,
-      color: STAT_METADATA.insight.statusColor,
-    },
-  ] as const;
-  const statusDetailTone = useMemo(
-    () => getStatusDetailTone(stats, isKorean ? 'ko' : 'en'),
-    [isKorean, stats],
-  );
-  const conditionSummary = useMemo(
-    () =>
-      getConditionSummary({
-        episode: currentScenario.episode,
-        lang: isKorean ? 'ko' : 'en',
-        stats,
-      }),
-    [currentScenario.episode, isKorean, stats],
-  );
   const statusCardWidth = Math.min(
     Math.round(width * (isNarrow ? 0.39 : 0.33)),
     188,
   );
-  const statusCardFrontRotate = statusCardFlipAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '180deg'],
-  });
-  const statusCardBackRotate = statusCardFlipAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['180deg', '360deg'],
-  });
-
-  const toggleStatusCard = () => {
-    const nextFlipped = !isStatusCardFlipped;
-    setIsStatusCardFlipped(nextFlipped);
-    Animated.spring(statusCardFlipAnim, {
-      toValue: nextFlipped ? 1 : 0,
-      useNativeDriver: true,
-      friction: 8,
-      tension: 50,
-    }).start();
-  };
 
   if (endingType) {
     return (
@@ -975,7 +867,7 @@ export default function GameScreen({
               onOpenRoadmap={() => setShowRoadmap(true)}
               onShowFullTitle={() =>
                 Alert.alert(
-                  isKorean ? '장면 제목' : 'Scene Title',
+                  isKorean ? '?λ㈃ ?쒕ぉ' : 'Scene Title',
                   headerTitle,
                 )
               }
@@ -985,912 +877,98 @@ export default function GameScreen({
               onSelectLanguage={setLanguageAndClose}
             />
             {!showResult ? (
-              <TouchableOpacity
-                activeOpacity={0.96}
-                onPress={toggleStatusCard}
-                style={[
-                  styles.statusFloatingCardWrap,
-                  {
-                    width: statusCardWidth,
-                    right: headerHorizontalPadding,
-                    top: headerHeight + 8,
-                  },
-                ]}
-              >
-                <View
-                  style={{
-                    width: '100%',
-                    height: isStatusCardFlipped ? 356 : undefined,
-                    minHeight: 0,
-                  }}
-                >
-                  <Animated.View
-                    style={[
-                      {
-                        position: 'relative',
-                        width: '100%',
-                        minHeight: 0,
-                        paddingHorizontal: 11,
-                        paddingTop: 8,
-                        paddingBottom: 7,
-                        borderRadius: 16,
-                        borderWidth: 1.1,
-                        borderColor: 'rgba(207,226,255,0.46)',
-                        backgroundColor: 'rgba(9, 21, 45, 0.88)',
-                        shadowColor: '#071224',
-                        shadowOpacity: 0.2,
-                        shadowRadius: 14,
-                        shadowOffset: { width: 0, height: 6 },
-                        elevation: 5,
-                        backfaceVisibility: 'hidden',
-                      },
-                      {
-                        transform: [
-                          { perspective: 1000 },
-                          { rotateY: statusCardFrontRotate },
-                        ],
-                      },
-                    ]}
-                  >
-                    <View
-                      style={{
-                        width: '100%',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}
-                    >
-                      <View
-                        style={{
-                          flex: 1,
-                          minWidth: 0,
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          gap: 7,
-                        }}
-                      >
-                        <View
-                          style={[
-                            styles.statusFloatingBadge,
-                            { borderColor: conditionSummary.color },
-                          ]}
-                        >
-                          <MaterialCommunityIcons
-                            name={
-                              conditionSummary.icon as keyof typeof MaterialCommunityIcons.glyphMap
-                            }
-                            size={17}
-                            color={conditionSummary.color}
-                          />
-                        </View>
-                        <View style={styles.statusFloatingHeadingText}>
-                          <Text
-                            style={[
-                              styles.statusFloatingHeadingAccent,
-                              { color: conditionSummary.color },
-                            ]}
-                            numberOfLines={1}
-                          >
-                            {conditionSummary.title}
-                          </Text>
-                        </View>
-                      </View>
-                      <MaterialCommunityIcons
-                        name="cards-outline"
-                        size={14}
-                        color="rgba(232,241,255,0.68)"
-                        style={{ marginLeft: 8, flexShrink: 0, opacity: 0.82 }}
-                      />
-                    </View>
-                    <View
-                      style={{
-                        height: 1,
-                        marginTop: 5,
-                        backgroundColor: 'rgba(207,226,255,0.18)',
-                      }}
-                    />
-                    <Text
-                      style={{
-                        marginTop: 5,
-                        marginBottom: 0,
-                        padding: 0,
-                        fontSize: 10,
-                        lineHeight: 14,
-                        color: 'rgba(228,234,244,0.82)',
-                        fontWeight: '700',
-                      }}
-                      numberOfLines={2}
-                    >
-                      {conditionSummary.description}
-                    </Text>
-                  </Animated.View>
-
-                  <Animated.View
-                    style={[
-                      styles.statusFloatingCard,
-                      styles.statusFloatingCardFace,
-                      styles.statusFloatingCardBack,
-                      {
-                        transform: [
-                          { perspective: 1000 },
-                          { rotateY: statusCardBackRotate },
-                        ],
-                      },
-                    ]}
-                  >
-                    <Text style={styles.statusBackTitle}>
-                      {isKorean ? '상태 보기' : 'Status'}
-                    </Text>
-                    <View style={styles.statusFloatingDivider} />
-                    <View style={styles.statusBackGrid}>
-                      {statusItems.map((item) => (
-                        <View
-                          key={`status-back-${item.key}`}
-                          style={styles.statusBackItem}
-                        >
-                          <MaterialCommunityIcons
-                            name={
-                              item.icon as keyof typeof MaterialCommunityIcons.glyphMap
-                            }
-                            size={20}
-                            color={item.color}
-                          />
-                          <View style={styles.statusBackItemText}>
-                            <View style={styles.statusBackTopRow}>
-                              <Text style={styles.statusBackLabel}>
-                                {item.label}
-                              </Text>
-                              <Text style={styles.statusBackValue}>
-                                {item.value}
-                                {' / '}
-                                {item.max}
-                              </Text>
-                            </View>
-                            <View
-                              style={[
-                                styles.statusBackTonePill,
-                                {
-                                  borderColor: `${item.color}55`,
-                                  backgroundColor: `${item.color}18`,
-                                },
-                              ]}
-                            >
-                              <Text
-                                style={[
-                                  styles.statusBackTone,
-                                  { color: item.color },
-                                ]}
-                              >
-                                {statusDetailTone[item.key]}
-                              </Text>
-                            </View>
-                          </View>
-                        </View>
-                      ))}
-                    </View>
-                  </Animated.View>
-                </View>
-              </TouchableOpacity>
+              <>
+              <StatusCard
+                width={statusCardWidth}
+                right={headerHorizontalPadding}
+                top={headerHeight + 8}
+                stats={stats}
+                episode={currentScenario.episode}
+                language={lang}
+                resetKey={currentScenarioId}
+                labels={{
+                  funds: t.fundsLabel,
+                  mental: t.mentalHpLabel,
+                  english: t.englishLabel,
+                  insight: t.insightLabel,
+                  stamina: t.staminaLabel,
+                  relation: t.relationLabel,
+                }}
+              />
+              </>
             ) : null}
           </View>
 
-          <ScrollView
+          <ScenarioPanel
             ref={storyScrollRef}
-            style={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              bottom: scenarioPanelBottom,
-              maxHeight: scenarioPanelMaxHeight,
-              zIndex: 5,
-              overflow: 'visible',
+            scenario={currentScenario}
+            language={lang}
+            isNarrow={isNarrow}
+            bottom={scenarioPanelBottom}
+            maxHeight={scenarioPanelMaxHeight}
+            showResult={showResult}
+            showFeedbackModal={showFeedbackModal}
+            selectedChoice={selectedChoice}
+            copy={{
+              situationLabel: isKorean ? '?곹솴 ?ㅻ챸' : 'Situation',
+              summaryLabel: t.daySummaryLabel,
+              summaryContinue: t.summaryContinue,
+              feedbackButton: t.feedbackButton,
+              continueButton: t.nextBtn,
+              feedbackTitle: t.feedbackModalTitle,
+              choiceLabel: t.resultSelectedLabel,
+              resultLabel: t.feedbackExplanation,
+              statsLabel: t.resultValuesLabel,
+              tipLabel: t.feedbackTip,
+              closeLabel: t.closeButton,
             }}
-            contentContainerStyle={{
-              paddingTop: 18,
-              paddingHorizontal: isNarrow ? 14 : 18,
+            statLabels={{
+              funds: t.fundsLabel,
+              mental: t.mentalHpLabel,
+              english: t.englishLabel,
+              insight: t.insightLabel,
+              stamina: t.staminaLabel,
+              relation: t.relationLabel,
             }}
-            showsVerticalScrollIndicator={false}
-            bounces={false}
-            scrollEnabled={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            <View
-              style={{
-                width: '100%',
-                overflow: 'visible',
-                paddingHorizontal: 2,
-              }}
-            >
-              <View
-                style={{
-                  width: '100%',
-                  marginBottom: 4,
-                  overflow: 'visible',
-                }}
-              >
-                  <View style={styles.scenarioTab}>
-                    <Text style={styles.scenarioTabText}>
-                      {isSummaryScenario
-                        ? t.daySummaryLabel
-                        : isKorean
-                          ? '상황 설명'
-                          : 'Situation'}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      width: '100%',
-                      maxHeight: scenarioPanelMaxHeight - 18,
-                      overflow: 'hidden',
-                      backgroundColor: 'rgba(7, 18, 38, 0.74)',
-                      borderRadius: 18,
-                      borderWidth: 1.2,
-                      borderColor: 'rgba(99, 154, 235, 0.46)',
-                      paddingHorizontal: 16,
-                      paddingTop: 14,
-                      paddingBottom: 16,
-                    }}
-                  >
-                    <ScrollView
-                      style={{
-                        width: '100%',
-                        maxHeight: scenarioPanelMaxHeight - 50,
-                      }}
-                      contentContainerStyle={{
-                        flexDirection: 'column',
-                        paddingBottom: showResult ? 12 : 2,
-                      }}
-                      nestedScrollEnabled
-                      scrollEnabled
-                      showsVerticalScrollIndicator={false}
-                      bounces={false}
-                    >
-                      <View
-                        style={{
-                          width: '100%',
-                          flexGrow: 0,
-                          flexShrink: 0,
-                          marginBottom: 6,
-                        }}
-                      >
-                        <Text
-                          style={styles.scenarioText}
-                          numberOfLines={isSummaryScenario ? 3 : undefined}
-                        >
-                          {currentScenario.description[lang]}
-                        </Text>
-                      </View>
-                      <View
-                        style={{
-                          width: '100%',
-                          flexGrow: 0,
-                          flexShrink: 0,
-                          flexDirection: 'column',
-                          gap: 8,
-                          overflow: 'visible',
-                        }}
-                      >
-                          {isSummaryScenario ? (
-                            <>
-                              {currentScenario.tip?.[lang] ? (
-                                <View style={styles.summaryTipCard}>
-                                  <View style={styles.summaryTipHeader}>
-                                    <MaterialCommunityIcons
-                                      name="lightbulb-on-outline"
-                                      size={19}
-                                      color="#F4C542"
-                                    />
-                                    <Text style={styles.summaryTipLabel}>
-                                      TIP
-                                    </Text>
-                                  </View>
-                                  <Text style={styles.summaryTipText}>
-                                    {currentScenario.tip[lang]}
-                                  </Text>
-                                </View>
-                              ) : null}
-                              <TouchableOpacity
-                                style={styles.nextButton}
-                                onPress={handleSummaryContinue}
-                              >
-                                <Text style={styles.nextButtonText}>
-                                  {t.summaryContinue}
-                                </Text>
-                              </TouchableOpacity>
-                            </>
-                          ) : (
-                            currentScenario.choices.map((choice, index) => {
-                              const choiceCopy = splitChoiceText(
-                                choice.text[lang],
-                              );
-                              const isSelectedChoice =
-                                selectedChoice === choice;
-                              const isInactiveChoice =
-                                showResult && !isSelectedChoice;
-
-                              return (
-                                <TouchableOpacity
-                                  key={index}
-                                  style={[
-                                    styles.choiceButton,
-                                    isSelectedChoice &&
-                                      styles.choiceButtonSelected,
-                                    isInactiveChoice &&
-                                      styles.choiceButtonInactive,
-                                  ]}
-                                  disabled={showResult}
-                                  activeOpacity={showResult ? 1 : 0.75}
-                                  onPress={() => {
-                                    if (!showResult) handleChoice(choice);
-                                  }}
-                                >
-                                  <View style={styles.choiceContentRow}>
-                                    <View style={styles.choiceIndexBubble}>
-                                      <Text style={styles.choiceIndexText}>
-                                        {index + 1}
-                                      </Text>
-                                    </View>
-                                    <View style={styles.choiceTextWrap}>
-                                      {choiceCopy.cue ? (
-                                        <Text style={styles.choiceCueText}>
-                                          {choiceCopy.cue}
-                                        </Text>
-                                      ) : null}
-                                      <Text style={styles.choiceText}>
-                                        {choiceCopy.body}
-                                      </Text>
-                                    </View>
-                                  </View>
-                                </TouchableOpacity>
-                              );
-                            })
-                          )}
-                      </View>
-                    </ScrollView>
-                    {showResult && selectedChoice ? (
-                      <View style={styles.resultActionRowFixed}>
-                        <TouchableOpacity
-                          style={styles.resultFeedbackButton}
-                          onPress={() => setShowFeedbackModal(true)}
-                        >
-                          <Text style={styles.resultFeedbackButtonText}>
-                            {t.feedbackButton}
-                          </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={[
-                            styles.nextButton,
-                            styles.resultContinueButton,
-                          ]}
-                          onPress={proceedToNextScenario}
-                        >
-                          <Text style={styles.nextButtonText}>
-                            {t.nextBtn}
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                    ) : null}
-                  </View>
-              </View>
-
-              {showResult &&
-                selectedChoice &&
-                (() => {
-                  const resultCardData = buildResultCardData(
-                    selectedChoice,
-                    lang,
-                    currentScenario.tip,
-                  );
-                  const resultToneColor =
-                    resultCardData.resultTone === 'good'
-                      ? '#66D980'
-                      : resultCardData.resultTone === 'bad'
-                        ? '#FF7B86'
-                        : '#F4C542';
-                  const resultToneIcon =
-                    resultCardData.resultTone === 'good'
-                      ? 'check-circle-outline'
-                      : resultCardData.resultTone === 'bad'
-                        ? 'close-circle-outline'
-                        : 'alert-circle-outline';
-                  const modalChoiceCopy = splitChoiceText(
-                    selectedChoice.text[lang],
-                  );
-
-                  return (
-                    <>
-                      <Modal
-                        visible={showFeedbackModal}
-                        transparent
-                        animationType="fade"
-                        statusBarTranslucent
-                        onRequestClose={() => setShowFeedbackModal(false)}
-                      >
-                        <SafeAreaView
-                          style={styles.feedbackModalOverlay}
-                          edges={['top', 'bottom']}
-                        >
-                          <View
-                            style={[
-                              styles.feedbackModalCard,
-                              {
-                                maxHeight: Math.min(
-                                  height - insets.top - insets.bottom - 28,
-                                  680,
-                                ),
-                              },
-                            ]}
-                          >
-                            <View style={styles.feedbackModalHeader}>
-                              <Text style={styles.feedbackModalTitle}>
-                                {t.feedbackModalTitle}
-                              </Text>
-                              <TouchableOpacity
-                                style={styles.feedbackModalCloseIcon}
-                                onPress={() => setShowFeedbackModal(false)}
-                                accessibilityRole="button"
-                                accessibilityLabel={t.closeButton}
-                              >
-                                <MaterialCommunityIcons
-                                  name="close"
-                                  size={20}
-                                  color="#D8E8FF"
-                                />
-                              </TouchableOpacity>
-                            </View>
-
-                            <ScrollView
-                              style={styles.feedbackModalScroll}
-                              contentContainerStyle={
-                                styles.feedbackModalContent
-                              }
-                              showsVerticalScrollIndicator={false}
-                              bounces={false}
-                            >
-                              <View
-                                style={[
-                                  styles.feedbackModalSection,
-                                  styles.feedbackChoiceSection,
-                                ]}
-                              >
-                                <View style={styles.feedbackSectionHeading}>
-                                  <MaterialCommunityIcons
-                                    name="checkbox-marked-circle-outline"
-                                    size={19}
-                                    color="#64B1FF"
-                                  />
-                                  <Text
-                                    style={[
-                                      styles.feedbackModalSectionTitle,
-                                      styles.feedbackChoiceTitle,
-                                    ]}
-                                  >
-                                    {t.resultSelectedLabel}
-                                  </Text>
-                                </View>
-                                {modalChoiceCopy.cue ? (
-                                  <Text style={styles.feedbackChoiceCue}>
-                                    {modalChoiceCopy.cue}
-                                  </Text>
-                                ) : null}
-                                <Text style={styles.feedbackChoiceText}>
-                                  {modalChoiceCopy.body}
-                                </Text>
-                              </View>
-
-                              <View
-                                style={[
-                                  styles.feedbackModalSection,
-                                  {
-                                    borderColor: `${resultToneColor}66`,
-                                    backgroundColor: `${resultToneColor}12`,
-                                  },
-                                ]}
-                              >
-                                <View style={styles.feedbackSectionHeading}>
-                                  <MaterialCommunityIcons
-                                    name={resultToneIcon}
-                                    size={20}
-                                    color={resultToneColor}
-                                  />
-                                  <Text
-                                    style={[
-                                      styles.feedbackModalSectionTitle,
-                                      { color: resultToneColor },
-                                    ]}
-                                  >
-                                    {t.feedbackExplanation}
-                                  </Text>
-                                </View>
-                                <Text style={styles.feedbackModalText}>
-                                  {resultCardData.feedbackText}
-                                </Text>
-                              </View>
-
-                              {resultCardData.changedStats.length ? (
-                                <View style={styles.feedbackStatsSection}>
-                                  <View style={styles.feedbackSectionHeading}>
-                                    <MaterialCommunityIcons
-                                      name="chart-line-variant"
-                                      size={18}
-                                      color="#B184FF"
-                                    />
-                                    <Text
-                                      style={[
-                                        styles.feedbackModalSectionTitle,
-                                        styles.feedbackStatsTitle,
-                                      ]}
-                                    >
-                                      {t.resultValuesLabel}
-                                    </Text>
-                                  </View>
-                                  <View style={styles.feedbackStatsGrid}>
-                                    {resultCardData.changedStats.map((entry) => (
-                                      <ResultStatItem
-                                        key={`feedback-${selectedChoice.nextScenarioId}-${entry.statKey}`}
-                                        statKey={entry.statKey}
-                                        value={entry.value}
-                                        compact
-                                        label={
-                                          entry.statKey === 'funds'
-                                            ? t.fundsLabel
-                                            : entry.statKey === 'mental'
-                                              ? t.mentalHpLabel
-                                              : entry.statKey === 'english'
-                                                ? t.englishLabel
-                                                : entry.statKey === 'insight'
-                                                  ? t.insightLabel
-                                                  : entry.statKey === 'stamina'
-                                                    ? t.staminaLabel
-                                                    : t.relationLabel
-                                        }
-                                      />
-                                    ))}
-                                  </View>
-                                </View>
-                              ) : null}
-
-                              {resultCardData.tipText ? (
-                                <View style={styles.feedbackTipSection}>
-                                  <View style={styles.feedbackSectionHeading}>
-                                    <MaterialCommunityIcons
-                                      name="lightbulb-on-outline"
-                                      size={20}
-                                      color="#F4C542"
-                                    />
-                                    <Text
-                                      style={[
-                                        styles.feedbackModalSectionTitle,
-                                        styles.feedbackTipTitle,
-                                      ]}
-                                    >
-                                      {t.feedbackTip}
-                                    </Text>
-                                  </View>
-                                  <Text style={styles.feedbackTipText}>
-                                    {resultCardData.tipText}
-                                  </Text>
-                                </View>
-                              ) : null}
-                            </ScrollView>
-
-                            <View style={styles.feedbackModalActions}>
-                              <TouchableOpacity
-                                style={styles.feedbackModalCloseButton}
-                                onPress={() => setShowFeedbackModal(false)}
-                                accessibilityRole="button"
-                                accessibilityLabel={t.closeButton}
-                              >
-                                <Text
-                                  style={styles.feedbackModalCloseButtonText}
-                                >
-                                  {t.closeButton}
-                                </Text>
-                              </TouchableOpacity>
-                              <TouchableOpacity
-                                style={styles.feedbackModalContinueButton}
-                                onPress={proceedToNextScenario}
-                                accessibilityRole="button"
-                                accessibilityLabel={t.nextBtn}
-                              >
-                                <Text
-                                  style={styles.feedbackModalContinueButtonText}
-                                >
-                                  {t.nextBtn}
-                                </Text>
-                              </TouchableOpacity>
-                            </View>
-                          </View>
-                        </SafeAreaView>
-                      </Modal>
-                    </>
-                  );
-                })()}
-            </View>
-          </ScrollView>
+            onChoice={handleChoice}
+            onSummaryContinue={handleSummaryContinue}
+            onOpenFeedback={() => setShowFeedbackModal(true)}
+            onCloseFeedback={() => setShowFeedbackModal(false)}
+            onContinue={proceedToNextScenario}
+          />
         </View>
       </ImageBackground>
 
-      <Modal
+      <RoadmapModal
+        ref={roadmapScrollRef}
         visible={showRoadmap}
-        transparent
-        animationType="fade"
-        statusBarTranslucent={false}
-        onRequestClose={() => setShowRoadmap(false)}
-      >
-        <ImageBackground
-          source={BACKGROUND_IMAGES.airport}
-          style={styles.roadmapModalBackground}
-          imageStyle={styles.roadmapModalBackgroundImage}
-        >
-          <View style={styles.roadmapModalScrim} />
-          <View
-            style={[
-              styles.roadmapModalSafeArea,
-              {
-                paddingTop: insets.top + roadmapVerticalInset,
-                paddingBottom: insets.bottom + roadmapVerticalInset,
-              },
-            ]}
-          >
-            <View
-              style={[
-                styles.roadmapModalCard,
-                {
-                  width: roadmapPanelWidth,
-                  height: roadmapPanelMaxHeight,
-                  maxHeight: roadmapPanelMaxHeight,
-                },
-              ]}
-            >
-              <View style={styles.roadmapFixedHeader}>
-                <View style={styles.roadmapHeaderRow}>
-                  <View style={styles.roadmapHeaderCopy}>
-                    <Text style={styles.roadmapTitle}>{t.roadmapTitle}</Text>
-                    <Text
-                      style={styles.roadmapLocationTitle}
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                    >
-                      {roadmapLocationTitle}
-                    </Text>
-                  </View>
-                  <TouchableOpacity
-                    style={styles.roadmapCloseButton}
-                    onPress={() => setShowRoadmap(false)}
-                    accessibilityRole="button"
-                    accessibilityLabel={t.closeButton}
-                  >
-                    <MaterialCommunityIcons
-                      name="close"
-                      size={21}
-                      color="#5B4C40"
-                    />
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.roadmapPersistentHint}>
-                  <MaterialCommunityIcons
-                    name="information-outline"
-                    size={15}
-                    color="#FFF5E5"
-                  />
-                  <Text style={styles.roadmapPersistentHintText}>
-                    {t.roadmapHint}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.roadmapBody}>
-                <ImageBackground
-                  source={require('../../assets/images/paper.png')}
-                  style={styles.roadmapPaperFrame}
-                  imageStyle={styles.roadmapPaperTexture}
-                >
-                  <ScrollView
-                    ref={roadmapScrollRef}
-                    style={[
-                      styles.roadmapEpisodeScroll,
-                      Platform.OS === 'web'
-                        ? ({
-                            scrollbarWidth: 'thin',
-                            scrollbarColor:
-                              'rgba(139, 92, 165, 0.24) transparent',
-                          } as never)
-                        : null,
-                    ]}
-                    showsVerticalScrollIndicator={Platform.OS === 'web'}
-                    nestedScrollEnabled
-                    bounces={false}
-                    contentContainerStyle={styles.roadmapEpisodeContent}
-                  >
-                    <View style={styles.passportPage}>
-                      <Text style={styles.passportPageHeader}>
-                        {`VISA / VISAS · WEEK ${selectedRoadmapWeek}`}
-                      </Text>
-                      <View style={styles.passportHeaderRule} />
-
-                      <View style={styles.stampGrid}>
-                        {selectedWeekRoadmapNodes.map((node, index) => {
-                          const hasCheckpoint = Boolean(
-                            checkpoints[node.scenarioId],
-                          );
-                          const state =
-                            node.scenarioId === currentScenarioId
-                              ? 'current'
-                              : hasCheckpoint
-                                ? 'completed'
-                                : 'locked';
-                          const isAvailable = state === 'completed';
-                          const stampColor =
-                            ROADMAP_STAMP_COLORS[
-                              index % ROADMAP_STAMP_COLORS.length
-                            ];
-                          const rotation = index % 2 === 0 ? '-9deg' : '8deg';
-
-                          return (
-                            <View
-                              key={`roadmap-${node.scenarioId}`}
-                              style={styles.stampSlot}
-                            >
-                              <TouchableOpacity
-                                activeOpacity={isAvailable ? 0.88 : 1}
-                                disabled={!isAvailable}
-                                onPress={() => jumpToRoadmapNode(node)}
-                                style={[
-                                  styles.stampFrame,
-                                ]}
-                              >
-                                <View
-                                  style={[
-                                    styles.stampTape,
-                                    index % 2 === 0
-                                      ? styles.stampTapeBlue
-                                      : styles.stampTapePeach,
-                                  ]}
-                                />
-                                <View
-                                  style={[
-                                    styles.stampBody,
-                                    {
-                                      borderColor: stampColor,
-                                      transform: [{ rotate: rotation }],
-                                    },
-                                    state === 'current' &&
-                                      styles.stampBodyCurrent,
-                                    state === 'locked' &&
-                                      styles.stampBodyLocked,
-                                  ]}
-                                >
-                                  {state === 'locked' ? (
-                                    <MaterialCommunityIcons
-                                      name="lock-outline"
-                                      size={14}
-                                      color="#A69582"
-                                    />
-                                  ) : null}
-                                  <Text
-                                    style={[
-                                      styles.stampPlace,
-                                      {
-                                        color:
-                                          state === 'locked'
-                                            ? '#8F806F'
-                                            : stampColor,
-                                      },
-                                    ]}
-                                  >
-                                    {state === 'locked'
-                                      ? 'LOCKED'
-                                      : node.stampLabel}
-                                  </Text>
-                                  <Text
-                                    style={[
-                                      styles.stampDate,
-                                      {
-                                        color:
-                                          state === 'locked'
-                                            ? '#9C8D7B'
-                                            : stampColor,
-                                      },
-                                    ]}
-                                  >
-                                    {node.progressLabel}
-                                  </Text>
-                                  <Text
-                                    style={[
-                                      styles.stampMeta,
-                                      {
-                                        color:
-                                          state === 'locked'
-                                            ? '#AA9A88'
-                                            : stampColor,
-                                      },
-                                    ]}
-                                  >
-                                    {state === 'current'
-                                      ? t.roadmapCurrent
-                                      : state === 'completed'
-                                        ? t.roadmapRewind
-                                        : t.roadmapLocked}
-                                  </Text>
-                                </View>
-                                <Text
-                                  style={[
-                                    styles.stampCaption,
-                                    state === 'locked' &&
-                                      styles.stampCaptionLocked,
-                                  ]}
-                                  numberOfLines={2}
-                                >
-                                  {node.title[lang]}
-                                </Text>
-                              </TouchableOpacity>
-                            </View>
-                          );
-                        })}
-                      </View>
-                    </View>
-                  </ScrollView>
-                </ImageBackground>
-
-                <View style={styles.roadmapWeekTabs}>
-                  {ROADMAP_WEEKS.map((weekMeta) => {
-                    const isSelected = selectedRoadmapWeek === weekMeta.week;
-                    const isUnlocked = unlockedRoadmapWeeks.has(weekMeta.week);
-
-                    return (
-                      <TouchableOpacity
-                        key={`roadmap-week-${weekMeta.week}`}
-                        style={[
-                          styles.roadmapWeekTab,
-                          isSelected && styles.roadmapWeekTabSelected,
-                          !isUnlocked && styles.roadmapWeekTabLocked,
-                        ]}
-                        activeOpacity={isUnlocked ? 0.82 : 1}
-                        onPress={() => {
-                          if (!isUnlocked) {
-                            Alert.alert(t.roadmapTitle, t.roadmapWeekLocked);
-                            return;
-                          }
-
-                          setSelectedRoadmapWeek(weekMeta.week);
-                        }}
-                      >
-                        <View style={styles.roadmapWeekTabTopRow}>
-                          <Text
-                            style={[
-                              styles.roadmapWeekTabTitle,
-                              isSelected && styles.roadmapWeekTabTitleSelected,
-                            ]}
-                          >
-                            {`W${weekMeta.week}`}
-                          </Text>
-                          {!isUnlocked ? (
-                            <MaterialCommunityIcons
-                              name="lock-outline"
-                              size={11}
-                              color="#A99884"
-                            />
-                          ) : null}
-                        </View>
-                        <Text
-                          style={[
-                            styles.roadmapWeekTabRange,
-                            isSelected && styles.roadmapWeekTabRangeSelected,
-                          ]}
-                        >
-                          {`${weekMeta.dayStart}–${weekMeta.dayEnd}`}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </View>
-            </View>
-          </View>
-        </ImageBackground>
-      </Modal>
+        language={lang}
+        copy={{
+          title: t.roadmapTitle,
+          hint: t.roadmapHint,
+          close: t.closeButton,
+          current: t.roadmapCurrent,
+          rewind: t.roadmapRewind,
+          locked: t.roadmapLocked,
+          weekLocked: t.roadmapWeekLocked,
+        }}
+        locationTitle={roadmapLocationTitle}
+        selectedWeek={selectedRoadmapWeek}
+        nodes={selectedWeekRoadmapNodes}
+        weeks={ROADMAP_WEEKS}
+        unlockedWeeks={unlockedRoadmapWeeks}
+        completedScenarioIds={new Set(Object.keys(checkpoints).map(Number))}
+        currentScenarioId={currentScenarioId}
+        panelWidth={roadmapPanelWidth}
+        panelHeight={roadmapPanelMaxHeight}
+        topInset={insets.top + roadmapVerticalInset}
+        bottomInset={insets.bottom + roadmapVerticalInset}
+        styles={styles}
+        stampColors={ROADMAP_STAMP_COLORS}
+        onClose={() => setShowRoadmap(false)}
+        onSelectWeek={setSelectedRoadmapWeek}
+        onJump={jumpToRoadmapNode}
+      />
     </SafeAreaView>
   );
 }
@@ -2053,142 +1131,6 @@ const styles = StyleSheet.create({
   storyMapControlTextNarrow: {
     fontSize: 7,
     lineHeight: 10,
-  },
-  statusFloatingCardWrap: {
-    position: 'absolute',
-    marginBottom: 0,
-    zIndex: 12,
-    elevation: 12,
-  },
-  statusFloatingCardFlipStage: {
-    minHeight: 92,
-  },
-  statusFloatingCard: {
-    minHeight: 92,
-    paddingHorizontal: 11,
-    paddingVertical: 8,
-    borderRadius: 16,
-    borderWidth: 1.1,
-    borderColor: 'rgba(207,226,255,0.46)',
-    backgroundColor: 'rgba(9, 21, 45, 0.88)',
-    shadowColor: '#071224',
-    shadowOpacity: 0.2,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 5,
-  },
-  statusFloatingHintIcon: {
-    opacity: 0.82,
-  },
-  statusFloatingCardFace: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    backfaceVisibility: 'hidden',
-  },
-  statusFloatingCardBack: {
-    justifyContent: 'flex-start',
-  },
-  statusFloatingFrontRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-    minWidth: 0,
-  },
-  statusFloatingBadge: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    borderWidth: 1.5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(34, 86, 200, 0.16)',
-  },
-  statusFloatingHeadingText: {
-    minWidth: 0,
-    flex: 1,
-    justifyContent: 'center',
-  },
-  statusFloatingHeadingAccent: {
-    fontSize: 13,
-    lineHeight: 16,
-    fontWeight: '900',
-  },
-  statusFloatingDescription: {
-    marginTop: 5,
-    fontSize: 10,
-    lineHeight: 14,
-    color: 'rgba(228,234,244,0.82)',
-    fontWeight: '700',
-  },
-  statusFloatingFooterRow: {
-    marginTop: 4,
-    alignItems: 'flex-end',
-  },
-  statusBackTitle: {
-    fontSize: 13,
-    lineHeight: 16,
-    fontWeight: '900',
-    color: '#F5F8FD',
-  },
-  statusBackGrid: {
-    marginTop: 8,
-    gap: 6,
-  },
-  statusBackItem: {
-    minHeight: 48,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(180, 209, 255, 0.12)',
-    paddingBottom: 6,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 8,
-  },
-  statusBackItemText: {
-    flex: 1,
-    minWidth: 0,
-    gap: 4,
-  },
-  statusBackTopRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  statusBackLabel: {
-    fontSize: 13,
-    lineHeight: 16,
-    fontWeight: '800',
-    color: 'rgba(227,236,246,0.9)',
-  },
-  statusBackTone: {
-    fontSize: 10,
-    lineHeight: 12,
-    fontWeight: '800',
-  },
-  statusBackTonePill: {
-    alignSelf: 'flex-start',
-    minWidth: 48,
-    minHeight: 22,
-    borderRadius: 7,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 9,
-    paddingVertical: 3,
-  },
-  statusBackValue: {
-    fontSize: 11,
-    lineHeight: 14,
-    fontWeight: '900',
-    color: '#F5F8FD',
-    flexShrink: 0,
-  },
-  statusFloatingDivider: {
-    marginTop: 5,
-    height: 1,
-    backgroundColor: 'rgba(207,226,255,0.18)',
   },
   languageToggleWrap: {
     width: 64,
@@ -2670,189 +1612,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 0,
     borderRadius: 16,
-  },
-  feedbackModalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    backgroundColor: 'rgba(2, 7, 18, 0.84)',
-  },
-  feedbackModalCard: {
-    width: '100%',
-    maxWidth: 560,
-    maxHeight: '88%',
-    alignSelf: 'center',
-    overflow: 'hidden',
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: 'rgba(105, 173, 255, 0.72)',
-    backgroundColor: 'rgba(5, 19, 43, 0.98)',
-    shadowColor: '#4FA3FF',
-    shadowOpacity: 0.22,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 15,
-  },
-  feedbackModalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(139, 181, 233, 0.2)',
-  },
-  feedbackModalTitle: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: '#F5F8FC',
-  },
-  feedbackModalCloseIcon: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(105, 173, 255, 0.12)',
-  },
-  feedbackModalScroll: {
-    flexShrink: 1,
-    minHeight: 0,
-  },
-  feedbackModalContent: {
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 18,
-  },
-  feedbackModalSection: {
-    borderWidth: 1,
-    borderRadius: 16,
-    paddingHorizontal: 13,
-    paddingVertical: 12,
-  },
-  feedbackChoiceSection: {
-    borderColor: 'rgba(100, 177, 255, 0.32)',
-    backgroundColor: 'rgba(18, 52, 94, 0.26)',
-  },
-  feedbackSectionHeading: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-  },
-  feedbackModalSectionTitle: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: '#78BEFF',
-  },
-  feedbackChoiceTitle: {
-    color: '#64B1FF',
-  },
-  feedbackChoiceCue: {
-    marginTop: 9,
-    fontSize: 12,
-    lineHeight: 17,
-    color: 'rgba(168, 206, 255, 0.82)',
-    fontWeight: '700',
-  },
-  feedbackChoiceText: {
-    marginTop: 4,
-    fontSize: 15,
-    lineHeight: 22,
-    color: '#F4F8FF',
-    fontWeight: '800',
-  },
-  feedbackModalText: {
-    marginTop: 9,
-    fontSize: 15,
-    lineHeight: 23,
-    fontWeight: '900',
-    color: '#F5F8FD',
-  },
-  feedbackStatsSection: {
-    borderWidth: 1,
-    borderRadius: 16,
-    borderColor: 'rgba(177, 132, 255, 0.24)',
-    backgroundColor: 'rgba(89, 50, 138, 0.08)',
-    paddingHorizontal: 13,
-    paddingVertical: 11,
-  },
-  feedbackStatsTitle: {
-    color: '#B184FF',
-  },
-  feedbackStatsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 7,
-    marginTop: 9,
-  },
-  feedbackStatChip: {
-    minWidth: 0,
-    flexShrink: 1,
-    borderWidth: 1,
-    borderColor: 'rgba(177, 132, 255, 0.22)',
-    borderRadius: 10,
-    backgroundColor: 'rgba(9, 20, 43, 0.44)',
-    paddingHorizontal: 9,
-    paddingVertical: 7,
-  },
-  feedbackTipSection: {
-    borderWidth: 1,
-    borderRadius: 16,
-    borderColor: 'rgba(244, 197, 66, 0.46)',
-    backgroundColor: 'rgba(126, 91, 19, 0.15)',
-    paddingHorizontal: 13,
-    paddingVertical: 12,
-  },
-  feedbackTipTitle: {
-    color: '#F4C542',
-  },
-  feedbackTipText: {
-    marginTop: 8,
-    fontSize: 13,
-    lineHeight: 20,
-    color: '#F7F0D8',
-    fontWeight: '700',
-  },
-  feedbackModalActions: {
-    flexShrink: 0,
-    flexDirection: 'row',
-    gap: 10,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(139, 181, 233, 0.18)',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 14,
-    backgroundColor: 'rgba(4, 16, 37, 0.98)',
-  },
-  feedbackModalCloseButton: {
-    flex: 1,
-    minHeight: 48,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(139, 181, 233, 0.36)',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-  },
-  feedbackModalCloseButtonText: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: '#C9D6E8',
-  },
-  feedbackModalContinueButton: {
-    flex: 1,
-    minHeight: 48,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#D9E9FF',
-  },
-  feedbackModalContinueButtonText: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: '#16385F',
   },
   nextButton: {
     backgroundColor: 'rgba(225, 240, 255, 0.98)',

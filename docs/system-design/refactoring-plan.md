@@ -14,6 +14,29 @@
 The first refactoring pass intentionally preserves the existing navigation model and game behavior.
 Further extraction of the large feedback, roadmap, and status-card render blocks should be handled in separate visual-regression commits.
 
+## Second Pass - Remaining Work
+
+This pass focuses on reducing the size and edit cost of `GameScreen` without
+changing scenario content or runtime behavior.
+
+1. Audit the current structure and record regression gates.
+2. Extract the feedback modal and keep result behavior unchanged.
+3. Unify the scenario data source between JSON and TypeScript.
+   - Deferred until the code-organization pass is complete.
+   - Do not change scenario IDs, content, normalization, or runtime source in
+     this pass.
+4. Extract the front/back status card.
+5. Extract the scenario description and choice panel.
+6. Extract the roadmap modal and run the full regression gate.
+
+### Second-pass gates
+
+- Run the focused unit tests after each extraction.
+- Run `npx tsc --noEmit` and lint after each extraction.
+- Run the complete `npm test` suite at the final gate.
+- Preserve automatic feedback opening, selected-choice locking, summary
+  behavior, roadmap rewind behavior, and status-card flipping.
+
 ## Goal
 
 Reduce the cost and regression risk of UI and scenario changes without changing current game behavior.
