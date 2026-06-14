@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   Animated,
@@ -20,12 +20,11 @@ import {
 } from 'react-native-safe-area-context';
 import { Tabs } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { Character } from '../../components/CharacterSelectScreen';
+import type { Character } from '../../locales/types';
 import EndingScene from '../../components/EndingScene';
 import SituationSummaryScene from '../../components/SituationSummaryScene';
 import {
   applyStatChanges,
-  isGameOverFromStats,
   type GameStats,
   type StatChanges,
 } from '../../utils/gameStats';
@@ -45,7 +44,6 @@ import {
   buildSituationSummary,
   type SituationSummary,
 } from '../../utils/situationSummary';
-import { shouldShowSituationSummary } from '../../utils/questProgress';
 import { saveGame, type SavedGameSession } from '../../utils/gamePersistence';
 import { playBgm } from '../../utils/bgmPlayer';
 import {
@@ -56,6 +54,18 @@ import {
   getScenarioDisplayTitle,
   getScenarioHeaderTitle,
 } from '../../utils/scenarioDisplay';
+import { STAT_METADATA } from '../../domain/stats/config';
+import GameHeaderBar from '../../features/game/components/GameHeaderBar';
+import ResultStatItem from '../../features/game/components/ResultStatItem';
+import {
+  resolveChoiceContinuation,
+  resolveSummaryContinuation,
+} from '../../domain/game/transitions';
+import {
+  BACKGROUND_IMAGES,
+  BACKGROUND_KEY_ALIASES,
+  type BackgroundKey,
+} from '../../shared/assets/registry';
 
 type Choice = {
   text: LocalizedText;
@@ -82,101 +92,6 @@ type Checkpoint = {
   scenarioId: number;
   stats: GameStats;
   playHistory: PlayedChoice[];
-};
-
-type BackgroundKey =
-  | 'airport'
-  | 'adaptation'
-  | 'office'
-  | 'house'
-  | 'cafe'
-  | 'bank'
-  | 'busstop'
-  | 'night_street'
-  | 'nightstreet_ppl'
-  | 'city_night'
-  | 'observatory_nature'
-  | 'partyroom_lonely'
-  | 'street'
-  | 'mart'
-  | 'arrival';
-
-const BACKGROUND_IMAGES: Record<BackgroundKey, ImageSourcePropType> = {
-  adaptation: require('../../assets/images/background/adaptation.png'),
-  airport: require('../../assets/images/background/airport.png'),
-  office: require('../../assets/images/background/office.png'),
-  house: require('../../assets/images/background/house.png'),
-  cafe: require('../../assets/images/background/cafe.png'),
-  bank: require('../../assets/images/background/bank.png'),
-  busstop: require('../../assets/images/background/busstop.png'),
-  night_street: require('../../assets/images/background/night_street.png'),
-  nightstreet_ppl: require('../../assets/images/background/nightstreet_ppl.png'),
-  city_night: require('../../assets/images/background/city_night.png'),
-  observatory_nature: require('../../assets/images/background/observatory_nature.png'),
-  partyroom_lonely: require('../../assets/images/background/partyroom_lonely.png'),
-  street: require('../../assets/images/background/busstop.png'),
-  mart: require('../../assets/images/background/mart.png'),
-  arrival: require('../../assets/images/background/airport.png'),
-};
-
-const BACKGROUND_KEY_ALIASES: Record<string, BackgroundKey> = {
-  adaptation: 'adaptation',
-  airport: 'airport',
-  office: 'office',
-  house: 'house',
-  cafe: 'cafe',
-  bank: 'bank',
-  busstop: 'busstop',
-  night_street: 'night_street',
-  nightstreet_ppl: 'nightstreet_ppl',
-  city_night: 'city_night',
-  observatory_nature: 'observatory_nature',
-  partyroom_lonely: 'partyroom_lonely',
-  street: 'street',
-  mart: 'mart',
-  arrival: 'arrival',
-  yvr_airport: 'airport',
-  airport_exit: 'airport',
-  airport_transport: 'airport',
-  skytrain: 'airport',
-  settling: 'house',
-  dorm_hallway: 'house',
-  dorm_room: 'house',
-  dorm_lobby: 'house',
-  kitchen: 'house',
-  laundry: 'house',
-  phone_store: 'office',
-  tim_hortons: 'cafe',
-  tim_hortons_counter: 'cafe',
-  grocery: 'mart',
-  grocery_store: 'mart',
-  grocery_counter: 'mart',
-  grocery_exit: 'mart',
-  bus_stop: 'busstop',
-  home_kitchen: 'house',
-  living_room: 'house',
-  child_bedroom: 'house',
-  dining_room: 'house',
-  shopping_mall: 'street',
-  garden: 'observatory_nature',
-  survival: 'nightstreet_ppl',
-  classroom: 'office',
-  library: 'office',
-  street_vancouver: 'street',
-  restaurant: 'cafe',
-  work: 'office',
-  interview: 'office',
-  mall: 'street',
-  online: 'house',
-  pub: 'partyroom_lonely',
-  school_gate: 'street',
-  community_center: 'office',
-  self_checkout: 'mart',
-  hospital: 'office',
-  campus: 'adaptation',
-  campus_cafe: 'cafe',
-  campus_street: 'street',
-  vancouver_view: 'adaptation',
 };
 
 const UI_TEXT = {
@@ -295,92 +210,7 @@ const getRoadmapStampLabel = (title: string, scenarioId: number) => {
   return `STEP ${scenarioId}`;
 };
 
-const STAT_CONFIG = {
-  funds: { color: '#D9E6F7', icon: 'currency-usd' },
-  mental: { color: '#D9E6F7', icon: 'brain' },
-  english: { color: '#D9E6F7', icon: 'book-open-page-variant-outline' },
-  insight: { color: '#D9E6F7', icon: 'eye-outline' },
-  stamina: { color: '#D9E6F7', icon: 'battery-high' },
-  relation: { color: '#D9E6F7', icon: 'account-group-outline' },
-} as const;
-
-const StatChangeBadge = ({
-  statKey,
-  value,
-  label,
-}: {
-  statKey: keyof typeof STAT_CONFIG;
-  value: number;
-  label: string;
-}) => {
-  if (value === 0) return null;
-  const isPositive = value > 0;
-
-  return (
-    <View
-      style={[
-        styles.badge,
-        isPositive ? styles.badgePositive : styles.badgeNegative,
-      ]}
-    >
-      <View
-        style={[
-          styles.badgeDot,
-          { backgroundColor: STAT_CONFIG[statKey].color },
-        ]}
-      />
-      <Text
-        style={[
-          styles.badgeText,
-          isPositive ? styles.badgeTextPositive : styles.badgeTextNegative,
-        ]}
-      >
-        {label} {isPositive ? `+${value}` : value}
-      </Text>
-    </View>
-  );
-};
-
-const ResultStatItem = ({
-  statKey,
-  value,
-  label,
-  compact = false,
-}: {
-  statKey: keyof typeof STAT_CONFIG;
-  value: number;
-  label: string;
-  compact?: boolean;
-}) => {
-  if (value === 0) return null;
-  const isPositive = value > 0;
-
-  return (
-    <View
-      style={[
-        styles.resultStatItem,
-        compact && styles.feedbackStatChip,
-      ]}
-    >
-      <MaterialCommunityIcons
-        name={STAT_CONFIG[statKey].icon}
-        size={20}
-        color={STAT_CONFIG[statKey].color}
-      />
-      <Text style={styles.resultStatLabel}>{label}</Text>
-      <Text
-        style={[
-          styles.resultStatValue,
-          isPositive
-            ? styles.resultStatValuePositive
-            : styles.resultStatValueNegative,
-        ]}
-      >
-        {isPositive ? `+${value}` : value}
-      </Text>
-    </View>
-  );
-};
+const STAT_CONFIG = STAT_METADATA;
 
 type Props = {
   character: Character | null;
@@ -594,27 +424,6 @@ export default function GameScreen({
       isMounted = false;
     };
   }, [currentBackground, currentCharacterOverlay]);
-
-  const getTimelineTitle = (currentLang: 'ko' | 'en', quest?: string) => {
-    const dayNumber =
-      typeof currentScenario.day === 'number' && currentScenario.day > 0
-        ? currentScenario.day
-        : undefined;
-    if (dayNumber) {
-      return currentLang === 'ko' ? `${dayNumber}일차` : `Day ${dayNumber}`;
-    }
-
-    const situationNumber = Number(quest?.split('-')[0] ?? '1');
-    const weekNumber =
-      Number.isFinite(situationNumber) && situationNumber > 0
-        ? situationNumber
-        : 1;
-    const startDay = (weekNumber - 1) * 6 + 1;
-    const endDay = weekNumber * 6;
-    return currentLang === 'ko'
-      ? `${weekNumber}주차: Day ${startDay} - ${endDay}`
-      : `Week ${weekNumber}: Day ${startDay} - ${endDay}`;
-  };
 
   const usesMainEpisodeProgress = useMemo(
     () =>
@@ -855,12 +664,19 @@ export default function GameScreen({
     if (!isSummaryScenario) return;
 
     const nextScenarioId = currentScenario.nextScenarioId;
-    if (nextScenarioId !== undefined && !scenarios[String(nextScenarioId)]) {
+    const continuation = resolveSummaryContinuation({
+      scenario: currentScenario,
+      nextScenarioExists:
+        nextScenarioId !== undefined &&
+        Boolean(scenarios[String(nextScenarioId)]),
+    });
+
+    if (continuation.type === 'missing') {
       Alert.alert(
         isKorean ? '시나리오 오류' : 'Scenario Error',
         isKorean
-          ? `다음 시나리오 ${nextScenarioId}을(를) 찾을 수 없습니다.`
-          : `The next scenario ${nextScenarioId} could not be found.`,
+          ? `다음 시나리오 ${continuation.nextScenarioId}을(를) 찾을 수 없습니다.`
+          : `The next scenario ${continuation.nextScenarioId} could not be found.`,
       );
       return;
     }
@@ -875,8 +691,8 @@ export default function GameScreen({
     setShowResult(false);
     setSelectedChoice(null);
 
-    if (nextScenarioId !== undefined) {
-      setCurrentScenarioId(nextScenarioId);
+    if (continuation.type === 'advance') {
+      setCurrentScenarioId(continuation.nextScenarioId);
     } else {
       setEndingType('success');
     }
@@ -885,7 +701,16 @@ export default function GameScreen({
   const proceedToNextScenario = () => {
     setShowFeedbackModal(false);
     if (selectedChoice) {
-      if (isGameOverFromStats(stats)) {
+      const nextScenarioId = selectedChoice.nextScenarioId;
+      const nextScenario = scenarios[String(nextScenarioId)];
+      const continuation = resolveChoiceContinuation({
+        stats,
+        scenario: currentScenario,
+        choice: selectedChoice,
+        nextScenarioExists: Boolean(nextScenario),
+      });
+
+      if (continuation.type === 'failure') {
         setShowResult(false);
         setSelectedChoice(null);
         setEndingType('failure');
@@ -896,13 +721,8 @@ export default function GameScreen({
         ...currentSituationChoices,
         selectedChoice,
       ];
-      const nextScenarioId = selectedChoice.nextScenarioId;
-      const nextScenario = scenarios[String(nextScenarioId)];
-      const shouldTriggerSummary =
-        currentScenario.isPhaseEnd ??
-        shouldShowSituationSummary(currentScenario.id);
 
-      if (currentScenario.isEnding) {
+      if (continuation.type === 'ending') {
         setCurrentSituationChoices([]);
         setShowResult(false);
         setSelectedChoice(null);
@@ -910,9 +730,9 @@ export default function GameScreen({
         return;
       }
 
-      if (!shouldTriggerSummary) {
+      if (continuation.type === 'advance') {
         setCurrentSituationChoices(completedSituationChoices);
-        setCurrentScenarioId(nextScenarioId);
+        setCurrentScenarioId(continuation.nextScenarioId);
       } else {
         setPendingSummary({
           summary: buildSituationSummary({
@@ -920,7 +740,7 @@ export default function GameScreen({
             expression: currentScenario.description,
             choices: completedSituationChoices,
           }),
-          nextScenarioId: nextScenario ? nextScenarioId : null,
+          nextScenarioId: continuation.nextScenarioId,
         });
         setCurrentSituationChoices([]);
       }
@@ -980,7 +800,7 @@ export default function GameScreen({
       label: t.fundsLabel,
       value: stats.funds,
       max: 1000,
-      color: '#F0D44E',
+      color: STAT_METADATA.funds.statusColor,
     },
     {
       key: 'mental',
@@ -988,7 +808,7 @@ export default function GameScreen({
       label: t.mentalHpLabel,
       value: stats.mental,
       max: 100,
-      color: '#4F8DFF',
+      color: STAT_METADATA.mental.statusColor,
     },
     {
       key: 'relation',
@@ -996,7 +816,7 @@ export default function GameScreen({
       label: t.relationLabel,
       value: stats.relation,
       max: 100,
-      color: '#9C7CFF',
+      color: STAT_METADATA.relation.statusColor,
     },
     {
       key: 'english',
@@ -1004,7 +824,7 @@ export default function GameScreen({
       label: t.englishLabel,
       value: stats.english,
       max: 100,
-      color: '#F26F97',
+      color: STAT_METADATA.english.statusColor,
     },
     {
       key: 'stamina',
@@ -1012,7 +832,7 @@ export default function GameScreen({
       label: t.staminaLabel,
       value: stats.stamina,
       max: 100,
-      color: '#4CC26A',
+      color: STAT_METADATA.stamina.statusColor,
     },
     {
       key: 'insight',
@@ -1020,7 +840,7 @@ export default function GameScreen({
       label: t.insightLabel,
       value: stats.insight,
       max: 100,
-      color: '#F0BE63',
+      color: STAT_METADATA.insight.statusColor,
     },
   ] as const;
   const statusDetailTone = useMemo(
@@ -1146,132 +966,24 @@ export default function GameScreen({
               borderBottomColor: 'rgba(207,226,255,0.14)',
             }}
           >
-            <View
-              style={{
-                height: headerHeight,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingHorizontal: headerHorizontalPadding,
-              }}
-            >
-              <TouchableOpacity
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 11,
-                  borderWidth: 1,
-                  borderColor: 'rgba(255,255,255,0.14)',
-                  backgroundColor: 'rgba(8, 19, 38, 0.28)',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                onPress={() => {
-                  setShowRoadmap(true);
-                }}
-              >
-                <MaterialCommunityIcons
-                  name="map-outline"
-                  size={20}
-                  color="#F1F1EF"
-                />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={{
-                  position: 'absolute',
-                  left: 56,
-                  right: 56,
-                  top: 0,
-                  bottom: 0,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                activeOpacity={0.82}
-                onPress={() => {
-                  Alert.alert(
-                    isKorean ? '장면 제목' : 'Scene Title',
-                    headerTitle,
-                  );
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 14,
-                    lineHeight: 18,
-                    fontWeight: '700',
-                    color: '#FFFFFF',
-                    letterSpacing: -0.2,
-                    textAlign: 'center',
-                    textShadowColor: 'rgba(3, 10, 19, 0.24)',
-                    textShadowOffset: { width: 0, height: 2 },
-                    textShadowRadius: 6,
-                  }}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {headerTitle}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 11,
-                  borderWidth: 1,
-                  borderColor: 'rgba(255,255,255,0.14)',
-                  backgroundColor: 'rgba(8, 19, 38, 0.28)',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                onPress={() => {
-                  setShowLanguageMenu((prev) => !prev);
-                }}
-              >
-                <MaterialCommunityIcons
-                  name="translate"
-                  size={20}
-                  color="#F1F1EF"
-                />
-              </TouchableOpacity>
-            </View>
-            {showLanguageMenu ? (
-              <View
-                style={[
-                  styles.languageMenu,
-                  { top: headerHeight + 4, right: headerHorizontalPadding },
-                ]}
-              >
-                <TouchableOpacity
-                  style={styles.languageMenuItem}
-                  onPress={() => setLanguageAndClose('ko')}
-                >
-                  <Text
-                    style={[
-                      styles.languageMenuText,
-                      isKorean && styles.languageMenuTextActive,
-                    ]}
-                  >
-                    한국어
-                  </Text>
-                </TouchableOpacity>
-                <View style={styles.languageMenuDivider} />
-                <TouchableOpacity
-                  style={styles.languageMenuItem}
-                  onPress={() => setLanguageAndClose('en')}
-                >
-                  <Text
-                    style={[
-                      styles.languageMenuText,
-                      !isKorean && styles.languageMenuTextActive,
-                    ]}
-                  >
-                    English
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ) : null}
+            <GameHeaderBar
+              height={headerHeight}
+              horizontalPadding={headerHorizontalPadding}
+              title={headerTitle}
+              language={lang}
+              showLanguageMenu={showLanguageMenu}
+              onOpenRoadmap={() => setShowRoadmap(true)}
+              onShowFullTitle={() =>
+                Alert.alert(
+                  isKorean ? '장면 제목' : 'Scene Title',
+                  headerTitle,
+                )
+              }
+              onToggleLanguageMenu={() =>
+                setShowLanguageMenu((prev) => !prev)
+              }
+              onSelectLanguage={setLanguageAndClose}
+            />
             {!showResult ? (
               <TouchableOpacity
                 activeOpacity={0.96}

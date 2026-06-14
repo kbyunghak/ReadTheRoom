@@ -10,7 +10,9 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { buildDisplayStats, type Character } from './CharacterSelectScreen';
+import { buildDisplayStats } from '../domain/stats/display';
+import type { Character } from '../locales/types';
+import CharacterStatBar from '../features/characters/components/CharacterStatBar';
 import type { SavedGameSession } from '../utils/gamePersistence';
 import { locales, type AppLanguage } from '../locales';
 
@@ -26,34 +28,6 @@ type Props = {
   savedSituationTitle?: string | null;
 };
 
-const StatRow = ({ label, value, max, color }: { label: string; value: number; max: number; color: string }) => {
-  const barAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(barAnim, {
-      toValue: value / max,
-      duration: 600,
-      delay: 200,
-      useNativeDriver: false,
-    }).start();
-  }, [barAnim, max, value]);
-
-  const barWidth = barAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0%', '100%'],
-  });
-
-  return (
-    <View style={statStyles.row}>
-      <Text style={statStyles.label}>{label}</Text>
-      <View style={statStyles.track}>
-        <Animated.View style={[statStyles.fill, { width: barWidth, backgroundColor: color }]} />
-      </View>
-      <Text style={[statStyles.value, { color }]}>{value}</Text>
-    </View>
-  );
-};
-
 const InfoSection = ({ title, body }: { title: string; body: string }) => (
   <>
     <View style={styles.divider} />
@@ -63,21 +37,6 @@ const InfoSection = ({ title, body }: { title: string; body: string }) => (
     </View>
   </>
 );
-
-const statStyles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
-  label: { width: 68, fontSize: 12, color: 'rgba(255,255,255,0.75)', fontWeight: '600' },
-  track: {
-    flex: 1,
-    height: 8,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderRadius: 4,
-    overflow: 'hidden',
-    marginHorizontal: 8,
-  },
-  fill: { height: '100%', borderRadius: 4 },
-  value: { width: 36, fontSize: 12, fontWeight: 'bold', textAlign: 'right' },
-});
 
 export default function CharacterDetailScreen({
   character,
@@ -153,7 +112,7 @@ export default function CharacterDetailScreen({
 
             <Text style={styles.sectionLabel}>{text.stats}</Text>
             {displayStats.map((stat) => (
-              <StatRow
+                <CharacterStatBar
                 key={`${character.id}-${stat.key}`}
                 label={stat.label[lang]}
                 value={stat.value}

@@ -10,6 +10,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { STAT_METADATA } from '../domain/stats/config';
+import { buildCoreCharacterStats } from '../domain/stats/display';
 import { BETA_CHARACTERS } from '../locales/characters';
 import { locales, type AppLanguage } from '../locales';
 import type {
@@ -22,83 +24,7 @@ import type {
 
 const SCREEN_PADDING = 18;
 const MAX_CONTENT_WIDTH = 560;
-const CORE_STAT_KEYS: StatKey[] = ['funds', 'english', 'stamina'];
-
 export type { Character, CharacterStat, LocalizedText, StartingStats, StatKey };
-
-const DISPLAY_STAT_META: Record<
-  StatKey,
-  {
-    label: LocalizedText;
-    sourceMax: number;
-    displayMax: number;
-    color: string;
-    icon: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
-  }
-> = {
-  funds: {
-    label: { ko: '자금', en: 'Funds' },
-    sourceMax: 1000,
-    displayMax: 1000,
-    color: '#F59F00',
-    icon: 'currency-usd',
-  },
-  mental: {
-    label: { ko: '멘탈', en: 'Mental' },
-    sourceMax: 100,
-    displayMax: 1000,
-    color: '#F03E3E',
-    icon: 'brain',
-  },
-  english: {
-    label: { ko: '영어', en: 'English' },
-    sourceMax: 100,
-    displayMax: 1000,
-    color: '#339AF0',
-    icon: 'book-open-variant',
-  },
-  insight: {
-    label: { ko: '눈치', en: 'Insight' },
-    sourceMax: 100,
-    displayMax: 1000,
-    color: '#BE4BDB',
-    icon: 'eye-outline',
-  },
-  stamina: {
-    label: { ko: '체력', en: 'Stamina' },
-    sourceMax: 100,
-    displayMax: 1000,
-    color: '#40C057',
-    icon: 'heart',
-  },
-  relation: {
-    label: { ko: '관계', en: 'Relation' },
-    sourceMax: 100,
-    displayMax: 1000,
-    color: '#FF6B9D',
-    icon: 'account-group',
-  },
-};
-
-const normalizeStat = (value: number, sourceMax: number, displayMax: number) =>
-  Math.round(
-    (Math.max(0, Math.min(value, sourceMax)) / sourceMax) * displayMax,
-  );
-
-export const buildDisplayStats = (
-  startingStats: StartingStats,
-): CharacterStat[] => {
-  return (Object.keys(DISPLAY_STAT_META) as StatKey[]).map((key) => {
-    const meta = DISPLAY_STAT_META[key];
-    return {
-      key,
-      label: meta.label,
-      value: normalizeStat(startingStats[key], meta.sourceMax, meta.displayMax),
-      max: meta.displayMax,
-      color: meta.color,
-    };
-  });
-};
 
 type Props = {
   onStartCharacter: (character: Character) => void;
@@ -121,9 +47,7 @@ export default function CharacterSelectScreen({
   const useCompactCard = contentWidth < 330;
 
   const renderCharacterCard = (character: Character) => {
-    const displayStats = buildDisplayStats(character.startingStats).filter(
-      (stat) => CORE_STAT_KEYS.includes(stat.key),
-    );
+    const displayStats = buildCoreCharacterStats(character.startingStats);
 
     return (
       <View key={character.id} style={[styles.card, { height: cardHeight }]}>
@@ -195,7 +119,7 @@ export default function CharacterSelectScreen({
 
           <View style={styles.statsRow}>
             {displayStats.map((stat) => {
-              const meta = DISPLAY_STAT_META[stat.key];
+              const meta = STAT_METADATA[stat.key];
 
               return (
                 <View
@@ -205,7 +129,7 @@ export default function CharacterSelectScreen({
                   <MaterialCommunityIcons
                     name={meta.icon}
                     size={12}
-                    color={meta.color}
+                    color={meta.characterColor}
                   />
                   <Text style={styles.statLabel} numberOfLines={1}>
                     {stat.label[lang]}

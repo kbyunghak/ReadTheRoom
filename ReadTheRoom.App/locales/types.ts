@@ -1,4 +1,5 @@
 import type { ImageSourcePropType } from 'react-native';
+import type { GameStats, StatKey } from '../domain/stats/types';
 
 export type AppLanguage = 'en' | 'ko';
 
@@ -7,16 +8,8 @@ export type LocalizedText = {
   en: string;
 };
 
-export type StartingStats = {
-  funds: number;
-  mental: number;
-  english: number;
-  insight: number;
-  stamina: number;
-  relation: number;
-};
-
-export type StatKey = keyof StartingStats;
+export type StartingStats = GameStats;
+export type { StatKey };
 
 export type CharacterStat = {
   key: StatKey;

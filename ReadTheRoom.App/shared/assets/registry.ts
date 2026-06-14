@@ -1,0 +1,112 @@
+import type { ImageSourcePropType } from 'react-native';
+
+export const LAUNCH_IMAGES = {
+  main: require('../../assets/images/main.png'),
+  warning: require('../../assets/images/background/dream.png'),
+} as const satisfies Record<string, ImageSourcePropType>;
+
+export const BACKGROUND_IMAGES = {
+  adaptation: require('../../assets/images/background/adaptation.png'),
+  airport: require('../../assets/images/background/airport.png'),
+  office: require('../../assets/images/background/office.png'),
+  house: require('../../assets/images/background/house.png'),
+  cafe: require('../../assets/images/background/cafe.png'),
+  bank: require('../../assets/images/background/bank.png'),
+  busstop: require('../../assets/images/background/busstop.png'),
+  night_street: require('../../assets/images/background/night_street.png'),
+  nightstreet_ppl: require('../../assets/images/background/nightstreet_ppl.png'),
+  city_night: require('../../assets/images/background/city_night.png'),
+  observatory_nature: require('../../assets/images/background/observatory_nature.png'),
+  partyroom_lonely: require('../../assets/images/background/partyroom_lonely.png'),
+  street: require('../../assets/images/background/busstop.png'),
+  mart: require('../../assets/images/background/mart.png'),
+  arrival: require('../../assets/images/background/airport.png'),
+} as const satisfies Record<string, ImageSourcePropType>;
+
+export type BackgroundKey = keyof typeof BACKGROUND_IMAGES;
+
+export const BACKGROUND_KEY_ALIASES: Record<string, BackgroundKey> = {
+  adaptation: 'adaptation',
+  airport: 'airport',
+  office: 'office',
+  house: 'house',
+  cafe: 'cafe',
+  bank: 'bank',
+  busstop: 'busstop',
+  night_street: 'night_street',
+  nightstreet_ppl: 'nightstreet_ppl',
+  city_night: 'city_night',
+  observatory_nature: 'observatory_nature',
+  partyroom_lonely: 'partyroom_lonely',
+  street: 'street',
+  mart: 'mart',
+  arrival: 'arrival',
+  yvr_airport: 'airport',
+  airport_exit: 'airport',
+  airport_transport: 'airport',
+  skytrain: 'airport',
+  settling: 'house',
+  dorm_hallway: 'house',
+  dorm_room: 'house',
+  dorm_lobby: 'house',
+  kitchen: 'house',
+  laundry: 'house',
+  phone_store: 'office',
+  tim_hortons: 'cafe',
+  tim_hortons_counter: 'cafe',
+  grocery: 'mart',
+  grocery_store: 'mart',
+  grocery_counter: 'mart',
+  grocery_exit: 'mart',
+  bus_stop: 'busstop',
+  home_kitchen: 'house',
+  living_room: 'house',
+  child_bedroom: 'house',
+  dining_room: 'house',
+  shopping_mall: 'street',
+  garden: 'observatory_nature',
+  survival: 'nightstreet_ppl',
+  classroom: 'office',
+  library: 'office',
+  street_vancouver: 'street',
+  restaurant: 'cafe',
+  work: 'office',
+  interview: 'office',
+  mall: 'street',
+  online: 'house',
+  pub: 'partyroom_lonely',
+  school_gate: 'street',
+  community_center: 'office',
+  self_checkout: 'mart',
+  hospital: 'office',
+  campus: 'adaptation',
+  campus_cafe: 'cafe',
+  campus_street: 'street',
+  vancouver_view: 'adaptation',
+};
+
+export const SUPPORTING_IMAGES = {
+  paper: require('../../assets/images/paper.png'),
+} as const satisfies Record<string, ImageSourcePropType>;
+
+export const CHARACTER_IMAGES = {
+  ken: require('../../assets/images/characters/ken.png'),
+  amy: require('../../assets/images/characters/amy.png'),
+  sora: require('../../assets/images/characters/sora.png'),
+  jun: require('../../assets/images/characters/jun.png'),
+  jina: require('../../assets/images/characters/jina.png'),
+  yoon: require('../../assets/images/characters/yoon.png'),
+  kenCard: require('../../assets/images/characters/ken_card.png'),
+  amyCard: require('../../assets/images/characters/amy_card.png'),
+  soraCard: require('../../assets/images/characters/sora_card.png'),
+  junCard: require('../../assets/images/characters/jun_card.png'),
+  jinaCard: require('../../assets/images/characters/jina_card.png'),
+  yoonCard: require('../../assets/images/characters/yoon_card.png'),
+} as const satisfies Record<string, ImageSourcePropType>;
+
+export const CORE_VISUAL_ASSETS: ImageSourcePropType[] = [
+  ...Object.values(LAUNCH_IMAGES),
+  ...new Set(Object.values(BACKGROUND_IMAGES)),
+  ...Object.values(SUPPORTING_IMAGES),
+  ...Object.values(CHARACTER_IMAGES),
+];

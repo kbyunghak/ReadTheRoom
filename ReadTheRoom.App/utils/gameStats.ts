@@ -1,20 +1,6 @@
-export type GameStats = {
-  funds: number;
-  mental: number;
-  english: number;
-  insight: number;
-  stamina: number;
-  relation: number;
-};
+import type { GameStats, StatChanges } from '../domain/stats/types';
 
-export type StatChanges = {
-  funds: number;
-  mental: number;
-  english: number;
-  insight: number;
-  stamina: number;
-  relation?: number;
-};
+export type { GameStats, StatChanges } from '../domain/stats/types';
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 

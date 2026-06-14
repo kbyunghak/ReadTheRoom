@@ -1,16 +1,11 @@
+import type { GameStats } from '../../domain/stats/types';
+
 export type LocaleText = {
   ko: string;
   en: string;
 };
 
-export type StatChanges = {
-  funds: number;
-  mental: number;
-  english: number;
-  insight: number;
-  stamina: number;
-  relation: number;
-};
+export type StatChanges = GameStats;
 
 export type ChoiceType = 'GROWTH' | 'STABLE' | 'REALIST';
 

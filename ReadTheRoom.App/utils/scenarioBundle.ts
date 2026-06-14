@@ -1,13 +1,8 @@
+import type { StatChanges } from '../domain/stats/types';
+
 export type LocalizedText = { en: string; ko: string };
 
-export type ScenarioStatChanges = {
-  funds: number;
-  mental: number;
-  english: number;
-  insight: number;
-  stamina: number;
-  relation?: number;
-};
+export type ScenarioStatChanges = StatChanges;
 
 export type ScenarioChoiceType = 'GROWTH' | 'STABLE' | 'REALIST';
 
