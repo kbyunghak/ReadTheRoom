@@ -458,7 +458,7 @@ export default function GameScreen({
 
     return {
       title: {
-        ko: '?대쾲 ?뚮젅?댁뿉???붾뱾?몃뜕 ?쒓컙',
+        ko: '이번 플레이에서 아쉬웠던 순간들',
         en: 'What Hurt This Run',
       },
       items: negativeItems,
@@ -483,11 +483,11 @@ export default function GameScreen({
         day: scenario.day ?? 1,
         progressLabel: usesMainEpisodeProgress
           ? getRoadmapProgressLabel(scenario)
-          : `DAY ${String(scenario.day ?? 1).padStart(2, '0')} 쨌 EP ${String(
+          : `DAY ${String(scenario.day ?? 1).padStart(2, '0')} EP ${String(
               scenario.episode ?? scenario.id,
             ).padStart(2, '0')}`,
         title: {
-          ko: getScenarioDisplayTitle(scenario, 'ko') || `?곹솴 ${scenario.id}`,
+          ko: getScenarioDisplayTitle(scenario, 'ko') || `시나리오 ${scenario.id}`,
           en:
             getScenarioDisplayTitle(scenario, 'en') ||
             `Situation ${scenario.id}`,
@@ -520,15 +520,15 @@ export default function GameScreen({
     ROADMAP_WEEKS[0];
   const roadmapLocationTitle =
     selectedRoadmapWeek === currentRoadmapWeek
-      ? `W${currentRoadmapWeek} 쨌 Day ${currentScenario.day ?? 1} 쨌 ${getRoadmapLocationLabel(
+      ? `W${currentRoadmapWeek} · Day ${currentScenario.day ?? 1} · ${getRoadmapLocationLabel(
           situationTitle,
         )}`
-      : `W${selectedRoadmapWeek} 쨌 Day ${String(
+      : `W${selectedRoadmapWeek} · Day ${String(
           selectedRoadmapWeekMeta.dayStart,
         ).padStart(
           2,
           '0',
-        )}??{String(selectedRoadmapWeekMeta.dayEnd).padStart(2, '0')}`;
+        )}~${String(selectedRoadmapWeekMeta.dayEnd).padStart(2, '0')}`;
 
   useEffect(() => {
     setCheckpoints((prev) => {
@@ -647,9 +647,9 @@ export default function GameScreen({
 
     if (continuation.type === 'missing') {
       Alert.alert(
-        isKorean ? '?쒕굹由ъ삤 ?ㅻ쪟' : 'Scenario Error',
+        isKorean ? '시나리오 오류' : 'Scenario Error',
         isKorean
-          ? `?ㅼ쓬 ?쒕굹由ъ삤 ${continuation.nextScenarioId}??瑜? 李얠쓣 ???놁뒿?덈떎.`
+          ? `다음 시나리오 ${continuation.nextScenarioId}를 찾을 수 없습니다.`
           : `The next scenario ${continuation.nextScenarioId} could not be found.`,
       );
       return;
@@ -867,7 +867,7 @@ export default function GameScreen({
               onOpenRoadmap={() => setShowRoadmap(true)}
               onShowFullTitle={() =>
                 Alert.alert(
-                  isKorean ? '?λ㈃ ?쒕ぉ' : 'Scene Title',
+                  isKorean ? '장면 제목' : 'Scene Title',
                   headerTitle,
                 )
               }
@@ -910,7 +910,7 @@ export default function GameScreen({
             showFeedbackModal={showFeedbackModal}
             selectedChoice={selectedChoice}
             copy={{
-              situationLabel: isKorean ? '?곹솴 ?ㅻ챸' : 'Situation',
+              situationLabel: isKorean ? '상황 설명' : 'Situation',
               summaryLabel: t.daySummaryLabel,
               summaryContinue: t.summaryContinue,
               feedbackButton: t.feedbackButton,
