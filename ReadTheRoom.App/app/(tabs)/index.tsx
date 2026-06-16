@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Tabs } from 'expo-router';
 import SplashScreen from '../../components/SplashScreen';
 import WarningScreen from '../../components/WarningScreen';
 import CharacterSelectScreen, {
@@ -33,6 +34,8 @@ export default function App() {
   const [savedSession, setSavedSession] = useState<SavedGameSession | null>(
     null,
   );
+  const [gameInitialSession, setGameInitialSession] =
+    useState<SavedGameSession | null>(null);
   const [savedSituationTitle, setSavedSituationTitle] = useState<string | null>(
     null,
   );
@@ -88,16 +91,31 @@ export default function App() {
     };
   }, []);
 
+  const renderScreen = (children: React.ReactNode) => (
+    <>
+      <Tabs.Screen
+        options={{
+          tabBarStyle: screen === 'game' ? { display: 'none' } : undefined,
+        }}
+      />
+      {children}
+    </>
+  );
+
   if (screen === 'splash') {
-    return <SplashScreen onLoadComplete={() => setScreen('warning')} />;
+    return renderScreen(
+      <SplashScreen onLoadComplete={() => setScreen('warning')} />,
+    );
   }
 
   if (screen === 'warning') {
-    return <WarningScreen onComplete={() => setScreen('characterSelect')} />;
+    return renderScreen(
+      <WarningScreen onComplete={() => setScreen('characterSelect')} />,
+    );
   }
 
   if (screen === 'characterSelect') {
-    return (
+    return renderScreen(
       <CharacterSelectScreen
         lang={lang}
         onToggleLanguage={() =>
@@ -112,18 +130,19 @@ export default function App() {
         onStartCharacter={(character) => {
           setSelectedCharacter(character);
           void loadCharacterProgress(character).then((restored) => {
+            setGameInitialSession(restored);
             if (restored) {
               setLang(restored.lang);
             }
             setScreen('game');
           });
         }}
-      />
+      />,
     );
   }
 
   if (screen === 'characterDetail' && selectedCharacter) {
-    return (
+    return renderScreen(
       <CharacterDetailScreen
         character={selectedCharacter}
         lang={lang}
@@ -138,35 +157,41 @@ export default function App() {
         onConfirm={(char, mode) => {
           setSelectedCharacter(char);
           if (mode === 'continue') {
-            setLang(savedSession?.lang ?? lang);
+            const sessionToContinue =
+              savedSession?.characterId === char.id ? savedSession : null;
+            setGameInitialSession(sessionToContinue);
+            setLang(sessionToContinue?.lang ?? lang);
           } else {
+            setGameInitialSession(null);
             setSavedSession(null);
             setSavedSituationTitle(null);
             void clearSavedGame(char.id);
           }
           setScreen('game');
         }}
-      />
+      />,
     );
   }
 
-  return (
+  return renderScreen(
     <GameScreen
       character={selectedCharacter}
       initialLang={lang}
-      initialSession={savedSession}
+      initialSession={gameInitialSession}
       onGoToCharacterSelect={() => {
         setSelectedCharacter(null);
+        setGameInitialSession(null);
         setSavedSituationTitle(null);
         setScreen('characterSelect');
       }}
       onClearSavedGame={() => {
+        setGameInitialSession(null);
         setSavedSession(null);
         setSavedSituationTitle(null);
         if (selectedCharacter?.id) {
           void clearSavedGame(selectedCharacter.id);
         }
       }}
-    />
+    />,
   );
 }
