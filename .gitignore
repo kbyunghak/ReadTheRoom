@@ -3,3 +3,6 @@
 
 # Generated Expo debug export
 /ReadTheRoom.App/dist-debug-two/
+
+# Scenario backup references
+/ReadTheRoom.App/assets/data/backup/

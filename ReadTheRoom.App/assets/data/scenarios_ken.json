@@ -253,7 +253,7 @@
         {
           "type": "REALIST",
           "text": { "ko": "\"Keep the change.\" (잔돈은 가지세요)", "en": "\"Keep the change.\"" },
-          "feedback": { "ko": "패스트푸드점에서 40달러를 팁으로 준 전설의 호구가 되었습니다. 직원이 환호하네요.", "en": "You became a legendary sucker by tipping $40 at a cafe. The staff is cheering." },
+          "feedback": { "ko": "카페에서 40달러를 팁처럼 남겨 직원도 크게 놀랍니다. 분위기는 좋아졌지만, 켄의 지갑은 조용히 울고 있습니다.", "en": "Ken leaves almost $40 as if it were a tip. The staff is delighted, but Ken's wallet quietly suffers." },
           "statChanges": { "funds": 0, "mental": 0, "english": 5, "insight": -10, "stamina": 0, "relation": 50 },
           "nextScenarioId": 8
         }
@@ -276,7 +276,7 @@
         {
           "type": "STABLE",
           "text": { "ko": "아까 받은 동전을 모두 털어준다.", "en": "Give him all the coins you just got." },
-          "feedback": { "ko": "다른 노숙자들까지 몰려오기 시작합니다. 잠시 타겟이 된 것 같네요.", "en": "Other homeless people start swarming. You've become a target." },
+          "feedback": { "ko": "주변의 시선이 조금 더 모이고, 켄은 당황한 채 빠르게 자리를 벗어납니다. 선의도 상황을 봐가며 표현해야 한다는 걸 배웁니다.", "en": "More attention gathers around Ken, and he quickly moves away, flustered. He learns that even kindness needs situational awareness." },
           "statChanges": { "funds": -5, "mental": -20, "english": 0, "insight": -20, "stamina": -5, "relation": 10 },
           "nextScenarioId": 9
         },
@@ -383,8 +383,8 @@
         "en": "Immigration went fine, but a $20 scam, roommate's temptation, and the coin bomb at Tim Hortons... What an eventful day."
       },
       "tip": {
-        "ko": "오늘의 생존 지식:\n1. 'How's it going'은 안부 인사입니다.\n2. 밴쿠버 마리화나는 합법이지만 한국인은 처벌받습니다.\n3. 팀홀튼 주문 전 메뉴 숙지는 필수입니다.\n4. 모르는 호의는 일단 의심하세요.",
-        "en": "Today's Survival Tips:\n1. 'How's it going' is a greeting.\n2. Marijuana is legal in Vancouver, but illegal for Koreans.\n3. Know the Tim Hortons menu before ordering.\n4. Be wary of unsolicited kindness."
+        "ko": "오늘의 생존 지식:\n1. 'How's it going'은 안부 인사입니다.\n2. 현지에서 허용되는 것처럼 보여도 학교 규정, 체류 신분, 본국 법률이 함께 영향을 줄 수 있습니다. 애매하면 피하는 편이 안전합니다.\n3. 팀홀튼 주문 전 메뉴 숙지는 필수입니다.\n4. 모르는 호의는 일단 의심하세요.",
+        "en": "Today's Survival Tips:\n1. 'How's it going' is a greeting.\n2. Even if something appears permitted locally, school rules, immigration status, and home-country laws may still matter. When unsure, it is safer to avoid it.\n3. Know the Tim Hortons menu before ordering.\n4. Be wary of unsolicited kindness."
       },
       "statChanges": { "funds": 0, "mental": 0, "english": 0, "insight": 0, "stamina": 0, "relation": 0 },
       "nextScenarioId": 20,
@@ -643,7 +643,7 @@
         {
           "type": "REALIST",
           "text": { "ko": "(똑같이 비웃으며) \"You look like a potato!\"", "en": "\"You look like a potato!\"" },
-          "feedback": { "ko": "유치한 싸움이 붙었습니다. 점원이 와서 둘 다 나가라고 소리칩니다. 최악의 밤입니다.", "en": "An immature fight breaks out. Server kicks both out. The worst night ever." },
+          "feedback": { "ko": "말싸움이 커지자 직원이 둘을 제지합니다. 켄은 대응보다 안전하게 물러나는 법도 필요하다는 걸 배웁니다.", "en": "As the argument escalates, staff steps in. Ken learns that stepping away can be safer than winning a comeback." },
           "statChanges": { "funds": 0, "mental": -80, "english": 5, "insight": -20, "stamina": -20, "relation": -30 },
           "nextScenarioId": 18
         }
@@ -1062,8 +1062,8 @@
         "en": "A terminal is placed before Ken. 15%, 18%, 20%... Ken's finger hesitates, lost."
       },
       "tip": {
-        "ko": "캐나다에서 팁을 아끼려다간 서버의 노골적인 무시를 당할 수 있습니다. 멘탈을 지키려면 지갑을 여세요.",
-        "en": "Saving on tips might get you ignored by servers. Open your wallet to save your mental state."
+        "ko": "캐나다 외식에서는 팁이 서비스 문화의 일부로 여겨지는 경우가 많습니다. 상황과 예산을 함께 보고 무리 없는 범위에서 선택하세요.",
+        "en": "In Canadian dining, tipping is often treated as part of service culture. Consider both the situation and your budget when choosing."
       },
       "choices": [
         {
