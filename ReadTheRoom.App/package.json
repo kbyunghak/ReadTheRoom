@@ -10,6 +10,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "check:encoding": "node ./scripts/check-mojibake.mjs",
+    "check:localization": "node ./scripts/check-localization.mjs",
     "test": "node --experimental-strip-types ./tests/gameStats.test.ts && node --experimental-strip-types ./tests/statMetadata.test.ts && node --experimental-strip-types ./tests/gameTransitions.test.ts && node --experimental-strip-types ./tests/gamePersistence.test.ts && node --experimental-strip-types ./tests/scenarioV2.test.ts && node --experimental-strip-types ./tests/scenarioRegistry.test.ts && node --experimental-strip-types ./tests/scenarioNormalization.test.ts && node --experimental-strip-types ./tests/kenScenario.test.ts && node --experimental-strip-types ./tests/scenarioProgress.test.ts && node --experimental-strip-types ./tests/scenarioDisplay.test.ts && node --experimental-strip-types ./tests/conditionSummary.test.ts && node --experimental-strip-types ./tests/resultCard.test.ts && node --experimental-strip-types ./tests/mojibakeGuard.test.ts",
     "test:refactor": "node --experimental-strip-types ./tests/scenarioNormalization.test.ts && node --experimental-strip-types ./tests/statMetadata.test.ts && node --experimental-strip-types ./tests/gameTransitions.test.ts",
     "test:ken": "node --experimental-strip-types ./tests/kenScenario.test.ts"
