@@ -21,13 +21,14 @@ The active application lives in [`ReadTheRoom.App`](ReadTheRoom.App).
 - React Native 0.81
 - TypeScript 5.9
 - AsyncStorage
-- Node-based TypeScript test scripts
+- Vitest
+- GitHub Actions CI
 
 ## Quick Start
 
 ```bash
 cd ReadTheRoom.App
-npm install
+npm ci
 npm start
 ```
 
@@ -44,11 +45,14 @@ npm run web
 ```bash
 cd ReadTheRoom.App
 npm test
+npm run test:coverage
+npm run check:encoding
+npm run check:localization
 npm run lint
-npx tsc --noEmit
+npm run typecheck
 ```
 
-The current test suite is optimized for release-blocking logic and data validation. UI integration testing is planned as a later layer.
+The current test suite is optimized for release-blocking logic and data validation. Coverage reporting is available through Vitest, while UI integration testing is planned as a later layer.
 
 ## Basic Game Flow
 

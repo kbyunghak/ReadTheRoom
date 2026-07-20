@@ -6,14 +6,14 @@ ReadTheRoom.App contains the mobile game runtime, character selection, story scr
 
 ## Requirements
 
-- Node.js compatible with the current Expo 54 toolchain.
-- npm.
+- Node.js 22, matching the GitHub Actions CI workflow.
+- npm, using `npm ci` for repeatable installs.
 - Expo Go for quick device testing, or a local Android/iOS development environment.
 
 ## Install
 
 ```bash
-npm install
+npm ci
 ```
 
 ## Run
@@ -34,11 +34,30 @@ npm run web
 
 ```bash
 npm test
+npm run test:coverage
+npm run check:encoding
+npm run check:localization
+npm run typecheck
 npm run lint
-npx tsc --noEmit
 ```
 
-`npm test` currently runs lightweight Node-based TypeScript tests. The suite focuses on scenario normalization, Ken scenario integrity, game transitions, persistence, result card data, condition summaries, and mojibake guards.
+`npm test` runs the Vitest suite. The tests focus on scenario normalization, Ken scenario integrity, game transitions, persistence, result card data, condition summaries, localization consistency, and mojibake guards.
+
+`npm run test:coverage` generates a local `coverage/` report. The output is ignored by Git.
+
+## Quality Gates
+
+The local validation commands mirror CI:
+
+```bash
+npm run check:encoding
+npm run check:localization
+npm run typecheck
+npm run lint
+npm test
+```
+
+Use these before opening a pull request or preparing a release candidate.
 
 ## App Structure
 
@@ -51,7 +70,8 @@ shared/               Shared registries and reusable infrastructure
 utils/                Scenario, display, persistence, and result helpers
 assets/data/          Runtime scenario JSON and scenario type definitions
 assets/images/        Character, background, event, and UI images
-tests/                Node-based release-first test suite
+tests/                Vitest release-first test suite
+vitest.config.ts      Vitest and coverage configuration
 ```
 
 ## Runtime Data
@@ -78,4 +98,5 @@ Ken is the most actively validated scenario pack. The beta character select scre
 - [Scenario Format](../docs/scenario-format.md)
 - [Testing Strategy](../docs/testing-strategy.md)
 - [Encoding Policy](../docs/encoding-policy.md)
+- [Contributing](../docs/contributing.md)
 - [Release Checklist](../docs/release-checklist.md)
