@@ -20,13 +20,19 @@ This folder is the documentation hub for ReadTheRoom. It separates current proje
 ## Reference Areas
 
 - `characters/`: character notes and story source material.
+  - [Character Analysis](characters/character-analysis.md)
+  - [Ken Episode Story Plan](characters/ken-episode-story.md)
 - `design/`: UX and visual design source notes.
+  - [UX Layout Draft](design/ux-layout-draft.md)
 - `schema/`: historical JSON schema notes and scenario-format references.
+  - [JSON Schema v2.7 Reference](schema/json-schema-v2.7.md)
+  - [Amy JSON Schema v2.8 Reference](schema/json-schema-amy-v2.8.md)
+  - [Scenario System Nice-To-Have Ideas](schema/json-schema-nice-to-have.md)
 - `system-design/`: refactoring notes and archived system design material.
 - `story-drafts/`: archived story draft material.
 
 ## Portfolio Status
 
-Current English `.md` files are the official portfolio-facing documentation.
+Current English `.md` files are the official portfolio-facing documentation and summaries.
 
-Korean `.ko.md` source notes are retained as reference material. They are useful for product thinking and future summaries, but they are not official portfolio-facing documentation until an English summary is written.
+Korean `.ko.md` source notes are retained as reference material. They are useful for product thinking and future summaries, but English `.md` summaries should be used for portfolio review.
