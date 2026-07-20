@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { test } from 'vitest';
 
 type StatKey = 'funds' | 'mental' | 'english' | 'insight' | 'stamina' | 'relation';
 
@@ -26,16 +27,6 @@ type ScenarioNode = {
 
 type DayScenarioFile = Record<string, Record<string, ScenarioNode>>;
 
-const run = (name: string, fn: () => void) => {
-  try {
-    fn();
-    console.log(`PASS ${name}`);
-  } catch (error) {
-    console.error(`FAIL ${name}`);
-    throw error;
-  }
-};
-
 const scenarioPath = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '../assets/data/scenarios_ken.json',
@@ -56,17 +47,17 @@ const assertFullStatChanges = (statChanges: StatChanges | undefined) => {
   }
 };
 
-run('Ken scenario ids are globally unique', () => {
+test('Ken scenario ids are globally unique', () => {
   assert.equal(new Set(nodes.map((node) => node.id)).size, nodes.length);
 });
 
-run('Ken object keys always match node ids', () => {
+test('Ken object keys always match node ids', () => {
   for (const { objectKey, node } of entries) {
     assert.equal(Number(objectKey), node.id);
   }
 });
 
-run('Ken main NORMAL ids are continuous from 1', () => {
+test('Ken main NORMAL ids are continuous from 1', () => {
   const mainIds = nodes
     .filter((node) => node.type === 'NORMAL' && node.id < 9000)
     .map((node) => node.id)
@@ -75,7 +66,7 @@ run('Ken main NORMAL ids are continuous from 1', () => {
   assert.deepEqual(mainIds, Array.from({ length: mainIds.length }, (_, index) => index + 1));
 });
 
-run('Ken Day 2 main ids continue after Day 1', () => {
+test('Ken Day 2 main ids continue after Day 1', () => {
   const mainIdsForDay = (day: number) =>
     nodes
       .filter((node) => node.type === 'NORMAL' && node.id < 9000 && node.day === day)
@@ -87,7 +78,7 @@ run('Ken Day 2 main ids continue after Day 1', () => {
   assert.equal(day2Ids[0], day1Ids.at(-1)! + 1);
 });
 
-run('Ken SUMMARY ids are continuous from 1001', () => {
+test('Ken SUMMARY ids are continuous from 1001', () => {
   const summaryIds = nodes
     .filter((node) => node.type === 'SUMMARY')
     .map((node) => node.id)
@@ -96,7 +87,7 @@ run('Ken SUMMARY ids are continuous from 1001', () => {
   assert.deepEqual(summaryIds, Array.from({ length: summaryIds.length }, (_, index) => 1001 + index));
 });
 
-run('Ken exception ids are continuous from 9001', () => {
+test('Ken exception ids are continuous from 9001', () => {
   const exceptionIds = nodes
     .filter((node) => node.id >= 9000)
     .map((node) => node.id)
@@ -105,7 +96,7 @@ run('Ken exception ids are continuous from 9001', () => {
   assert.deepEqual(exceptionIds, Array.from({ length: exceptionIds.length }, (_, index) => 9001 + index));
 });
 
-run('Ken NORMAL nodes have exactly three complete choices', () => {
+test('Ken NORMAL nodes have exactly three complete choices', () => {
   for (const node of nodes.filter((candidate) => candidate.type === 'NORMAL')) {
     assert.equal(node.choices?.length, 3, `NORMAL node ${node.id} must have three choices`);
     for (const choice of node.choices ?? []) {
@@ -115,7 +106,7 @@ run('Ken NORMAL nodes have exactly three complete choices', () => {
   }
 });
 
-run('Ken SUMMARY nodes have no choices and complete optional stat changes', () => {
+test('Ken SUMMARY nodes have no choices and complete optional stat changes', () => {
   for (const node of nodes.filter((candidate) => candidate.type === 'SUMMARY')) {
     assert.equal(node.choices?.length ?? 0, 0, `SUMMARY node ${node.id} must not have choices`);
     if (node.statChanges) {
@@ -124,7 +115,7 @@ run('Ken SUMMARY nodes have no choices and complete optional stat changes', () =
   }
 });
 
-run('Ken choice and SUMMARY links reference existing nodes', () => {
+test('Ken choice and SUMMARY links reference existing nodes', () => {
   for (const node of nodes) {
     for (const choice of node.choices ?? []) {
       assert.ok(nodesById.has(choice.nextScenarioId), `${node.id} links to missing ${choice.nextScenarioId}`);
@@ -135,7 +126,7 @@ run('Ken choice and SUMMARY links reference existing nodes', () => {
   }
 });
 
-run('Ken first-choice smoke flow reaches every main node without loops', () => {
+test('Ken first-choice smoke flow reaches every main node without loops', () => {
   const visited = new Set<number>();
   const flow: number[] = [];
   let currentId: number | undefined = 1;
@@ -165,12 +156,12 @@ run('Ken first-choice smoke flow reaches every main node without loops', () => {
   ]);
 });
 
-run('Ken Day 1 summary continues to the first Day 2 node', () => {
+test('Ken Day 1 summary continues to the first Day 2 node', () => {
   assert.equal(nodesById.get(1001)?.nextScenarioId, 20);
   assert.equal(nodesById.get(20)?.day, 2);
 });
 
-run('Ken exception branch is reachable and returns to the main flow', () => {
+test('Ken exception branch is reachable and returns to the main flow', () => {
   const branchSource = nodesById.get(22);
   const exceptionNode = nodesById.get(9001);
 
@@ -179,12 +170,12 @@ run('Ken exception branch is reachable and returns to the main flow', () => {
   assert.ok(exceptionNode.choices?.every((choice) => choice.nextScenarioId === 23));
 });
 
-run('Ken nodes preserve week and episode metadata', () => {
+test('Ken nodes preserve week and episode metadata', () => {
   assert.ok(nodes.every((node) => node.week === 1));
   assert.ok(nodes.every((node) => typeof node.episode === 'number'));
 });
 
-run('Ken Day 1 and Day 2 main episode counts match the UI sequence', () => {
+test('Ken Day 1 and Day 2 main episode counts match the UI sequence', () => {
   const mainEpisodesForDay = (day: number) =>
     nodes
       .filter(
@@ -200,7 +191,7 @@ run('Ken Day 1 and Day 2 main episode counts match the UI sequence', () => {
   assert.deepEqual(mainEpisodesForDay(2), Array.from({ length: 10 }, (_, index) => index + 1));
 });
 
-run('Ken special and SUMMARY nodes do not have main episodes', () => {
+test('Ken special and SUMMARY nodes do not have main episodes', () => {
   assert.equal(nodesById.get(9001)?.mainEpisode, undefined);
   assert.equal(nodesById.get(1001)?.mainEpisode, undefined);
   assert.equal(nodesById.get(1002)?.mainEpisode, undefined);

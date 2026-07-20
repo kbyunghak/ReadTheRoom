@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { test } from 'vitest';
 import { shouldShowSituationSummary } from '../utils/questProgress.ts';
 
 type LocalizedText = { ko: string; en: string };
@@ -55,16 +56,6 @@ type ScenarioFileV2 =
       }[];
     };
 
-const run = (name: string, fn: () => void) => {
-  try {
-    fn();
-    console.log(`PASS ${name}`);
-  } catch (error) {
-    console.error(`FAIL ${name}`);
-    throw error;
-  }
-};
-
 const loadJinaScenario = (): ScenarioFileV2 => {
   const scenarioPath = path.resolve(
     path.dirname(fileURLToPath(import.meta.url)),
@@ -79,7 +70,7 @@ const flattenNodes = (data: ScenarioFileV2) =>
 
 const FULL_STAT_KEYS = ['funds', 'mental', 'english', 'insight', 'stamina', 'relation'] as const;
 
-run('jina scenario file follows the v2 top-level schema', () => {
+test('jina scenario file follows the v2 top-level schema', () => {
   const data = loadJinaScenario();
 
   assert.equal(data.character, 'Jina');
@@ -88,7 +79,7 @@ run('jina scenario file follows the v2 top-level schema', () => {
   assert.ok(flattenNodes(data).length > 0);
 });
 
-run('jina nodes include required localized text and valid choice structure', () => {
+test('jina nodes include required localized text and valid choice structure', () => {
   const data = loadJinaScenario();
   const nodes = flattenNodes(data);
 
@@ -126,7 +117,7 @@ run('jina nodes include required localized text and valid choice structure', () 
   }
 });
 
-run('jina test flow reaches node 10 then hands off to node 11', () => {
+test('jina test flow reaches node 10 then hands off to node 11', () => {
   const data = loadJinaScenario();
   const nodes = flattenNodes(data);
 
@@ -139,7 +130,7 @@ run('jina test flow reaches node 10 then hands off to node 11', () => {
   assert.ok(node10?.choices.every((choice) => choice.nextScenarioId === 11));
 });
 
-run('summary trigger logic can be driven by explicit phase end markers or fallback rules', () => {
+test('summary trigger logic can be driven by explicit phase end markers or fallback rules', () => {
   const explicitFlow = [
     { id: 1, isPhaseEnd: false },
     { id: 2, isPhaseEnd: false },
@@ -164,7 +155,7 @@ run('summary trigger logic can be driven by explicit phase end markers or fallba
   assert.deepEqual(fallbackTriggeredAt, [5]);
 });
 
-run('day-bucket summary nodes can omit choices without breaking normalization assumptions', () => {
+test('day-bucket summary nodes can omit choices without breaking normalization assumptions', () => {
   const scenarioPath = path.resolve(
     path.dirname(fileURLToPath(import.meta.url)),
     '../assets/data/scenarios_ken.json',

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { test } from 'vitest';
 
 const PROJECT_ROOT = process.cwd();
 
@@ -33,16 +34,6 @@ const MOJIBAKE_PATTERNS = [
   '??{String',
 ];
 
-const run = (name: string, fn: () => void) => {
-  try {
-    fn();
-    console.log(`PASS ${name}`);
-  } catch (error) {
-    console.error(`FAIL ${name}`);
-    throw error;
-  }
-};
-
 const collectSourceFiles = (dir: string): string[] => {
   if (!fs.existsSync(dir)) {
     return [];
@@ -73,7 +64,7 @@ const collectSourceFiles = (dir: string): string[] => {
   });
 };
 
-run('UI source files do not contain known broken Korean mojibake strings', () => {
+test('UI source files do not contain known broken Korean mojibake strings', () => {
   const files = TARGET_DIRECTORIES.flatMap((directory) =>
     collectSourceFiles(path.join(PROJECT_ROOT, directory)),
   );

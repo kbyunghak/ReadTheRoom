@@ -1,18 +1,9 @@
 import assert from 'node:assert/strict';
+import { test } from 'vitest';
 import { clearSavedGame, loadSavedGame, saveGame } from '../utils/gamePersistence.ts';
 import { createMemoryStorage, defaultSavedSession } from './fixtures/index.ts';
 
-const run = async (name: string, fn: () => Promise<void>) => {
-  try {
-    await fn();
-    console.log(`PASS ${name}`);
-  } catch (error) {
-    console.error(`FAIL ${name}`);
-    throw error;
-  }
-};
-
-await run('saveGame persists a progressed session and loadSavedGame restores it', async () => {
+test('saveGame persists a progressed session and loadSavedGame restores it', async () => {
   const storage = createMemoryStorage();
   const session = defaultSavedSession();
 
@@ -22,7 +13,7 @@ await run('saveGame persists a progressed session and loadSavedGame restores it'
   assert.deepEqual(loaded, session);
 });
 
-await run('saved progress does not reset unless clearSavedGame is called', async () => {
+test('saved progress does not reset unless clearSavedGame is called', async () => {
   const storage = createMemoryStorage();
   const progressedSession = defaultSavedSession({
     currentScenarioId: 12,
@@ -46,7 +37,7 @@ await run('saved progress does not reset unless clearSavedGame is called', async
   assert.deepEqual(secondLoad?.stats, progressedSession.stats);
 });
 
-await run('clearSavedGame removes the saved session explicitly', async () => {
+test('clearSavedGame removes the saved session explicitly', async () => {
   const storage = createMemoryStorage();
   await saveGame(defaultSavedSession(), storage);
 
@@ -56,7 +47,7 @@ await run('clearSavedGame removes the saved session explicitly', async () => {
   assert.equal(loaded, null);
 });
 
-await run('character saves are isolated so one character does not overwrite another', async () => {
+test('character saves are isolated so one character does not overwrite another', async () => {
   const storage = createMemoryStorage();
   const kenSession = defaultSavedSession({ characterId: 'ken', currentScenarioId: 9 });
   const amySession = defaultSavedSession({ characterId: 'amy', currentScenarioId: 14 });
@@ -73,7 +64,7 @@ await run('character saves are isolated so one character does not overwrite anot
   assert.equal(loadedAmy?.characterId, 'amy');
 });
 
-await run('loadSavedGame normalizes missing relation values in stats and checkpoints', async () => {
+test('loadSavedGame normalizes missing relation values in stats and checkpoints', async () => {
   const storage = createMemoryStorage();
   const statsWithoutRelation = {
     funds: 455,
@@ -106,7 +97,7 @@ await run('loadSavedGame normalizes missing relation values in stats and checkpo
   assert.equal(loaded?.checkpoints[1]?.stats.relation, 50);
 });
 
-await run('saved checkpoints are preserved when the session is restored', async () => {
+test('saved checkpoints are preserved when the session is restored', async () => {
   const storage = createMemoryStorage();
   const session = defaultSavedSession({
     checkpoints: {
