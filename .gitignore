@@ -4,5 +4,8 @@
 # Generated Expo debug export
 /ReadTheRoom.App/dist-debug-two/
 
+# Test coverage output
+/ReadTheRoom.App/coverage/
+
 # Scenario backup references
 /ReadTheRoom.App/assets/data/backup/

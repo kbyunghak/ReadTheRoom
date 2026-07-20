@@ -13,6 +13,7 @@
     "check:localization": "node ./scripts/check-localization.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:refactor": "vitest run tests/scenarioNormalization.test.ts tests/statMetadata.test.ts tests/gameTransitions.test.ts",
     "test:ken": "vitest run tests/kenScenario.test.ts"
   },
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
+    "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "typescript": "~5.9.2",
