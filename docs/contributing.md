@@ -58,3 +58,7 @@ Keep unrelated work in separate commits:
 - Refactoring.
 
 This keeps release review safer and makes regressions easier to trace.
+
+## Documentation Updates
+
+Documentation updates are expected whenever implementation changes affect architecture, testing, release workflow, scenario format, or user-facing behavior.

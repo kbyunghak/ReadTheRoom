@@ -36,3 +36,29 @@ This folder is the documentation hub for ReadTheRoom. It separates current proje
 Current English `.md` files are the official portfolio-facing documentation and summaries.
 
 Korean `.ko.md` source notes are retained as reference material. They are useful for product thinking and future summaries, but English `.md` summaries should be used for portfolio review.
+
+## Documentation Maintenance
+
+Documentation is treated as part of the codebase.
+
+When product behavior, scenario format, testing commands, release flow, or UX direction changes, update the related documentation in the same pull request or in a dedicated follow-up documentation pull request.
+
+Documentation should always describe the current implementation rather than planned behavior unless the document is explicitly marked as a proposal or draft.
+
+## Document Types
+
+This repository follows the documentation naming convention below.
+
+- `.md`: official English documentation intended for contributors and portfolio readers.
+- `.ko.md`: Korean source notes, design references, and planning documents.
+- `archive/`: historical drafts and deprecated references retained for project history.
+
+## Korean Source Notes And English Summaries
+
+Korean source notes are considered primary design references during development.
+
+English documentation summarizes the current implementation and architecture for external readers.
+
+When a `.ko.md` document changes in a way that affects product behavior or design, update the corresponding English documentation.
+
+When implementation changes make an English document outdated, review the related Korean source note and either update it or mark it as historical.
