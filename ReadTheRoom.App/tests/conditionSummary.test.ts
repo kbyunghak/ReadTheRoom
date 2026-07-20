@@ -35,6 +35,24 @@ test('episode 1 override returns excitement when opening stats are stable', () =
   assert.equal(summary.title, '설레임');
 });
 
+test('episode 1 override returns localized English copy', () => {
+  const shakySummary = getConditionSummary({
+    episode: 1,
+    lang: 'en',
+    stats: lowConfidenceEpisodeOneStats,
+  });
+  const stableSummary = getConditionSummary({
+    episode: 1,
+    lang: 'en',
+    stats: episodeOneStartStats,
+  });
+
+  assert.equal(shakySummary.title, 'Super Nervous');
+  assert.equal(shakySummary.description, 'It is finally starting. Take one deep breath.');
+  assert.equal(stableSummary.title, 'Full of Excitement');
+  assert.equal(stableSummary.description, 'You made it to the airport. It already feels exciting.');
+});
+
 test('three or more risk stats return 생존 경보', () => {
   const summary = getConditionSummary({
     episode: 2,
@@ -154,4 +172,37 @@ test('status detail tone includes all six stat entries', () => {
     'insight',
   ]);
   assert.equal(tone.funds, '위험');
+});
+
+test('status detail tone classifies English boundary values', () => {
+  const riskTone = getStatusDetailTone(
+    {
+      funds: 100,
+      mental: 20,
+      english: 20,
+      insight: 20,
+      stamina: 20,
+      relation: 20,
+    },
+    'en',
+  );
+  const warningTone = getStatusDetailTone(
+    {
+      funds: 300,
+      mental: 40,
+      english: 40,
+      insight: 40,
+      stamina: 40,
+      relation: 40,
+    },
+    'en',
+  );
+  const stableTone = getStatusDetailTone(stableStats, 'en');
+
+  assert.equal(riskTone.funds, 'Risk');
+  assert.equal(riskTone.mental, 'Risk');
+  assert.equal(warningTone.funds, 'Care');
+  assert.equal(warningTone.mental, 'Care');
+  assert.equal(stableTone.funds, 'Stable');
+  assert.equal(stableTone.mental, 'Stable');
 });

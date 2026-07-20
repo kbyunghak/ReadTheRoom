@@ -114,6 +114,12 @@ test('shouldShowSituationSummary stays false before the fifth scenario', () => {
   assert.equal(shouldShowSituationSummary(4), false);
 });
 
+test('shouldShowSituationSummary stays false without a current scenario id', () => {
+  assert.equal(shouldShowSituationSummary(), false);
+  assert.equal(shouldShowSituationSummary(null), false);
+  assert.equal(shouldShowSituationSummary(0), false);
+});
+
 test('shouldShowSituationSummary becomes true at every fifth scenario', () => {
   assert.equal(shouldShowSituationSummary(5), true);
   assert.equal(shouldShowSituationSummary(10), true);

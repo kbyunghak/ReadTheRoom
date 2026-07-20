@@ -39,6 +39,36 @@ test('SUMMARY display title uses a localized day completion label', () => {
   assert.equal(getScenarioDisplayTitle(scenario, 'en'), 'Day 1 Complete');
 });
 
+test('display title falls back to localized situation objects', () => {
+  const scenario: Scenario = {
+    ...baseScenario,
+    situation: {
+      ko: '상황 제목',
+      en: 'Situation Title',
+    },
+  };
+
+  assert.equal(getScenarioDisplayTitle(scenario, 'ko'), '상황 제목');
+  assert.equal(getScenarioDisplayTitle(scenario, 'en'), 'Situation Title');
+});
+
+test('display title falls back between legacy situation strings', () => {
+  const koreanScenario: Scenario = {
+    ...baseScenario,
+    situation: '기존 한글 상황',
+    situationEN: 'Legacy English Situation',
+  };
+  const englishFallbackScenario: Scenario = {
+    ...baseScenario,
+    situation: '한글만 있는 상황',
+    situationEN: '',
+  };
+
+  assert.equal(getScenarioDisplayTitle(koreanScenario, 'ko'), '기존 한글 상황');
+  assert.equal(getScenarioDisplayTitle(koreanScenario, 'en'), 'Legacy English Situation');
+  assert.equal(getScenarioDisplayTitle(englishFallbackScenario, 'en'), '한글만 있는 상황');
+});
+
 test('NORMAL header includes day, main episode, and display title', () => {
   const scenario: Scenario = {
     ...baseScenario,
@@ -64,6 +94,31 @@ test('SPECIAL header does not force an episode number', () => {
   };
 
   assert.equal(getScenarioHeaderTitle(scenario, 'ko'), '[Day 2] 마트 결제대의 식은땀');
+});
+
+test('SPECIAL header falls back to a localized generic label without a display title', () => {
+  const scenario: Scenario = {
+    ...baseScenario,
+    day: 3,
+    situation: '',
+    situationEN: '',
+  };
+
+  assert.equal(getScenarioHeaderTitle(scenario, 'ko'), '[Day 3] 특별 이벤트');
+  assert.equal(getScenarioHeaderTitle(scenario, 'en'), '[Day 3] Special Event');
+});
+
+test('header falls back to day and title when no episode number exists', () => {
+  const scenario: Scenario = {
+    ...baseScenario,
+    type: 'ENDING',
+    title: {
+      ko: '엔딩',
+      en: 'Ending',
+    },
+  };
+
+  assert.equal(getScenarioHeaderTitle(scenario, 'ko'), '[Day 1] 엔딩');
 });
 
 test('SUMMARY header only shows the day completion label', () => {
