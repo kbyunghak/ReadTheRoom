@@ -1,3 +1,6 @@
+> Status: Korean source note
+> Purpose: UX layout reference draft. Not an official portfolio summary.
+
 1. UX 설명 문서 초안
 1. 화면 개요
 

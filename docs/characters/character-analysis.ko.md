@@ -1,3 +1,6 @@
+> Status: Korean source note
+> Purpose: Character balance and design reference. Not an official portfolio summary.
+
 🏆 🔒 FINAL MASTER DOCUMENT v3.0 (THE GOLDEN BALANCE)
 ⚠️ 핵심 밸런스 엔진 룰셋 (Character Side)
 지연된 처벌: 모든 캐릭터의 시작 스탯은 유통기한이 있는 자원이다.

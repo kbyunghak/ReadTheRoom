@@ -1,3 +1,6 @@
+> Status: Korean source note
+> Purpose: Historical Amy JSON schema reference. Not the active runtime scenario format.
+
 Read The Room: Vancouver Life - 시스템 디자인 가이드 (v2.7)
 1. 목적
 이 문서는 Read The Room의 시스템 디자인 문서를 실제 데이터 구조로 옮기기 위한 구현 기준이다.  

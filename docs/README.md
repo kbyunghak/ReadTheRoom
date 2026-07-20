@@ -20,6 +20,7 @@ This folder is the documentation hub for ReadTheRoom. It separates current proje
 ## Reference Areas
 
 - `characters/`: character notes and story source material.
+- `design/`: UX and visual design source notes.
 - `schema/`: historical JSON schema notes and scenario-format references.
 - `system-design/`: refactoring notes and archived system design material.
 - `story-drafts/`: archived story draft material.
@@ -28,4 +29,4 @@ This folder is the documentation hub for ReadTheRoom. It separates current proje
 
 Current English `.md` files are the official portfolio-facing documentation.
 
-Korean `.txt` source notes are retained as reference material. Some older drafts may need recovery or conversion before they are suitable for portfolio presentation. Do not treat corrupted or archived drafts as official product documentation.
+Korean `.ko.md` source notes are retained as reference material. They are useful for product thinking and future summaries, but they are not official portfolio-facing documentation until an English summary is written.

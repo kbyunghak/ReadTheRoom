@@ -1,3 +1,6 @@
+> Status: Korean source note
+> Purpose: Ken episode planning reference. Not an official portfolio summary.
+
 1. 에피소드 구성에 대한 전략적 제언
 구조의 최적화: 하루를 '오전-오후-저녁' 혹은 '이동-목적지-결과'와 같이 3개의 굵직한 이벤트로 나눕니다.  
 

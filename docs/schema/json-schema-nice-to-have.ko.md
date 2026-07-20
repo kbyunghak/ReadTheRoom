@@ -1,3 +1,6 @@
+> Status: Korean source note
+> Purpose: Future schema and feature ideas. Not part of the current release scope.
+
 19. Nice to Have: 미래 개선 아이디어 목록 (일단 반영하지 않는다)
 당장은 출시를 위해 킵해두고, 추후 업데이트 시 고려할 리스트입니다.
 
