@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { test } from 'vitest';
 import {
   resolveChoiceContinuation,
   resolveSummaryContinuation,
@@ -7,16 +8,6 @@ import type {
   Scenario,
   ScenarioChoice,
 } from '../utils/scenarioBundle.ts';
-
-const run = (name: string, fn: () => void) => {
-  try {
-    fn();
-    console.log(`PASS ${name}`);
-  } catch (error) {
-    console.error(`FAIL ${name}`);
-    throw error;
-  }
-};
 
 const stableStats = {
   funds: 500,
@@ -48,7 +39,7 @@ const scenario: Scenario = {
   choices: [choice],
 };
 
-run('failed stats take priority over normal navigation', () => {
+test('failed stats take priority over normal navigation', () => {
   const result = resolveChoiceContinuation({
     stats: { ...stableStats, mental: 0 },
     scenario,
@@ -59,7 +50,7 @@ run('failed stats take priority over normal navigation', () => {
   assert.deepEqual(result, { type: 'failure' });
 });
 
-run('ending scenarios finish without navigating to their choice target', () => {
+test('ending scenarios finish without navigating to their choice target', () => {
   const result = resolveChoiceContinuation({
     stats: stableStats,
     scenario: { ...scenario, isEnding: true },
@@ -70,7 +61,7 @@ run('ending scenarios finish without navigating to their choice target', () => {
   assert.deepEqual(result, { type: 'ending' });
 });
 
-run('normal scenarios advance to the selected choice target', () => {
+test('normal scenarios advance to the selected choice target', () => {
   const result = resolveChoiceContinuation({
     stats: stableStats,
     scenario,
@@ -81,7 +72,7 @@ run('normal scenarios advance to the selected choice target', () => {
   assert.deepEqual(result, { type: 'advance', nextScenarioId: 2 });
 });
 
-run('phase-end scenarios open a summary with an available next node', () => {
+test('phase-end scenarios open a summary with an available next node', () => {
   const result = resolveChoiceContinuation({
     stats: stableStats,
     scenario: { ...scenario, isPhaseEnd: true },
@@ -92,7 +83,7 @@ run('phase-end scenarios open a summary with an available next node', () => {
   assert.deepEqual(result, { type: 'summary', nextScenarioId: 2 });
 });
 
-run('phase-end scenarios keep a null target when the next node is missing', () => {
+test('phase-end scenarios keep a null target when the next node is missing', () => {
   const result = resolveChoiceContinuation({
     stats: stableStats,
     scenario: { ...scenario, isPhaseEnd: true },
@@ -103,7 +94,7 @@ run('phase-end scenarios keep a null target when the next node is missing', () =
   assert.deepEqual(result, { type: 'summary', nextScenarioId: null });
 });
 
-run('summary nodes distinguish advance, missing target, and ending', () => {
+test('summary nodes distinguish advance, missing target, and ending', () => {
   const summary = {
     ...scenario,
     id: 1001,

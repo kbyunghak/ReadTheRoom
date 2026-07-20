@@ -1,20 +1,11 @@
 import assert from 'node:assert/strict';
+import { test } from 'vitest';
 import { createScenarioBundle } from '../utils/scenarioBundle.ts';
 import { dayBucketScenarioFixture } from './fixtures/index.ts';
 
 const scenarioInput = dayBucketScenarioFixture as unknown as Parameters<typeof createScenarioBundle>[0];
 
-const run = (name: string, fn: () => void) => {
-  try {
-    fn();
-    console.log(`PASS ${name}`);
-  } catch (error) {
-    console.error(`FAIL ${name}`);
-    throw error;
-  }
-};
-
-run('createScenarioBundle flattens Day bucket data into a scenario map', () => {
+test('createScenarioBundle flattens Day bucket data into a scenario map', () => {
   const bundle = createScenarioBundle(scenarioInput);
 
   assert.equal(bundle.version, 'day-bucket-v1');
@@ -24,13 +15,13 @@ run('createScenarioBundle flattens Day bucket data into a scenario map', () => {
   assert.ok(bundle.scenarios['1001']);
 });
 
-run('createScenarioBundle uses Day bucket node ids in sorted order', () => {
+test('createScenarioBundle uses Day bucket node ids in sorted order', () => {
   const bundle = createScenarioBundle(scenarioInput);
 
   assert.deepEqual(bundle.phases[0]?.nodeIds, [1, 1001]);
 });
 
-run('SUMMARY nodes from Day bucket data are normalized as phase end nodes', () => {
+test('SUMMARY nodes from Day bucket data are normalized as phase end nodes', () => {
   const bundle = createScenarioBundle(scenarioInput);
   const summaryNode = bundle.scenarios['1001'];
 
@@ -49,7 +40,7 @@ run('SUMMARY nodes from Day bucket data are normalized as phase end nodes', () =
   });
 });
 
-run('Day bucket nodes use title as the fallback situation value', () => {
+test('Day bucket nodes use title as the fallback situation value', () => {
   const bundle = createScenarioBundle(scenarioInput);
   const firstNode = bundle.scenarios['1'];
 

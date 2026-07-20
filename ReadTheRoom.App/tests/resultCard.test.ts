@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { test } from 'vitest';
 import {
   buildResultCardData,
   buildSelectedChoiceText,
@@ -11,16 +12,6 @@ import {
   choiceWithZeroChanges,
 } from './fixtures/choices.ts';
 import { tipScenarioNode } from './fixtures/scenarios.ts';
-
-const test = (name: string, fn: () => void) => {
-  try {
-    fn();
-    console.log(`PASS ${name}`);
-  } catch (error) {
-    console.error(`FAIL ${name}`);
-    throw error;
-  }
-};
 
 test('buildSelectedChoiceText joins cue and body for result display', () => {
   const text = buildSelectedChoiceText(

@@ -1,24 +1,15 @@
 import assert from 'node:assert/strict';
+import { test } from 'vitest';
 import { STAT_METADATA } from '../domain/stats/config.ts';
 import { buildDisplayStats } from '../domain/stats/display.ts';
 import { buildCoreCharacterStats } from '../domain/stats/display.ts';
 import { STAT_KEYS } from '../domain/stats/types.ts';
 
-const run = (name: string, fn: () => void) => {
-  try {
-    fn();
-    console.log(`PASS ${name}`);
-  } catch (error) {
-    console.error(`FAIL ${name}`);
-    throw error;
-  }
-};
-
-run('stat metadata defines every canonical stat exactly once', () => {
+test('stat metadata defines every canonical stat exactly once', () => {
   assert.deepEqual(Object.keys(STAT_METADATA), [...STAT_KEYS]);
 });
 
-run('character display stats preserve funds and scale bounded stats by ten', () => {
+test('character display stats preserve funds and scale bounded stats by ten', () => {
   const displayStats = buildDisplayStats({
     funds: 500,
     mental: 50,
@@ -41,7 +32,7 @@ run('character display stats preserve funds and scale bounded stats by ten', () 
   });
 });
 
-run('character display stats clamp values to the configured range', () => {
+test('character display stats clamp values to the configured range', () => {
   const displayStats = buildDisplayStats({
     funds: 1500,
     mental: -10,
@@ -59,7 +50,7 @@ run('character display stats clamp values to the configured range', () => {
   assert.equal(values.english, 1000);
 });
 
-run('character cards expose only funds, english, and stamina', () => {
+test('character cards expose only funds, english, and stamina', () => {
   const stats = buildCoreCharacterStats({
     funds: 500,
     mental: 50,

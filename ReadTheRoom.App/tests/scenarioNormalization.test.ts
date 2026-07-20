@@ -1,17 +1,8 @@
 import assert from 'node:assert/strict';
+import { test } from 'vitest';
 import { createScenarioBundle } from '../utils/scenarioBundle.ts';
 
 type ScenarioInput = Parameters<typeof createScenarioBundle>[0];
-
-const run = (name: string, fn: () => void) => {
-  try {
-    fn();
-    console.log(`PASS ${name}`);
-  } catch (error) {
-    console.error(`FAIL ${name}`);
-    throw error;
-  }
-};
 
 const localized = (value: string) => ({ ko: value, en: value });
 
@@ -24,7 +15,7 @@ const partialChoice = {
   nextScenarioId: 2,
 };
 
-run('legacy collections preserve their nodes and use the lowest sorted id as the start', () => {
+test('legacy collections preserve their nodes and use the lowest sorted id as the start', () => {
   const input = {
     '5': {
       id: 5,
@@ -46,7 +37,7 @@ run('legacy collections preserve their nodes and use the lowest sorted id as the
   assert.equal(bundle.scenarios['5']?.description.en, 'Fifth node');
 });
 
-run('phase V2 data preserves phase metadata and normalizes choice defaults', () => {
+test('phase V2 data preserves phase metadata and normalizes choice defaults', () => {
   const input = {
     version: '2.0',
     startScenarioId: 10,
@@ -88,7 +79,7 @@ run('phase V2 data preserves phase metadata and normalizes choice defaults', () 
   });
 });
 
-run('flat V2 data falls back to its first node and title-based situation', () => {
+test('flat V2 data falls back to its first node and title-based situation', () => {
   const input = {
     version: '2.1',
     character: 'Test',
@@ -111,7 +102,7 @@ run('flat V2 data falls back to its first node and title-based situation', () =>
   assert.equal(node?.quest, '3-1');
 });
 
-run('Day bucket data sorts days and nodes while deriving SUMMARY and ENDING flags', () => {
+test('Day bucket data sorts days and nodes while deriving SUMMARY and ENDING flags', () => {
   const input = {
     Day2: {
       '9001': {
@@ -168,7 +159,7 @@ run('Day bucket data sorts days and nodes while deriving SUMMARY and ENDING flag
   assert.equal(bundle.scenarios['9001']?.choices.length, 0);
 });
 
-run('placeholder Day buckets remain valid and do not change the first implemented node', () => {
+test('placeholder Day buckets remain valid and do not change the first implemented node', () => {
   const input = {
     Day1: {
       '1': {
@@ -191,7 +182,7 @@ run('placeholder Day buckets remain valid and do not change the first implemente
   assert.ok(bundle.scenarios['1']);
 });
 
-run('normalization does not mutate the original partial choice', () => {
+test('normalization does not mutate the original partial choice', () => {
   const inputChoice = {
     ...partialChoice,
     statChanges: { english: 5 },

@@ -1,16 +1,7 @@
 import assert from 'node:assert/strict';
+import { test } from 'vitest';
 import { getScenarioDisplayTitle, getScenarioHeaderTitle } from '../utils/scenarioDisplay.ts';
 import type { Scenario } from '../utils/scenarioRegistry.ts';
-
-const run = (name: string, fn: () => void) => {
-  try {
-    fn();
-    console.log(`PASS ${name}`);
-  } catch (error) {
-    console.error(`FAIL ${name}`);
-    throw error;
-  }
-};
 
 const baseScenario = {
   id: 9001,
@@ -20,7 +11,7 @@ const baseScenario = {
   choices: [],
 } satisfies Scenario;
 
-run('display title removes internal exception labels outside the component', () => {
+test('display title removes internal exception labels outside the component', () => {
   const scenario: Scenario = {
     ...baseScenario,
     title: {
@@ -33,7 +24,7 @@ run('display title removes internal exception labels outside the component', () 
   assert.equal(getScenarioDisplayTitle(scenario, 'en'), 'Pressure in the Secondary Room');
 });
 
-run('SUMMARY display title uses a localized day completion label', () => {
+test('SUMMARY display title uses a localized day completion label', () => {
   const scenario: Scenario = {
     ...baseScenario,
     id: 1001,
@@ -48,7 +39,7 @@ run('SUMMARY display title uses a localized day completion label', () => {
   assert.equal(getScenarioDisplayTitle(scenario, 'en'), 'Day 1 Complete');
 });
 
-run('NORMAL header includes day, main episode, and display title', () => {
+test('NORMAL header includes day, main episode, and display title', () => {
   const scenario: Scenario = {
     ...baseScenario,
     id: 2,
@@ -62,7 +53,7 @@ run('NORMAL header includes day, main episode, and display title', () => {
   assert.equal(getScenarioHeaderTitle(scenario, 'ko'), '[Day 1] EP 01: 세컨더리 룸의 압박');
 });
 
-run('SPECIAL header does not force an episode number', () => {
+test('SPECIAL header does not force an episode number', () => {
   const scenario: Scenario = {
     ...baseScenario,
     day: 2,
@@ -75,7 +66,7 @@ run('SPECIAL header does not force an episode number', () => {
   assert.equal(getScenarioHeaderTitle(scenario, 'ko'), '[Day 2] 마트 결제대의 식은땀');
 });
 
-run('SUMMARY header only shows the day completion label', () => {
+test('SUMMARY header only shows the day completion label', () => {
   const scenario: Scenario = {
     ...baseScenario,
     id: 1001,

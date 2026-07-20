@@ -1,18 +1,9 @@
 import assert from 'node:assert/strict';
+import { test } from 'vitest';
 import { applyStatChanges, isGameOverFromStats, type GameStats, type StatChanges } from '../utils/gameStats.ts';
 import { shouldShowSituationSummary } from '../utils/questProgress.ts';
 
-const run = (name: string, fn: () => void) => {
-  try {
-    fn();
-    console.log(`PASS ${name}`);
-  } catch (error) {
-    console.error(`FAIL ${name}`);
-    throw error;
-  }
-};
-
-run('applyStatChanges updates funds and bounded stats correctly', () => {
+test('applyStatChanges updates funds and bounded stats correctly', () => {
   const currentStats: GameStats = {
     funds: 500,
     mental: 50,
@@ -41,7 +32,7 @@ run('applyStatChanges updates funds and bounded stats correctly', () => {
   });
 });
 
-run('applyStatChanges clamps non-fund stats between 0 and 100', () => {
+test('applyStatChanges clamps non-fund stats between 0 and 100', () => {
   const currentStats: GameStats = {
     funds: 40,
     mental: 95,
@@ -70,7 +61,7 @@ run('applyStatChanges clamps non-fund stats between 0 and 100', () => {
   });
 });
 
-run('applyStatChanges does not allow funds to go below zero', () => {
+test('applyStatChanges does not allow funds to go below zero', () => {
   const currentStats: GameStats = {
     funds: 15,
     mental: 60,
@@ -92,7 +83,7 @@ run('applyStatChanges does not allow funds to go below zero', () => {
   assert.equal(applyStatChanges(currentStats, statChanges).funds, 0);
 });
 
-run('isGameOverFromStats returns true when one of the critical survival stats reaches zero', () => {
+test('isGameOverFromStats returns true when one of the critical survival stats reaches zero', () => {
   assert.equal(
     isGameOverFromStats({
       funds: 250,
@@ -118,16 +109,16 @@ run('isGameOverFromStats returns true when one of the critical survival stats re
   );
 });
 
-run('shouldShowSituationSummary stays false before the fifth scenario', () => {
+test('shouldShowSituationSummary stays false before the fifth scenario', () => {
   assert.equal(shouldShowSituationSummary(1), false);
   assert.equal(shouldShowSituationSummary(4), false);
 });
 
-run('shouldShowSituationSummary becomes true at every fifth scenario', () => {
+test('shouldShowSituationSummary becomes true at every fifth scenario', () => {
   assert.equal(shouldShowSituationSummary(5), true);
   assert.equal(shouldShowSituationSummary(10), true);
 });
 
-run('shouldShowSituationSummary becomes true at the end even without a next scenario', () => {
+test('shouldShowSituationSummary becomes true at the end even without a next scenario', () => {
   assert.equal(shouldShowSituationSummary(15), true);
 });
