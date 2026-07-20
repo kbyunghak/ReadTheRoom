@@ -8,6 +8,7 @@ Run from `ReadTheRoom.App`:
 
 ```bash
 npm run lint
+npm run check:encoding
 npx tsc --noEmit
 npm test
 ```

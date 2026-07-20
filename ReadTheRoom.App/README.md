@@ -77,4 +77,5 @@ Ken is the most actively validated scenario pack. The beta character select scre
 - [Game Flow](../docs/game-flow.md)
 - [Scenario Format](../docs/scenario-format.md)
 - [Testing Strategy](../docs/testing-strategy.md)
+- [Encoding Policy](../docs/encoding-policy.md)
 - [Release Checklist](../docs/release-checklist.md)

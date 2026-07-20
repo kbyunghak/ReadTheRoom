@@ -89,6 +89,8 @@ ReadTheRoom/
 - [Game Flow](docs/game-flow.md)
 - [Scenario Format](docs/scenario-format.md)
 - [Testing Strategy](docs/testing-strategy.md)
+- [Encoding Policy](docs/encoding-policy.md)
+- [Contributing](docs/contributing.md)
 - [Release Checklist](docs/release-checklist.md)
 - [Roadmap](docs/roadmap.md)
 - [Legacy Backend](docs/legacy-backend.md)
