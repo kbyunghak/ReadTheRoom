@@ -32,7 +32,7 @@ changing scenario content or runtime behavior.
 ### Second-pass gates
 
 - Run the focused unit tests after each extraction.
-- Run `npx tsc --noEmit` and lint after each extraction.
+- Run `npm run typecheck` and lint after each extraction.
 - Run the complete `npm test` suite at the final gate.
 - Preserve automatic feedback opening, selected-choice locking, summary
   behavior, roadmap rewind behavior, and status-card flipping.
@@ -46,7 +46,7 @@ Refactoring is performed in small steps, and every step must pass its own test g
 
 - Do not combine behavior changes with structural refactoring.
 - Keep each commit limited to one purpose.
-- Run `npm test`, `npx tsc --noEmit`, and `npm run lint` at every gate.
+- Run `npm test`, `npm run typecheck`, and `npm run lint` at every gate.
 - Preserve current JSON compatibility until the scenario data migration is explicitly approved.
 - Prefer pure functions, feature modules, hooks, and reducers over class hierarchies.
 - Do not extract a shared component until at least two real callers need the same behavior.

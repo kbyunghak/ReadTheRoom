@@ -61,7 +61,7 @@ ReadTheRoom.App/
   utils/                Scenario, display, persistence, and result helpers
   locales/              Character and localized UI copy
   assets/               Runtime data and images
-  tests/                Node-based unit and data integrity tests
+  tests/                Vitest unit and data integrity tests
 ```
 
 ## UI Layer
@@ -143,6 +143,5 @@ UI and scenario rendering select one language at runtime. Korean should appear i
 ## Known Technical Debt
 
 - UI integration tests are not yet in place.
-- `npm test` currently uses a long explicit command chain.
 - Some legacy or draft documentation still needs cleanup or archival.
-- Remaining localization/mojibake cleanup should be tracked separately from documentation work.
+- StoryMap and GameScreen UI responsibilities can be split further.

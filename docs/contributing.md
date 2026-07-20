@@ -7,9 +7,10 @@ This project is currently maintained as a focused indie game project. Contributi
 Run from `ReadTheRoom.App`:
 
 ```bash
-npm run lint
 npm run check:encoding
-npx tsc --noEmit
+npm run check:localization
+npm run typecheck
+npm run lint
 npm test
 ```
 

@@ -1,12 +1,12 @@
 # Testing Strategy
 
-ReadTheRoom uses release-first testing. The immediate goal is not full coverage. The goal is to catch issues that can break progression, corrupt save data, or display broken user-facing strings.
+ReadTheRoom uses release-first testing. The goal is to catch issues that can break progression, corrupt save data, or display broken user-facing strings before they reach a release candidate.
 
 For release validation, see [Release Checklist](release-checklist.md).
 
 ## Current Test Model
 
-Tests are lightweight Node-based TypeScript files executed through `npm test`.
+Tests are Vitest-based TypeScript tests executed through `npm test`.
 
 The current test suite covers:
 
@@ -21,7 +21,9 @@ The current test suite covers:
 - Scenario title display.
 - Condition summaries.
 - Result card data.
+- Localization key consistency.
 - Mojibake guard checks.
+- Coverage reporting for tested logic.
 
 ## Current Command
 
@@ -33,9 +35,11 @@ npm test
 Additional checks:
 
 ```bash
-npm run lint
 npm run check:encoding
-npx tsc --noEmit
+npm run check:localization
+npm run typecheck
+npm run lint
+npm run test:coverage
 ```
 
 ## Test Priorities
@@ -70,41 +74,9 @@ npx tsc --noEmit
 
 ## Recommended Next Improvements
 
-### 1. Replace The Long Test Chain
+### 1. Add UI Integration Tests
 
-The current `npm test` script explicitly chains every test file. This works, but it is hard to maintain.
-
-Recommended next step:
-
-```text
-ReadTheRoom.App/scripts/run-tests.mjs
-```
-
-The runner should:
-
-- Discover `tests/**/*.test.ts`.
-- Sort files for stable output.
-- Run each test with `node --experimental-strip-types`.
-- Stop with a non-zero exit code on failure.
-- Print a clear summary.
-- Fail clearly when no test files are found.
-
-### 2. Add CI
-
-GitHub Actions should run:
-
-```bash
-npm ci
-npm run lint
-npx tsc --noEmit
-npm test
-```
-
-The workflow must set `working-directory: ReadTheRoom.App`.
-
-### 3. Add UI Integration Tests
-
-Later, introduce React Native Testing Library for:
+Introduce React Native Testing Library for:
 
 - Character select to game start.
 - Choice to feedback modal to next scenario.
@@ -116,6 +88,19 @@ Mocks will be needed for:
 - Expo Router.
 - Animation modules.
 - Asset loading.
+
+### 2. Expand Meaningful Branch Coverage
+
+Prefer user-impacting branches over arbitrary percentage chasing:
+
+- Missing or invalid scenario links.
+- Persistence failure and recovery paths.
+- Optional localization fields.
+- Default or fallback display values.
+
+### 3. Release Workflow Validation
+
+Later, add build-oriented release validation after the Expo release path is finalized.
 
 ## Testing Principles
 

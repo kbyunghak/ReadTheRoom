@@ -7,18 +7,22 @@ Use this checklist before treating a build as a release candidate.
 Run from `ReadTheRoom.App`:
 
 ```bash
-npm run lint
 npm run check:encoding
-npx tsc --noEmit
+npm run check:localization
+npm run typecheck
+npm run lint
 npm test
+npm run test:coverage
 ```
 
 Expected:
 
+- Encoding check passes.
+- Localization key consistency check passes.
 - Lint passes.
 - TypeScript passes.
 - All tests pass.
-- Existing `MODULE_TYPELESS_PACKAGE_JSON` warnings are not failures, but should be cleaned later.
+- Coverage report is generated without failing.
 
 ## Expo Go Smoke Test
 

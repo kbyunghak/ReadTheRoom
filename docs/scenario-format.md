@@ -2,7 +2,7 @@
 
 This document describes the scenario data format used by the current implementation.
 
-The corrupted draft `docs/schema/TS시나리오_포맷_v1.0.md` is not treated as the official source. This document is based on the current TypeScript types and runtime JSON loader.
+Historical schema drafts under `docs/schema/` are reference material only. This document is based on the current TypeScript types and runtime JSON loader.
 
 For runtime transitions, see [Game Flow](game-flow.md). For test coverage, see [Testing Strategy](testing-strategy.md).
 

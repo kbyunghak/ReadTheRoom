@@ -120,9 +120,10 @@ CI should run the encoding check before typecheck and tests:
 
 ```bash
 npm ci
-npm run lint
 npm run check:encoding
-npx tsc --noEmit
+npm run check:localization
+npm run typecheck
+npm run lint
 npm test
 ```
 

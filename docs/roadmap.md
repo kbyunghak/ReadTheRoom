@@ -11,12 +11,9 @@ This roadmap separates release stabilization from future content and technical i
 
 ## Near-Term
 
-- Rewrite the documentation hub.
-- Add GitHub Actions CI.
-- Replace the long `npm test` command chain with a test runner script.
 - Polish StoryMap readability and episode state hierarchy.
-- Clean remaining mojibake/localization copy issues in source files.
 - Add a release checklist-driven Expo Go validation pass.
+- Add initial UI tests for the highest-risk screens.
 
 ## Testing Improvements
 
@@ -24,6 +21,7 @@ This roadmap separates release stabilization from future content and technical i
 - Cover character select to game start.
 - Cover choice to feedback modal to next scenario.
 - Cover save and resume behavior at screen level.
+- Use current Vitest coverage reports to identify meaningful branch gaps.
 
 ## Scenario Data Improvements
 
@@ -37,8 +35,7 @@ This roadmap separates release stabilization from future content and technical i
 - Split remaining large GameScreen responsibilities.
 - Move reusable UI state into focused hooks where appropriate.
 - Improve StoryMap card text handling for long Korean and English titles.
-- Add stricter localization/mojibake guards for known corrupted strings.
-- Decide whether to adopt Vitest or Jest after the current Node test runner is simplified.
+- Keep localization/mojibake guard patterns updated as new regressions are discovered.
 
 ## Longer-Term
 

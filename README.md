@@ -89,6 +89,7 @@ ReadTheRoom/
 
 ## Documentation
 
+- [Documentation Hub](docs/README.md)
 - [Architecture](docs/architecture.md)
 - [Game Flow](docs/game-flow.md)
 - [Scenario Format](docs/scenario-format.md)
