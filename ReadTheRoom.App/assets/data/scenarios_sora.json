@@ -5,36 +5,80 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 1,
-      "title": { "ko": "비행기 안, 착륙의 순간", "en": "Inside the Plane, Landing" },
-      "backgroundKey": "airport",
+      "week": 1,
+      "mainEpisode": 1,
+      "title": {
+        "ko": "캐나다 국적기 안, 울음소리와 온기",
+        "en": "On the Canadian Flag Carrier, Cries and Warmth"
+      },
+      "backgroundKey": "airplane_inside",
       "description": {
-        "ko": "비행기가 밴쿠버 공항에 내려앉자 승객들이 환호하며 박수를 칩니다. 켄(Ken)은 이 생소한 광경에 설레면서도 묘한 긴장감을 느낍니다.",
-        "en": "As the plane touches down at YVR, passengers cheer. Ken feels a mix of excitement and tension."
+        "ko": "10시간이 넘는 비행 끝에 밴쿠버 공항 착륙 신호가 들어오자, 지친 미취학 아동 제이든이 앙앙 울음을 터뜨립니다. 주변 승객들의 눈치가 보여 당황한 소라에게 승무원과 현지 승객들이 환하게 웃으며 \"It's totally fine, mama! You did great\"라며 따뜻하게 위로해 줍니다.",
+        "en": "As the landing signal lights up at YVR after a 10-hour flight, exhausted little Jaden bursts into tears. Flustered Sora receives warm smiles and reassurance from the flight attendants and local passengers: 'It's totally fine, mama! You did great.'"
       },
       "tip": {
-        "ko": "북미 항공편의 박수 문화는 낯설 수 있지만, 함께 참여하지 않으면 주변의 의아한 시선을 받을 수 있습니다. 분위기를 읽는 첫 번째 시험대입니다.",
-        "en": "The clapping culture might be strange, but not participating can draw curious stares. It's your first test in reading the room."
+        "ko": "💡 캐나다는 아이와 보호자에 대한 배려 문화(Family-friendly culture)가 매우 깊게 자리 잡고 있습니다. 당황하지 않고 주변에 감사한 마음을 표현하는 것이 중요합니다.",
+        "en": "💡 Canada has a deep family-friendly culture. Staying calm and expressing gratitude to those around you is key."
       },
       "choices": [
         {
-          "type": "GROWTH",
-          "text": { "ko": "신기한 듯 주변 사람들을 관찰하며 따라 한다.", "en": "Observe others with curiosity and follow along." },
-          "feedback": { "ko": "★ 대박! 켄은 이방인의 시선으로 문화를 배우기 시작합니다. 낯선 공기가 더는 두렵지 않습니다.", "en": "★ Amazing! Ken starts learning the culture as an outsider. The strange air is no longer scary." },
-          "statChanges": { "funds": 0, "mental": 5, "english": 5, "insight": 18, "stamina": 0, "relation": 5 },
+          "type": "STABLE",
+          "text": {
+            "ko": "아이를 포근하게 안아 다독이며 승객들에게 감사함의 미소를 전한다.",
+            "en": "Warmly hug Jaden to comfort him and share a grateful smile with passengers."
+          },
+          "feedback": {
+            "ko": "승객들의 온기 어린 눈빛에 피로가 녹아내립니다. 제이든도 조금씩 울음을 멈추고 안정을 찾습니다.",
+            "en": "The warmth of the passengers melts away your fatigue. Jaden calms down and feels safe."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 20,
+            "english": 5,
+            "insight": 10,
+            "stamina": -5,
+            "relation": 15
+          },
           "nextScenarioId": 2
         },
         {
-          "type": "STABLE",
-          "text": { "ko": "조용히 눈을 감고 마음의 평정을 찾는다.", "en": "Quietly close your eyes and find inner peace." },
-          "feedback": { "ko": "켄은 소란 속에서도 차분함을 유지합니다. 밴쿠버에서의 첫날을 버틸 에너지를 비축합니다.", "en": "Ken remains calm amidst the noise, saving energy to survive his first day in Vancouver." },
-          "statChanges": { "funds": 0, "mental": 15, "english": 0, "insight": 5, "stamina": 5, "relation": 0 },
+          "type": "GROWTH",
+          "text": {
+            "ko": "승무원에게 \"Thank you so much for your patience\"라며 영어로 감사를 표한다.",
+            "en": "Thank the flight attendant in English: 'Thank you so much for your patience.'"
+          },
+          "feedback": {
+            "ko": "★ 성공! 승무원이 배려로 아동용 에어캐나다 날개 뱃지와 과자를 챙겨주어 제이든이 방긋 웃습니다.",
+            "en": "★ Success! The flight attendant gives Jaden a toy wings pin and snacks, making him smile brightly."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 15,
+            "english": 15,
+            "insight": 15,
+            "stamina": -5,
+            "relation": 20
+          },
           "nextScenarioId": 2
         },
         {
           "type": "REALIST",
-          "text": { "ko": "비행기 창밖을 보며 다음 이동 경로를 복습한다.", "en": "Look out the window and review your next route." },
-          "feedback": { "ko": "★ 아차... 풍경에 취해 시간을 낭비할 뻔했네요. 켄은 현실적인 생존 계획을 머릿속에 다시 그립니다.", "en": "★ Oops... Almost wasted time on the view. Ken redraws his realistic survival plan in his head." },
-          "statChanges": { "funds": 0, "mental": -5, "english": 0, "insight": 15, "stamina": 0, "relation": 0 },
+          "text": {
+            "ko": "아이 가방에서 캐릭터 사탕을 얼른 꺼내 입에 물려 상황을 수습한다.",
+            "en": "Quickly grab a candy from the bag to quiet Jaden down."
+          },
+          "feedback": {
+            "ko": "울음은 멈췄지만 가방을 샅샅이 뒤지느라 소라의 얼마 없는 체력이 급격히 깎였습니다.",
+            "en": "The crying stops, but rummaging through the bag rapidly drains Sora's low stamina."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 0,
+            "english": 0,
+            "insight": 10,
+            "stamina": -15,
+            "relation": 5
+          },
           "nextScenarioId": 2
         }
       ]
@@ -44,75 +88,80 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 2,
-      "title": { "ko": "공항 심사대, 날카로운 질문", "en": "Immigration Desk, Sharp Questions" },
+      "week": 1,
+      "mainEpisode": 2,
+      "title": {
+        "ko": "입국 심사대: 유학맘을 향한 가족 우대 라인",
+        "en": "Immigration Line: Family Priority Line for Studying Moms"
+      },
       "backgroundKey": "airport",
       "description": {
-        "ko": "무표정한 심사관이 켄(Ken)을 빤히 봅니다. \"방문 목적이랑 체류 기간은?\" 켄은 심사관의 압박에 입이 바짝 마릅니다.",
-        "en": "A stony-faced officer stares at Ken. \"Purpose of visit and duration?\" Ken's throat goes dry under pressure."
+        "ko": "입국 심사장의 긴 줄을 보고 한숨을 쉬던 중, 안내 직원이 제이든을 보더니 \"Families with young kids, this way please!\"라며 영유아 동반 패스트트랙 라인으로 안내해 줍니다.",
+        "en": "Sighing at the long immigration line, an airport staff spots Jaden and directs you to the fast-track family line: 'Families with young kids, this way please!'"
       },
       "tip": {
-        "ko": "심사관 앞에서 핸드폰을 꺼내거나 서류를 뒤적이면 '정밀 검사실'행 급행열차를 타게 됩니다. 매운맛을 피하려면 눈을 맞추세요.",
-        "en": "Fiddling with your phone or papers leads to the 'secondary room.' To avoid the spicy taste of reality, keep eye contact."
+        "ko": "💡 YVR 공항에서는 어린아이를 동반한 가족 승객에게 우선 수속 혜택을 제공합니다. 눈치를 살피며 안내 표지판을 잘 확인하세요.",
+        "en": "💡 YVR Airport offers priority processing for families with young children. Keep an eye out for staff signs."
       },
       "choices": [
         {
           "type": "GROWTH",
-          "text": { "ko": "(단답형) \"Study. 4 years.\"", "en": "\"Study. 4 years.\"" },
-          "feedback": { "ko": "★ 성공! 켄의 짧고 명확한 대답이 통했습니다! 심사관은 군더더기 없이 도장을 찍어줍니다.", "en": "★ Success! Ken's short, clear answer worked! The officer stamps the passport." },
-          "statChanges": { "funds": 0, "mental": 5, "english": 12, "insight": 18, "stamina": -5, "relation": 0 },
+          "text": {
+            "ko": "밝은 미소로 \"Thank you for your help!\" 인사하고 안내받은 줄로 이동한다.",
+            "en": "Thank the staff brightly: 'Thank you for your help!' and head to the priority line."
+          },
+          "feedback": {
+            "ko": "★ 성공! 빠르게 심사를 마치고 입국 허가증(Student/Visitor Permit)을 무사히 수령했습니다.",
+            "en": "★ Success! Cleared immigration rapidly and received all study and visitor permits safely."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 15,
+            "english": 10,
+            "insight": 15,
+            "stamina": 5,
+            "relation": 10
+          },
           "nextScenarioId": 3
         },
         {
           "type": "STABLE",
-          "text": { "ko": "미소 지으며 준비한 서류 뭉치를 내민다.", "en": "Smile and hand over the prepared documents." },
-          "feedback": { "ko": "★ 저런... 심사관의 표정이 더 굳어집니다. 친절보다는 정확한 답변이 필요한 순간입니다.", "en": "★ Oh dear... The officer's face hardens. Accuracy is needed more than kindness right now." },
-          "statChanges": { "funds": 0, "mental": -15, "english": 5, "insight": 10, "stamina": -10, "relation": 0 },
+          "text": {
+            "ko": "혹시 다른 사람들에게 방해가 될까 봐 조용히 고개를 숙여 인사하며 이동한다.",
+            "en": "Politely bow your head in gratitude and walk over to the family queue."
+          },
+          "feedback": {
+            "ko": "긴 대기 시간 없이 수속을 마쳐 아이도 지치지 않고 무사히 심사를 통과했습니다.",
+            "en": "Avoided long waiting times, saving both your energy and keeping Jaden calm."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 20,
+            "english": 0,
+            "insight": 10,
+            "stamina": 10,
+            "relation": 5
+          },
           "nextScenarioId": 3
         },
         {
           "type": "REALIST",
-          "text": { "ko": "긴장을 풀기 위해 주머니 속 사탕을 꺼내 먹는다.", "en": "Eat a candy from your pocket to relax." },
-          "feedback": { "ko": "★ 매운맛! 심사 구역에서 취식이라니요. 보안 요원의 따가운 시선에 켄의 멘탈이 요동칩니다.", "en": "★ Spicy! Eating in the inspection area? Security's sharp glares shake Ken's mental state." },
-          "statChanges": { "funds": 0, "mental": -30, "english": 0, "insight": -10, "stamina": -5, "relation": 0 },
-          "nextScenarioId": 9001
-        }
-      ]
-    },
-    "9001": {
-      "id": 9001,
-      "type": "NORMAL",
-      "day": 1,
-      "episode": 2.1,
-      "title": { "ko": "취조실에서의 고립", "en": "Interrogation Room Isolation" },
-      "backgroundKey": "partyroom_lonely",
-      "description": {
-        "ko": "차가운 방에서 3시간 동안 반복된 질문을 받은 켄(Ken). 텅 빈 지갑보다 텅 빈 자존감이 그를 더 아프게 합니다.",
-        "en": "After 3 hours of repeated questions in a cold room, Ken's hollow pride hurts more than his wallet."
-      },
-      "tip": {
-        "ko": "캐나다 공권력의 차가움을 뼈저리게 느꼈나요? 이곳은 예의보다는 규칙이 우선하는 곳입니다.",
-        "en": "Felt the chill of Canadian authority? Here, rules come before manners."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "질문 내용을 복기하며 영어를 공부한다.", "en": "Review the questions and study English." },
-          "feedback": { "ko": "★ 대박! 켄은 이 치욕적인 순간조차 배움의 기회로 삼습니다. 독한 놈 소리를 듣겠네요.", "en": "★ Amazing! Ken uses even this humiliating moment to learn. People will call him tough." },
-          "statChanges": { "funds": 0, "mental": 5, "english": 15, "insight": 10, "stamina": -20, "relation": 0 },
-          "nextScenarioId": 3
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "가족 사진을 보며 멘탈을 회복한다.", "en": "Look at family photos to recover." },
-          "feedback": { "ko": "★ 울컥... 가족들의 얼굴을 보니 눈시울이 뜨거워집니다. 하지만 켄은 다시 일어섭니다.", "en": "★ Choked up... Seeing family makes his eyes well up, but Ken stands back up." },
-          "statChanges": { "funds": 0, "mental": 30, "english": 0, "insight": 0, "stamina": -10, "relation": 20 },
-          "nextScenarioId": 3
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "영혼이 나간 상태로 짐을 찾으러 간다.", "en": "Head to baggage claim with a hollow soul." },
-          "feedback": { "ko": "★ 뼈아픈... 켄의 몸은 만신창이가 되었지만, 그래도 입국 허가는 받아냈습니다.", "en": "★ Painful... Ken's body is wrecked, but he managed to get the permit." },
-          "statChanges": { "funds": 0, "mental": -20, "english": 5, "insight": 25, "stamina": -40, "relation": 0 },
+          "text": {
+            "ko": "아이 서류와 내 학생 비자 서류가 누락되지 않았는지 연신 확인하느라 허둥지둥한다.",
+            "en": "Obsessively double-check both your study permit and Jaden's visitor documents in a rush."
+          },
+          "feedback": {
+            "ko": "서류는 완벽했지만 불안감 때문에 심장이 쿵쾅거리고 피로도가 쌓입니다.",
+            "en": "Documents were flawless, but constant anxiety raised your stress and fatigue."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": -10,
+            "english": 0,
+            "insight": 10,
+            "stamina": -10,
+            "relation": 0
+          },
           "nextScenarioId": 3
         }
       ]
@@ -122,77 +171,559 @@
       "type": "NORMAL",
       "day": 1,
       "episode": 3,
-      "title": { "ko": "수하물 벨트 앞의 초조함", "en": "Anxiety at the Baggage Belt" },
-      "backgroundKey": "airport",
+      "week": 1,
+      "mainEpisode": 3,
+      "title": {
+        "ko": "공항 택시 탑승: 카시트(Car Seat) 규정과 첫 이동",
+        "en": "Airport Taxi: Car Seat Regulation & First Ride"
+      },
+      "backgroundKey": "city_day",
       "description": {
-        "ko": "벨트가 돌기 시작하고 승객들이 하나둘 떠납니다. 켄(Ken)은 자신의 노란 리본 가방을 애타게 기다립니다.",
-        "en": "The belt starts moving, and passengers leave one by one. Ken desperately waits for his yellow ribbon bag."
+        "ko": "짐 3개와 유모차를 끌고 공항 밖 택시 승강장에 왔습니다. 캐나다는 어린아이 탑승 시 카시트 규정이 엄격한데, 안내원이 영유아 전용 카시트가 장착된 밴 택시를 배차해 줍니다.",
+        "en": "Arriving at the taxi stand with 3 bags and a stroller. Canada has strict child car seat laws, and the attendant assigns a van taxi equipped with a toddler car seat."
       },
       "tip": {
-        "ko": "남의 가방을 잘못 건드리면 '절도범' 오해를 받기 딱 좋습니다. 밴쿠버의 친절은 가방 앞에서 멈춥니다.",
-        "en": "Touching someone else's bag is a shortcut to being mistaken for a thief. Kindness stops at the belt."
+        "ko": "💡 BC주 법률상 만 9세 미만(또는 145cm 미만)은 카시트가 필수입니다. 일반 '택시'는 대중교통 예외 규정이 적용되지만, '우버·개인차·지인 차'는 미착용 시 단속 대상이 되므로 꼭 주의하세요!",
+        "en": "💡 BC law requires child seats for kids under age 9 (or under 145cm). Standard taxis are exempt, but personal cars, Uber, and friend's rides strictly require a car seat by law!"
       },
       "choices": [
         {
           "type": "GROWTH",
-          "text": { "ko": "주변 직원에게 가방이 다 나온 건지 묻는다.", "en": "Ask a staff member if all bags are out." },
-          "feedback": { "ko": "★ 성공! 직원은 아직 더 나올 짐이 있다고 말해줍니다. 켄은 가슴을 쓸어내립니다.", "en": "★ Success! The staff says there's more to come. Ken sighs in relief." },
-          "statChanges": { "funds": 0, "mental": 5, "english": 10, "insight": 15, "stamina": -5, "relation": 5 },
-          "nextScenarioId": 4
+          "text": {
+            "ko": "택시 기사님에게 목적지 주소를 보여주며 아이 카시트 벨트 착용 상태를 함께 체크한다.",
+            "en": "Show the destination address to the driver and double-check Jaden's car seat belt together."
+          },
+          "feedback": {
+            "ko": "★ 성공! 기사님이 꼼꼼한 엄마의 모습에 감탄하며 안전하게 캐나다 첫 숙소까지 운전해 줍니다.",
+            "en": "★ Success! The driver appreciates your safety checks and drives safely to your accommodation."
+          },
+          "statChanges": {
+            "funds": -55,
+            "mental": 15,
+            "english": 10,
+            "insight": 20,
+            "stamina": 0,
+            "relation": 10
+          },
+          "nextScenarioId": 1001
         },
         {
           "type": "STABLE",
-          "text": { "ko": "노란색 리본만 집중해서 쳐다본다.", "en": "Focus only on the yellow ribbon." },
-          "feedback": { "ko": "★ 울컥... 비슷하게 생긴 가방은 많지만 켄의 것은 보이지 않습니다. 불안감이 발끝부터 차오릅니다.", "en": "★ Choked up... Many similar bags, but none are Ken's. Anxiety rises from his toes." },
-          "statChanges": { "funds": 0, "mental": -15, "english": 0, "insight": 5, "stamina": -5, "relation": 0 },
-          "nextScenarioId": 4
+          "text": {
+            "ko": "지친 아이를 카시트에 고정시키고 창밖의 밴쿠버 풍경을 보여주며 다독인다.",
+            "en": "Secure Jaden in the car seat and soothe him while showing the Vancouver views outside."
+          },
+          "feedback": {
+            "ko": "울창한 나무와 깨끗한 거리를 보며 제이든이 호기심을 가집니다. 안도감이 밀려옵니다.",
+            "en": "Seeing lush trees and clean streets sparks Jaden's curiosity, bringing a sense of relief."
+          },
+          "statChanges": {
+            "funds": -55,
+            "mental": 20,
+            "english": 0,
+            "insight": 5,
+            "stamina": 5,
+            "relation": 15
+          },
+          "nextScenarioId": 1001
         },
         {
           "type": "REALIST",
-          "text": { "ko": "분실을 대비해 수하물 표(Tag)를 미리 꺼낸다.", "en": "Prepare the baggage tag just in case." },
-          "feedback": { "ko": "★ 아차... 최악의 상황을 가정하니 손 끝이 떨립니다. 켄은 차가운 현실을 직감합니다.", "en": "★ Oops... Preparing for the worst makes his fingers tremble. Ken senses a cold reality." },
-          "statChanges": { "funds": 0, "mental": -5, "english": 0, "insight": 25, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 4
+          "text": {
+            "ko": "택시 미터기 요금이 빠르게 오르는 것을 보며 가계부 예산을 걱정한다.",
+            "en": "Watch the taxi meter tick up rapidly and worry about your tight budget."
+          },
+          "feedback": {
+            "ko": "팁까지 포함해 $65가 지출되었습니다. 캐나다의 비싼 체감 물가를 실감합니다.",
+            "en": "$65 spent including tips. You feel the reality of Canada's high living cost firsthand."
+          },
+          "statChanges": {
+            "funds": -65,
+            "mental": -10,
+            "english": 0,
+            "insight": 15,
+            "stamina": -5,
+            "relation": 0
+          },
+          "nextScenarioId": 1001
         }
       ]
+    },
+    "1001": {
+      "id": 1001,
+      "type": "SUMMARY",
+      "day": 1,
+      "episode": 4,
+      "week": 1,
+      "title": {
+        "ko": "Day 1 회고: 아이와 함께한 무사 입국",
+        "en": "Day 1 Reflection: Safe Arrival with My Child"
+      },
+      "backgroundKey": "city_night",
+      "description": {
+        "ko": "비행기에서의 울음소리 소동부터 패스트트랙 입국, 안전한 택시 이동까지! 소라는 자신의 피곤함 속에서도 제이든을 완벽히 지켜내며 밴쿠버에서의 첫날을 무사히 마쳤습니다.",
+        "en": "From flight cries to fast-track entry and a safe taxi ride! Despite extreme fatigue, Sora protected Jaden perfectly and completed Day 1 in Vancouver."
+      },
+      "tip": {
+        "ko": "아이와의 유학 정착 첫날: 엄마의 완벽주의보다는 아이와 본인의 체력 안배가 최우선입니다.",
+        "en": "First day of studying abroad with a child: Pacing stamina is more important than perfectionism."
+      },
+      "statChanges": {
+        "funds": 0,
+        "mental": 30,
+        "english": 10,
+        "insight": 20,
+        "stamina": 30,
+        "relation": 20
+      },
+      "nextScenarioId": 10,
+      "choices": []
+    }
+  },
+  "Day2": {
+    "10": {
+      "id": 10,
+      "type": "NORMAL",
+      "day": 2,
+      "episode": 1,
+      "week": 1,
+      "mainEpisode": 1,
+      "title": {
+        "ko": "시차 적응과 아침 식사: 아이 맞춤형 마트 장보기",
+        "en": "Jet Lag & Breakfast: Kid-Friendly Grocery Shopping"
+      },
+      "backgroundKey": "grocery_store",
+      "description": {
+        "ko": "시차 때문에 새벽 4시에 깬 제이든이 배고프다고 떼를 씁니다. 아침 일찍 문을 연 마트(Save-On-Foods)로 가 아이가 마실 우유와 시리얼, 과일을 사려 합니다.",
+        "en": "Jaden wakes up at 4 AM due to jet lag, crying that he's hungry. You visit early-open Save-On-Foods to buy milk, cereal, and fruit."
+      },
+      "tip": {
+        "ko": "💡 캐나다 우유는 유지방 함량(3.25% Homogenized, 2%, 1%, Skim) 구분이 엄격합니다. 아이들에게는 보통 3.25% Homo Milk를 주로 먹입니다.",
+        "en": "💡 Canadian milk is labeled by fat content. 3.25% Homogenized (Homo Milk) is standard for young toddlers."
+      },
+      "choices": [
+        {
+          "type": "STABLE",
+          "text": {
+            "ko": "아이를 카트에 앉히고 빨간색 3.25% Homo Milk와 유기농 바나나를 집어 든다.",
+            "en": "Seat Jaden in the shopping cart and pick up red 3.25% Homo Milk and organic bananas."
+          },
+          "feedback": {
+            "ko": "아이가 바나나를 오물거리며 행복해합니다. 영양도 챙기고 아이 기분도 풀어주었습니다.",
+            "en": "Jaden happily munches on a banana. Nutrition secured and child comforted."
+          },
+          "statChanges": {
+            "funds": -15,
+            "mental": 15,
+            "english": 0,
+            "insight": 15,
+            "stamina": 5,
+            "relation": 15
+          },
+          "nextScenarioId": 11
+        },
+        {
+          "type": "GROWTH",
+          "text": {
+            "ko": "직원에게 어린아이에게 추천하는 시리얼 종류를 물어보고 소통해 본다.",
+            "en": "Ask staff for low-sugar cereal recommendations for young toddlers."
+          },
+          "feedback": {
+            "ko": "★ 성공! 친절한 직원이 설탕이 적은 현지 유기농 아동 시리얼을 추천해 주었습니다.",
+            "en": "★ Success! A helpful staff recommends a popular low-sugar organic cereal for kids."
+          },
+          "statChanges": {
+            "funds": -18,
+            "mental": 10,
+            "english": 10,
+            "insight": 15,
+            "stamina": -5,
+            "relation": 10
+          },
+          "nextScenarioId": 11
+        },
+        {
+          "type": "REALIST",
+          "text": {
+            "ko": "아이 장난감 코너를 지나치다가 떼를 쓰는 제이든을 달래느라 진땀을 뺀다.",
+            "en": "Sweat nervously trying to pull Jaden away from the toy aisle."
+          },
+          "feedback": {
+            "ko": "아이를 달래어 겨우 계산대로 왔지만 아침부터 체력이 크게 고갈되었습니다.",
+            "en": "Managed to distract Jaden, but the tantrum drained your limited stamina."
+          },
+          "statChanges": {
+            "funds": -10,
+            "mental": -15,
+            "english": 0,
+            "insight": 5,
+            "stamina": -20,
+            "relation": -5
+          },
+          "nextScenarioId": 11
+        }
+      ]
+    },
+    "11": {
+      "id": 11,
+      "type": "NORMAL",
+      "day": 2,
+      "episode": 2,
+      "week": 1,
+      "mainEpisode": 2,
+      "title": {
+        "ko": "행정 관문: 아이 데이케어(Daycare) / 학교 등록 상담",
+        "en": "Administrative Step: Daycare & School Board Registration"
+      },
+      "backgroundKey": "office",
+      "description": {
+        "ko": "엄마가 수업을 들을 동안 제이든이 다닐 유치원/데이케어 등록을 위해 교육청(School Board) 사무실을 찾았습니다. 예방접종 영문 증명서와 서류를 제출해야 합니다.",
+        "en": "Visiting the School Board/Daycare office to register Jaden while you attend classes. Immunization records and permits are required."
+      },
+      "tip": {
+        "ko": "💡 캐나다는 아동 예방접종 기록(Immunization Record) 확인이 매우 엄격합니다. 한국 수첩의 영문 변환 서류가 필수입니다.",
+        "en": "💡 Canada strictly verifies children's immunization records. Certified English translation documents are mandatory."
+      },
+      "choices": [
+        {
+          "type": "GROWTH",
+          "text": {
+            "ko": "준비해 온 영문 예방접종 증명서를 제출하며 등록 절차와 대기 순번을 명확히 묻는다.",
+            "en": "Submit your English immunization record and clearly inquire about registration and waitlists."
+          },
+          "feedback": {
+            "ko": "★ 대박! 철저한 서류 준비 덕분에 담당자가 칭찬하며 빠른 서류 승인을 도와주었습니다.",
+            "en": "★ Amazing! The officer praises your thorough prep and speeds up document approval."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 20,
+            "english": 20,
+            "insight": 25,
+            "stamina": -10,
+            "relation": 15
+          },
+          "nextScenarioId": 12
+        },
+        {
+          "type": "STABLE",
+          "text": {
+            "ko": "서류를 차분히 제출하고 아이가 곁에서 색칠 공부를 하도록 그림책을 쥐여준다.",
+            "en": "Hand over the documents calmly and give Jaden a coloring book to keep him busy."
+          },
+          "feedback": {
+            "ko": "아이가 조용히 놀아준 덕분에 차분하게 서류 접수를 마쳤습니다.",
+            "en": "Jaden played quietly, allowing you to complete the paperwork smoothly."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 15,
+            "english": 5,
+            "insight": 10,
+            "stamina": 0,
+            "relation": 20
+          },
+          "nextScenarioId": 12
+        },
+        {
+          "type": "REALIST",
+          "text": {
+            "ko": "비싼 데이케어 비용 안내를 듣고 가슴이 철렁하여 주저한다.",
+            "en": "Gasp and hesitate upon hearing the high monthly cost of local daycare."
+          },
+          "feedback": {
+            "ko": "월 $1,000가 넘는 비용에 머리가 아프지만, 아이 케어를 위해 어쩔 수 없는 지출임을 깨닫습니다.",
+            "en": "Monthly fees exceeding $1,000 cause stress, but you realize it's essential for your child."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": -20,
+            "english": 0,
+            "insight": 15,
+            "stamina": -5,
+            "relation": 0
+          },
+          "nextScenarioId": 12
+        }
+      ]
+    },
+    "12": {
+      "id": 12,
+      "type": "NORMAL",
+      "day": 2,
+      "episode": 3,
+      "week": 1,
+      "mainEpisode": 3,
+      "title": {
+        "ko": "첫 공원 나들이: 놀이터에서의 학부모 소통",
+        "en": "First Park Visit: Connecting with Local Parents at the Playground"
+      },
+      "backgroundKey": "adaptation",
+      "description": {
+        "ko": "서류 접수를 마치고 인근 공원 놀이터에 들렀습니다. 제이든이 현지 아이들과 미끄럼틀을 타는 동안, 곁에 있던 현지 엄마가 반갑게 인사하며 말을 건네옵니다.",
+        "en": "Stopping by a local park playground. While Jaden plays on the slide with local kids, a friendly local mom greets you."
+      },
+      "tip": {
+        "ko": "💡 동네 공원은 현지 학부모들과 육아 정보(육아용품, 병원, 유치원 평가)를 교환하는 최고의 네트워킹 장소입니다.",
+        "en": "💡 Local parks are prime spots to exchange parenting tips, pediatrician info, and daycare reviews with local parents."
+      },
+      "choices": [
+        {
+          "type": "GROWTH",
+          "text": {
+            "ko": "\"Hi! My name is Sora, we just moved from Korea\"라며 반갑게 소통을 시작한다.",
+            "en": "Start a conversation warmly: 'Hi! My name is Sora, we just moved from Korea.'"
+          },
+          "feedback": {
+            "ko": "★ 대박! 현지 엄마가 동네 소아과 추천 정보와 좋은 아동 도서관 프로그램 팁을 가득 전해줍니다.",
+            "en": "★ Amazing! The local mom shares great pediatrician recommendations and library storytime program tips."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 25,
+            "english": 20,
+            "insight": 20,
+            "stamina": -5,
+            "relation": 30
+          },
+          "nextScenarioId": 1002
+        },
+        {
+          "type": "STABLE",
+          "text": {
+            "ko": "따뜻한 미소로 인사를 나누고 제이든이 안전하게 노는지 집중해서 지켜본다.",
+            "en": "Exchange warm smiles and focus on watching Jaden play safely on the equipment."
+          },
+          "feedback": {
+            "ko": "제이든이 신나게 뛰놀며 스트레스를 풀었습니다. 엄마의 마음도 평화로워집니다.",
+            "en": "Jaden releases his stress playing freely, bringing peace and comfort to your heart."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 20,
+            "english": 5,
+            "insight": 10,
+            "stamina": 10,
+            "relation": 10
+          },
+          "nextScenarioId": 1002
+        },
+        {
+          "type": "REALIST",
+          "text": {
+            "ko": "영어 대화가 길어지자 부담을 느끼고 아이에게 \"이제 집에 가자\"며 서둘러 자리를 뜬다.",
+            "en": "Feel overwhelmed as the conversation turns long and quickly tell Jaden 'Time to go home.'"
+          },
+          "feedback": {
+            "ko": "더 놀고 싶어 하는 제이든이 떼를 써서 집으로 오는 길이 피곤해졌습니다.",
+            "en": "Jaden throws a tantrum wanting to play more, making the walk home exhausting."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": -10,
+            "english": 0,
+            "insight": 0,
+            "stamina": -15,
+            "relation": -10
+          },
+          "nextScenarioId": 1002
+        }
+      ]
+    },
+    "1002": {
+      "id": 1002,
+      "type": "SUMMARY",
+      "day": 2,
+      "episode": 4,
+      "week": 1,
+      "title": {
+        "ko": "Day 2 회고: 육아와 정착 행정의 첫걸음",
+        "en": "Day 2 Reflection: First Steps in Parenting & Settlement Admin"
+      },
+      "backgroundKey": "city_night",
+      "description": {
+        "ko": "새벽 시차 장보기부터 데이케어 서류 등록, 공원에서의 학부모 만남까지! 소라는 낮은 체력에도 불구하고 유학맘으로서 최고의 적응력을 보여주었습니다.",
+        "en": "From early morning jet-lag groceries to daycare paperwork and playground networking! Despite low stamina, Sora showed incredible adaptation as a student mom."
+      },
+      "tip": {
+        "ko": "학부모 네트워크 구축: 현지 학부모들과의 관계는 아이의 적응뿐만 아니라 엄마의 멘탈 관리에도 핵심 자산입니다.",
+        "en": "Parent networking: Building ties with local parents is key for both child adaptation and mom's mental well-being."
+      },
+      "statChanges": {
+        "funds": 0,
+        "mental": 30,
+        "english": 15,
+        "insight": 20,
+        "stamina": 30,
+        "relation": 25
+      },
+      "nextScenarioId": 20,
+      "choices": []
     }
   },
   "Day3": {
+    "20": {
+      "id": 20,
+      "type": "NORMAL",
+      "day": 3,
+      "episode": 1,
+      "week": 1,
+      "mainEpisode": 1,
+      "title": {
+        "ko": "아이 동반 대중교통: 유모차 탑승과 버스 기사님의 배려",
+        "en": "Public Transit with Child: Stroller Boarding & Driver's Kindness"
+      },
+      "backgroundKey": "bus_stop",
+      "description": {
+        "ko": "오후에 학교 오리엔테이션 참석을 위해 제이든을 유모차에 태우고 버스 정류장에 서 있습니다. 버스가 오자 기사님이 차체를 낮춰주며(Kneeling Bus) 편하게 오르도록 도와줍니다.",
+        "en": "Standing at the bus stop with Jaden in a stroller to attend campus orientation. The driver lowers the bus (kneeling feature) to help you board easily."
+      },
+      "tip": {
+        "ko": "💡 밴쿠버 TransLink 버스는 휠체어 및 유모차용 전면 공간과 차체 낮춤 기능을 제공합니다. 탑승 시 당황하지 않고 천천히 진입하면 됩니다.",
+        "en": "💡 TransLink buses feature kneeling doors and dedicated stroller areas. Take your time entering calmly."
+      },
+      "choices": [
+        {
+          "type": "GROWTH",
+          "text": {
+            "ko": "기사님에게 \"Thank you so much!\" 인사를 건네고 유모차 전용 공간에 안전하게 브레이크를 채운다.",
+            "en": "Thank the driver heartily and lock the stroller wheels securely in the designated area."
+          },
+          "feedback": {
+            "ko": "★ 성공! 주변 승객들도 자리를 양보해 주어 아이와 함께 안전하고 쾌적하게 이동했습니다.",
+            "en": "★ Success! Passengers offer seats, making the ride safe and comfortable for both of you."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 15,
+            "english": 10,
+            "insight": 15,
+            "stamina": 0,
+            "relation": 20
+          },
+          "nextScenarioId": 21
+        },
+        {
+          "type": "STABLE",
+          "text": {
+            "ko": "아이 손을 꼭 잡고 창밖 풍경을 보여주며 조용히 버스 여정을 즐긴다.",
+            "en": "Hold Jaden's hand tightly and enjoy the bus ride quietly showing him the city sights."
+          },
+          "feedback": {
+            "ko": "제이든이 창밖의 파란 하늘과 커다란 신호등을 보며 즐거워합니다.",
+            "en": "Jaden marvels at the blue sky and big traffic lights, enjoying the peaceful ride."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 20,
+            "english": 0,
+            "insight": 5,
+            "stamina": 5,
+            "relation": 10
+          },
+          "nextScenarioId": 21
+        },
+        {
+          "type": "REALIST",
+          "text": {
+            "ko": "유모차 바퀴가 좁은 문틀에 걸려 당황하며 허둥지둥 진땀을 뺀다.",
+            "en": "Panic as the stroller wheel gets caught briefly in the narrow doorway."
+          },
+          "feedback": {
+            "ko": "기사님이 친절히 도와주셨지만 순간 긴장으로 식은땀이 흘렀습니다.",
+            "en": "The driver kindly assists, but the momentary panic leaves you sweating."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": -15,
+            "english": 0,
+            "insight": 10,
+            "stamina": -15,
+            "relation": 0
+          },
+          "nextScenarioId": 21
+        }
+      ]
+    },
     "21": {
       "id": 21,
       "type": "NORMAL",
       "day": 3,
-      "episode": 1,
-      "title": { "ko": "아침의 벨소리, 반가운 소식", "en": "Morning Ringtone, Good News" },
-      "backgroundKey": "house",
+      "episode": 2,
+      "week": 1,
+      "mainEpisode": 2,
+      "title": {
+        "ko": "캠퍼스 학식 푸드코트: 아동용 키즈밀과 No Tip 경험",
+        "en": "Campus Food Court: Kid's Meal & No Tip Counter Service"
+      },
+      "backgroundKey": "cafe",
       "description": {
-        "ko": "마크와 식사하던 중 켄(Ken)의 휴대폰이 울립니다. 공항 수하물 센터입니다! 짐을 찾았으며 오늘 중으로 배송될 예정이라는 소식에 켄의 심장이 요동칩니다.",
-        "en": "While eating with Mark, Ken's phone rings. It's the airport! The news that his bag was found and will be delivered today makes Ken's heart race."
+        "ko": "학교 중앙 건물(The Nest) 푸드코트에 도착했습니다. 아이가 먹기 좋은 안 매운 치킨 텐더 키즈밀 메뉴를 발견했습니다. 카운터 결제 시 팁 화면이 나타납니다.",
+        "en": "Arriving at the campus food court (The Nest). You find a mild chicken tender kid's meal for Jaden. A tip option appears on the payment screen."
       },
       "tip": {
-        "ko": "배송 기사님이 집 벨을 눌렀을 때 응답이 없으면 짐을 문 앞에 두고 가거나 다시 가져갈 수 있습니다. 전화기를 꼭 곁에 두세요.",
-        "en": "If you don't answer when the driver rings, they might leave the bag at the door or take it back. Keep your phone close."
+        "ko": "💡 캐나다에서 셀프서비스 방식의 푸드코트나 패스트푸드 카운터 결제 시 팁(No Tip / Skip)은 선택사항이며 안 주어도 전혀 무방합니다.",
+        "en": "💡 In Canada, tipping at counter-service food courts or fast food places is optional and completely fine to skip."
       },
       "choices": [
         {
+          "type": "REALIST",
+          "text": {
+            "ko": "카운터 결제이므로 당당하게 'No Tip'을 누르고 아동 세트 메뉴 금액만 정직하게 결제한다.",
+            "en": "Press 'No Tip' on the screen confidently for counter service and pay only for the meal."
+          },
+          "feedback": {
+            "ko": "지갑 보존 성공! 절약한 돈으로 제이든 아비노 아동용 로션을 사기로 다짐합니다.",
+            "en": "Wallet saved! You decide to use the saved money for Jaden's kid lotion later."
+          },
+          "statChanges": {
+            "funds": -12,
+            "mental": 10,
+            "english": 5,
+            "insight": 20,
+            "stamina": 0,
+            "relation": 0
+          },
+          "nextScenarioId": 22
+        },
+        {
           "type": "GROWTH",
-          "text": { "ko": "기쁜 마음에 마크에게 커피를 사겠다고 제안한다.", "en": "Offer to buy Mark coffee in celebration." },
-          "feedback": { "ko": "★ 성공! 켄은 신세를 진 마크에게 고마움을 표합니다. 마크는 켄의 기특한 마음씨에 크게 웃으며 좋아하네요.", "en": "★ Success! Ken expresses gratitude to Mark. Mark laughs heartily, appreciating Ken's thoughtful gesture." },
-          "statChanges": { "funds": -10, "mental": 20, "english": 5, "insight": 10, "stamina": 5, "relation": 35 },
+          "text": {
+            "ko": "점원에게 \"Is this menu mild enough for a 4-year-old?\"라고 매운맛 여부를 확인한다.",
+            "en": "Check with the staff: 'Is this menu mild enough for a 4-year-old?'"
+          },
+          "feedback": {
+            "ko": "★ 성공! 점원이 친절하게 무염 감자튀김으로 변경해 주어 안심하고 아이에게 먹일 수 있게 되었습니다.",
+            "en": "★ Success! Staff kindly substitutes salt-free fries, making the meal perfectly safe for Jaden."
+          },
+          "statChanges": {
+            "funds": -14,
+            "mental": 15,
+            "english": 15,
+            "insight": 15,
+            "stamina": 5,
+            "relation": 10
+          },
           "nextScenarioId": 22
         },
         {
           "type": "STABLE",
-          "text": { "ko": "배송 예정 시간을 다시 한번 정확히 확인한다.", "en": "Double-check the exact delivery time again." },
-          "feedback": { "ko": "켄은 짐을 놓치지 않기 위해 침착하게 메모합니다. 확실한 게 가장 안전하니까요.", "en": "Ken takes notes calmly to ensure he doesn't miss the delivery. Staying sure is the safest way." },
-          "statChanges": { "funds": 0, "mental": 10, "english": 10, "insight": 15, "stamina": 0, "relation": 5 },
-          "nextScenarioId": 22
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "짐이 오기 전까지 밀린 집안일을 돕는다.", "en": "Help with chores until the bag arrives." },
-          "feedback": { "ko": "★ 아차... 너무 열심히 하려다 마크의 아끼는 컵을 깰 뻔했습니다. 과한 열정은 때로 독이 됩니다.", "en": "★ Oops... Almost broke Mark's favorite cup while trying too hard. Excessive zeal can sometimes backfire." },
-          "statChanges": { "funds": -5, "mental": -10, "english": 0, "insight": 15, "stamina": -15, "relation": 10 },
+          "text": {
+            "ko": "눈치가 보여 무심코 15% 팁 버튼을 누르고 안락한 창가 자리에 앉아 아이 밥을 먹인다.",
+            "en": "Unintentionally press the 15% tip button feeling self-conscious, and feed Jaden by the window."
+          },
+          "feedback": {
+            "ko": "예산은 살짝 더 나갔지만 따뜻하고 바삭한 치킨을 제이든이 맛있게 잘 먹어 마음이 뿌듯합니다.",
+            "en": "Spent a bit more, but seeing Jaden enjoy the crispy chicken brings warmth to your heart."
+          },
+          "statChanges": {
+            "funds": -16,
+            "mental": 10,
+            "english": 0,
+            "insight": 0,
+            "stamina": 10,
+            "relation": 5
+          },
           "nextScenarioId": 22
         }
       ]
@@ -201,362 +732,81 @@
       "id": 22,
       "type": "NORMAL",
       "day": 3,
-      "episode": 2,
-      "title": { "ko": "기다림의 시간, 공원 산책", "en": "Waiting Time, Park Stroll" },
-      "backgroundKey": "adaptation",
-      "description": {
-        "ko": "배송까지 시간이 남았습니다. 켄(Ken)은 긴장도 풀 겸 마크가 추천한 근처 공원을 한 바퀴 돌아보기로 합니다.",
-        "en": "There's time before delivery. Ken decides to walk around the nearby park Mark recommended to relax."
-      },
-      "tip": {
-        "ko": "밴쿠버의 공원에는 야생 동물들이 많습니다. 귀엽다고 먹이를 주면 벌금을 물 수 있으니 주의하세요.",
-        "en": "Vancouver parks have plenty of wildlife. Feeding them might be cute, but it can lead to heavy fines."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "산책 중인 현지인에게 가벼운 인사를 건넨다.", "en": "Give a light greeting to a local on a stroll." },
-          "feedback": { "ko": "★ 성공! 용기 낸 인사에 환한 미소가 돌아옵니다. 자신감이 한 뼘 더 자라나는 게 느껴집니다.", "en": "★ Success! A bright smile returns to your brave greeting. You feel your confidence growing." },
-          "statChanges": { "funds": 0, "mental": 15, "english": 20, "insight": 10, "stamina": -5, "relation": 10 },
-          "nextScenarioId": 23
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "벤치에 앉아 푸른 나무들을 보며 명상한다.", "en": "Sit on a bench and meditate while looking at trees." },
-          "feedback": { "ko": "★ 울컥... 숲 향기를 맡으니 밴쿠버에 오길 정말 잘했다는 생각이 듭니다. 마음이 정화됩니다.", "en": "★ Choked up... The forest scent makes you feel glad you came to Vancouver. Your mind is cleared." },
-          "statChanges": { "funds": 0, "mental": 30, "english": 0, "insight": 5, "stamina": 15, "relation": 0 },
-          "nextScenarioId": 23
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "★ 검은 다람쥐를 발견하고 사진을 찍는다!", "en": "★ Spot a black squirrel and take a photo!" },
-          "feedback": { "ko": "★ 대박! 밴쿠버의 명물을 발견했습니다! 왠지 오늘 하루가 행운으로 가득할 것 같네요!", "en": "★ Amazing! You've spotted a Vancouver icon! Somehow, today feels full of luck!" },
-          "statChanges": { "funds": 0, "mental": 40, "english": 0, "insight": 30, "stamina": 5, "relation": 15 },
-          "nextScenarioId": 23
-        }
-      ]
-    },
-    "23": {
-      "id": 23,
-      "type": "NORMAL",
-      "day": 3,
       "episode": 3,
-      "title": { "ko": "캠퍼스 행 버스, 첫 단독 탑승", "en": "Bus to Campus, First Solo Ride" },
-      "backgroundKey": "busstop",
+      "week": 1,
+      "mainEpisode": 3,
+      "title": {
+        "ko": "도서관 어린이 코너(Children's Zone)에서의 쉬는 시간",
+        "en": "Break Time at Library Children's Zone"
+      },
+      "backgroundKey": "classroom",
       "description": {
-        "ko": "켄(Ken)은 짐이 오기 전 학교를 미리 둘러보기로 합니다. 처음으로 혼자 버스 정류장에 서니 왠지 긴장됩니다.",
-        "en": "Ken decides to scout the school before the bag arrives. Standing alone at the bus stop for the first time feels nerve-wracking."
+        "ko": "오리엔테이션 전 남는 시간, 도서관 1층 어린이 도서 구역(Children's Zone)으로 들어왔습니다. 폭신한 매트와 알록달록한 그림책들이 잘 구비되어 있습니다.",
+        "en": "During spare time before orientation, you enter the library's 1st floor Children's Zone, filled with soft mats and picture books."
       },
       "tip": {
-        "ko": "밴쿠버 버스는 거스름돈을 주지 않습니다. 카드가 없다면 정확한 잔돈을 준비하는 매운맛을 경험하게 될 것입니다.",
-        "en": "Vancouver buses don't provide change. If you don't have a card, you'll learn the spicy lesson of needing exact change."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "기사님에게 목적지까지 가는지 영어로 묻는다.", "en": "Ask the driver in English if they go to the destination." },
-          "feedback": { "ko": "★ 성공! 켄은 서툰 영어지만 당당하게 질문합니다. 기사님의 친절한 답변에 안도합니다.", "en": "★ Success! Ken asks boldly in broken English. He's relieved by the driver's kind answer." },
-          "statChanges": { "funds": 0, "mental": 10, "english": 15, "insight": 20, "stamina": -5, "relation": 5 },
-          "nextScenarioId": 24
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "가장 뒷좌석에 앉아 풍경을 감상한다.", "en": "Sit in the back seat and enjoy the scenery." },
-          "feedback": { "ko": "켄은 차창 밖으로 흐르는 밴쿠버의 일상을 눈에 담습니다. 조금씩 이곳이 익숙해집니다.", "en": "Ken takes in the daily life of Vancouver passing by the window. He's slowly getting used to this place." },
-          "statChanges": { "funds": -3, "mental": 15, "english": 0, "insight": 10, "stamina": 5, "relation": 0 },
-          "nextScenarioId": 24
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "하차 벨 대신 줄(Pull Cord)을 당길 준비를 한다.", "en": "Prepare to pull the cord instead of a stop button." },
-          "feedback": { "ko": "★ 아차... 너무 일찍 당기려다 다른 승객의 시선을 받았습니다. 밴쿠버식 벨은 처음이라 당황스럽네요.", "en": "★ Oops... Tried to pull it too early and got stares. Vancouver-style stops are new and confusing." },
-          "statChanges": { "funds": 0, "mental": -15, "english": 0, "insight": 25, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 24
-        }
-      ]
-    },
-    "24": {
-      "id": 24,
-      "type": "NORMAL",
-      "day": 3,
-      "episode": 4,
-      "title": { "ko": "캠퍼스의 미로, 강의실 찾기", "en": "Campus Maze, Finding the Classroom" },
-      "backgroundKey": "adaptation",
-      "description": {
-        "ko": "UBC 캠퍼스에 도착한 켄(Ken). 끝없이 펼쳐진 건물들 사이에서 자신이 수업을 들을 건물을 찾아야 합니다.",
-        "en": "Ken arrives at the UBC campus. Amidst the endless buildings, he must find the one for his class."
-      },
-      "tip": {
-        "ko": "대학교 캠퍼스는 구글 맵만으로는 부족할 수 있습니다. 각 건물 앞의 지도를 확인하는 습관을 들이세요.",
-        "en": "Google Maps might not be enough for a university campus. Get used to checking maps in front of buildings."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "지나가는 학생에게 학생회관의 위치를 묻는다.", "en": "Ask a passing student for the Student Union Building." },
-          "feedback": { "ko": "★ 대박! 켄은 용기를 내어 질문했고, 친절한 학생 덕분에 지름길까지 알아냈습니다!", "en": "★ Amazing! Ken plucked up the courage to ask and even found a shortcut thanks to a kind student!" },
-          "statChanges": { "funds": 0, "mental": 5, "english": 25, "insight": 20, "stamina": -10, "relation": 15 },
-          "nextScenarioId": 25
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "근처 카페에 앉아 지도를 꼼꼼히 살핀다.", "en": "Sit in a nearby cafe and study the map carefully." },
-          "feedback": { "ko": "켄은 서두르지 않고 경로를 파악합니다. 여유로운 마음가짐이 실수를 줄여줍니다.", "en": "Ken takes his time to map out the route. A relaxed mindset reduces mistakes." },
-          "statChanges": { "funds": -5, "mental": 20, "english": 0, "insight": 15, "stamina": 10, "relation": 0 },
-          "nextScenarioId": 25
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "무거운 가방을 메고 직접 발로 뛰어본다.", "en": "Run around with a heavy bag to find it." },
-          "feedback": { "ko": "★ 뼈아픈... 너무 넓은 캠퍼스 탓에 켄은 금세 지쳐버렸습니다. 체력 안배가 절실합니다.", "en": "★ Painful... The massive campus exhausted Ken quickly. Pacing himself is crucial." },
-          "statChanges": { "funds": 0, "mental": -10, "english": 0, "insight": 10, "stamina": -35, "relation": 0 },
-          "nextScenarioId": 25
-        }
-      ]
-    },
-    "25": {
-      "id": 25,
-      "type": "NORMAL",
-      "day": 3,
-      "episode": 5,
-      "title": { "ko": "북스토어의 충격적인 가격표", "en": "Shocking Price Tags at the Bookstore" },
-      "backgroundKey": "office",
-      "description": {
-        "ko": "전공 서적을 사러 북스토어에 들른 켄(Ken). 책 한 권에 200달러가 넘는 것을 보고 자신의 눈을 의심합니다.",
-        "en": "Ken stops by the bookstore to buy textbooks. He can't believe his eyes when he sees a book costing over $200."
-      },
-      "tip": {
-        "ko": "새 책은 매우 비싸지만 중고(Used)나 대여(Rent)를 이용하면 지갑의 매운맛을 중화시킬 수 있습니다.",
-        "en": "New books are very expensive, but buying 'Used' or 'Renting' can neutralize the spicy cost."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "게시판에서 학생들의 직거래 글을 찾는다.", "en": "Look for student direct sale posts on the board." },
-          "feedback": { "ko": "★ 대박! 켄은 현지 학생들의 생존 방식을 직접 체험하며 귀중한 정보를 수집합니다.", "en": "★ Amazing! Ken experiences local students' survival methods and collects valuable info." },
-          "statChanges": { "funds": 0, "mental": 10, "english": 15, "insight": 35, "stamina": -10, "relation": 10 },
-          "nextScenarioId": 26
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "일단 꼭 필요한 책 한 권만 구매한다.", "en": "Just buy one essential book for now." },
-          "feedback": { "ko": "켄은 충동구매 대신 합리적인 선택을 합니다. 남은 예산은 식비로 돌려야 하니까요.", "en": "Ken makes a rational choice instead of an impulse buy. He needs to save for food." },
-          "statChanges": { "funds": -220, "mental": 5, "english": 0, "insight": 15, "stamina": -5, "relation": 0 },
-          "nextScenarioId": 26
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "중고(Used) 서적 매대를 샅샅이 뒤진다.", "en": "Scour the 'Used' book section thoroughly." },
-          "feedback": { "ko": "★ 성공! 운 좋게 상태 좋은 중고책을 반값에 찾아냈습니다. 켄의 경제 관념이 빛납니다!", "en": "★ Success! Luckily found a good-condition used book for half price. Ken's financial sense shines!" },
-          "statChanges": { "funds": 110, "mental": 15, "english": 0, "insight": 25, "stamina": -15, "relation": 0 },
-          "nextScenarioId": 26
-        }
-      ]
-    },
-    "26": {
-      "id": 26,
-      "type": "NORMAL",
-      "day": 3,
-      "episode": 6,
-      "title": { "ko": "집으로 돌아오는 길, 멀리 보이는 트럭", "en": "Way Home, A Truck in the Distance" },
-      "backgroundKey": "busstop",
-      "description": {
-        "ko": "캠퍼스 답사를 마치고 돌아오는 켄(Ken). 집 앞에 낯익은 로고가 그려진 배달 트럭이 멈춰 서 있습니다.",
-        "en": "Ken returns from campus. A delivery truck with a familiar logo is stopped in front of his house."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "기사님에게 달려가 내 가방인지 영어로 묻는다.", "en": "Run to the driver and ask in English if it's your bag." },
-          "feedback": { "ko": "★ 성공! 켄은 당당하게 영어로 확인합니다. 기사님이 엄지를 치켜세우며 가방을 건넵니다.", "en": "★ Success! Ken confirms boldly in English. The driver gives a thumbs up and hands over the bag." },
-          "statChanges": { "funds": 0, "mental": 20, "english": 20, "insight": 15, "stamina": -10, "relation": 10 },
-          "nextScenarioId": 27
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "마크에게 전화해 짐이 온 것 같다고 알린다.", "en": "Call Mark to let him know the bag seems to be here." },
-          "feedback": { "ko": "마크가 함께 기뻐하며 금방 가겠다고 말합니다. 함께 기쁨을 나눌 사람이 있어 다행입니다.", "en": "Mark celebrates and says he'll be right there. Glad to have someone to share the joy with." },
-          "statChanges": { "funds": 0, "mental": 25, "english": 5, "insight": 5, "stamina": 0, "relation": 30 },
-          "nextScenarioId": 27
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "배달 기사님에게 건넬 팁(Tip)을 미리 준비한다.", "en": "Prepare a tip to give to the delivery driver." },
-          "feedback": { "ko": "★ 대박! 켄은 배운 현지 문화를 실천합니다. 기사님이 아주 흡족해하며 가방을 집 안까지 옮겨줍니다.", "en": "★ Amazing! Ken practices the local culture. The driver is satisfied and moves the bag inside." },
-          "statChanges": { "funds": -5, "mental": 10, "english": 5, "insight": 30, "stamina": 5, "relation": 20 },
-          "nextScenarioId": 27
-        }
-      ]
-    },
-    "27": {
-      "id": 27,
-      "type": "NORMAL",
-      "day": 3,
-      "episode": 7,
-      "title": { "ko": "가방 해제, 되찾은 나의 세계", "en": "Unpacking, Reclaiming My World" },
-      "backgroundKey": "travel_case",
-      "description": {
-        "ko": "켄(Ken)은 떨리는 손으로 노란 리본 가방을 엽니다. 익숙한 옷 향기와 소중한 물건들이 켄을 반깁니다.",
-        "en": "Ken opens the yellow ribbon bag with trembling hands. The familiar scent of clothes and precious items welcome him."
-      },
-      "tip": {
-        "ko": "해외 배송된 가방은 파손될 수 있습니다. 중요한 물건이 사라졌다면 즉시 신고해야 매운맛 보상을 받을 수 있습니다.",
-        "en": "Luggage can be damaged during shipping. Report missing items immediately to get your spicy compensation."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "가져온 전공 관련 자료들을 책상에 정리한다.", "en": "Organize major-related materials on the desk." },
-          "feedback": { "ko": "★ 성공! 켄은 학업에 대한 열의를 불태웁니다. 이제 정말 밴쿠버 대학생이 된 기분입니다.", "en": "★ Success! Ken fuels his passion for study. He finally feels like a real Vancouver student." },
-          "statChanges": { "funds": 0, "mental": 15, "english": 5, "insight": 25, "stamina": -10, "relation": 0 },
-          "nextScenarioId": 28
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "가장 아끼는 한국 옷으로 갈아입어 본다.", "en": "Change into your favorite Korean clothes." },
-          "feedback": { "ko": "★ 울컥... 익숙한 옷을 입으니 비로소 켄 자신으로 돌아온 기분입니다. 안도감이 밀려옵니다.", "en": "★ Choked up... Wearing familiar clothes, Ken feels like himself again. A wave of relief washes over him." },
-          "statChanges": { "funds": 0, "mental": 40, "english": 0, "insight": 10, "stamina": 15, "relation": 5 },
-          "nextScenarioId": 28
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "한국에서 가져온 비상식량을 분류해 정리한다.", "en": "Sort and organize emergency food from Korea." },
-          "feedback": { "ko": "★ 아차... 컵라면 한 개가 터져 있네요. 하지만 남은 식량들은 앞으로의 켄을 든든하게 해줄 것입니다.", "en": "★ Oops... One cup noodle burst. But the remaining food will support Ken well." },
-          "statChanges": { "funds": 50, "mental": 5, "english": 0, "insight": 20, "stamina": 10, "relation": 0 },
-          "nextScenarioId": 28
-        }
-      ]
-    },
-    "28": {
-      "id": 28,
-      "type": "NORMAL",
-      "day": 3,
-      "episode": 8,
-      "title": { "ko": "마트 재방문, 고마움의 재료", "en": "Revisiting the Mart, Ingredients of Gratitude" },
-      "backgroundKey": "mart",
-      "description": {
-        "ko": "켄(Ken)은 마크에게 한국 음식을 대접하기 위해 다시 마트를 찾았습니다. 어제보다는 한결 여유로운 발걸음입니다.",
-        "en": "Ken visits the mart again to cook a Korean meal for Mark. His steps are much more relaxed than yesterday."
-      },
-      "tip": {
-        "ko": "현지 마트의 'Asian Food' 코너는 생각보다 비쌉니다. 가성비 좋은 대용량 마트를 찾는 게 지갑에 덜 맵습니다.",
-        "en": "The 'Asian Food' section in local marts is pricier than you'd think. Large wholesalers are less spicy for your wallet."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "직원에게 신선한 고기를 고르는 법을 묻는다.", "en": "Ask staff how to pick fresh meat." },
-          "feedback": { "ko": "★ 성공! 직원의 팁 덕분에 최고의 재료를 골랐습니다. 켄의 생활력이 한층 강화됩니다.", "en": "★ Success! Thanks to the staff's tip, Ken picked the best ingredients. His survival skills grow." },
-          "statChanges": { "funds": -15, "mental": 10, "english": 15, "insight": 20, "stamina": -5, "relation": 5 },
-          "nextScenarioId": 29
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "어제 봐둔 세일 품목들 위주로 장을 본다.", "en": "Shop mostly for the sale items spotted yesterday." },
-          "feedback": { "ko": "켄은 알뜰하게 예산을 집행합니다. 계획적인 소비가 마음의 평화를 가져다줍니다.", "en": "Ken manages his budget thriftily. Planned spending brings peace of mind." },
-          "statChanges": { "funds": 25, "mental": 15, "english": 0, "insight": 15, "stamina": -5, "relation": 0 },
-          "nextScenarioId": 29
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "결제 전 멤버십 할인이 적용되는지 꼭 확인한다.", "en": "Check if membership discounts apply before paying." },
-          "feedback": { "ko": "★ 아차... 하마터면 할인을 놓칠 뻔했네요! 켄의 날카로운 눈매가 10달러를 아껴주었습니다.", "en": "★ Oops... Almost missed the discount! Ken's sharp eyes saved him $10." },
-          "statChanges": { "funds": 10, "mental": 5, "english": 5, "insight": 30, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 29
-        }
-      ]
-    },
-    "29": {
-      "id": 29,
-      "type": "NORMAL",
-      "day": 3,
-      "episode": 9,
-      "title": { "ko": "주방에서의 사투, 첫 요리", "en": "Struggle in the Kitchen, First Cooking" },
-      "backgroundKey": "house",
-      "description": {
-        "ko": "마크를 위해 주방에 선 켄(Ken). 하지만 서양식 인덕션과 낯선 조리 도구들이 켄을 당황하게 만듭니다.",
-        "en": "Ken stands in the kitchen for Mark. But the Western induction and strange tools confuse him."
-      },
-      "tip": {
-        "ko": "북미의 화재 경보기는 매우 예민합니다. 환기 없이 연기를 내면 소방차가 출동하는 매운맛을 보게 됩니다.",
-        "en": "North American smoke detectors are very sensitive. Cooking with smoke and no vent leads to a spicy fire truck visit."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "유튜브로 현지 가전 사용법을 검색하며 익힌다.", "en": "Search YouTube to learn how to use local appliances." },
-          "feedback": { "ko": "★ 성공! 켄은 스스로 문제를 해결하며 요리를 완성해 나갑니다. 독립심이 상승합니다.", "en": "★ Success! Ken finishes cooking by solving problems himself. His independence grows." },
-          "statChanges": { "funds": 0, "mental": 15, "english": 5, "insight": 25, "stamina": -15, "relation": 0 },
-          "nextScenarioId": 30
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "마크에게 솔직하게 도움을 요청한다.", "en": "Frankly ask Mark for help." },
-          "feedback": { "ko": "함께 요리하며 웃음꽃을 피웁니다. 켄은 요리 실력보다 더 소중한 유대감을 얻었습니다.", "en": "They laugh while cooking together. Ken gained a bond more precious than cooking skills." },
-          "statChanges": { "funds": 0, "mental": 25, "english": 5, "insight": 10, "stamina": -5, "relation": 40 },
-          "nextScenarioId": 30
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "최대한 연기가 나지 않는 간단한 메뉴로 변경한다.", "en": "Change to a simple menu that creates minimal smoke." },
-          "feedback": { "ko": "★ 저런... 연기는 안 났지만 맛은 조금 아쉽네요. 마크가 웃으며 괜찮다고 위로해 줍니다.", "en": "★ Oh dear... No smoke, but the taste is lacking. Mark smiles and comforts Ken." },
-          "statChanges": { "funds": 0, "mental": -20, "english": 0, "insight": 20, "stamina": 10, "relation": 10 },
-          "nextScenarioId": 9009
-        }
-      ]
-    },
-    "9009": {
-      "id": 9009,
-      "type": "NORMAL",
-      "day": 3,
-      "episode": 9.1,
-      "title": { "ko": "주방의 식은땀, 요리의 완성", "en": "Sweat in the Kitchen, Finishing the Meal" },
-      "backgroundKey": "house",
-      "description": {
-        "ko": "실수가 있었지만 켄(Ken)은 포기하지 않고 정성을 다해 음식을 완성했습니다. 고소한 냄새가 집 안 가득 퍼집니다.",
-        "en": "Despite mistakes, Ken didn't give up and finished with care. A savory aroma fills the house."
+        "ko": "💡 북미 대학 및 지역 도서관에는 학생 유학맘/유학아빠들을 위한 아동 전용 독서 및 놀이 구역이 잘 구비되어 있습니다.",
+        "en": "💡 North American campus/public libraries offer dedicated family areas for student parents and children."
       },
       "choices": [
         {
           "type": "STABLE",
-          "text": { "ko": "기대하는 마음으로 마크를 식탁으로 부른다.", "en": "Call Mark to the table with anticipation." },
-          "feedback": { "ko": "★ 울컥... 마크가 맛있다며 엄지를 치켜세웁니다. 고생했던 지난 3일의 피로가 씻은 듯 사라집니다.", "en": "★ Choked up... Mark gives a thumbs up, saying it's delicious. The fatigue of the past 3 days vanishes." },
-          "statChanges": { "funds": 0, "mental": 35, "english": 5, "insight": 10, "stamina": 15, "relation": 20 },
-          "nextScenarioId": 30
-        }
-      ]
-    },
-    "30": {
-      "id": 30,
-      "type": "NORMAL",
-      "day": 3,
-      "episode": 10,
-      "title": { "ko": "식사 후의 고요한 대화", "en": "Quiet Talk After the Meal" },
-      "backgroundKey": "house",
-      "description": {
-        "ko": "식사를 마친 켄(Ken)과 마크. 켄은 오늘 하루를 정리하며 마크에게 내일 수업에 대한 조언을 듣습니다.",
-        "en": "Ken and Mark after the meal. Ken listens to Mark's advice for tomorrow's classes while reflecting on the day."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "내일 수업에 대해 적극적으로 묻고 기록한다.", "en": "Actively ask about and record tomorrow's classes." },
-          "feedback": { "ko": "★ 대박! 켄의 열정에 마크가 감동하여 캠퍼스 꿀팁을 전해줍니다. 켄은 무기를 얻은 기분입니다.", "en": "★ Amazing! Impressed by Ken's passion, Mark shares campus tips. Ken feels armed and ready." },
-          "statChanges": { "funds": 0, "mental": 15, "english": 15, "insight": 35, "stamina": -10, "relation": 20 },
+          "text": {
+            "ko": "제이든에게 영어 그림책을 따뜻한 목소리로 읽어주며 함께 여유를 즐긴다.",
+            "en": "Read English picture books warmly to Jaden and enjoy a peaceful moment together."
+          },
+          "feedback": {
+            "ko": "아이의 눈빛이 반짝입니다. 지친 피로가 싹 가시며 멘탈이 크게 회복됩니다.",
+            "en": "Jaden's eyes sparkle with excitement. Fatigue vanishes, greatly restoring your mental energy."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 25,
+            "english": 10,
+            "insight": 10,
+            "stamina": 15,
+            "relation": 20
+          },
           "nextScenarioId": 1003
         },
         {
-          "type": "STABLE",
-          "text": { "ko": "그저 들어준 것에 감사하며 미소 짓는다.", "en": "Just smile and thank him for listening." },
-          "feedback": { "ko": "두 사람 사이에 깊은 유대감이 형성됩니다. 밴쿠버에서의 첫 친구가 마크라서 정말 다행입니다.", "en": "A deep bond forms between them. So lucky that Mark is the first friend in Vancouver." },
-          "statChanges": { "funds": 0, "mental": 30, "english": 0, "insight": 10, "stamina": 20, "relation": 30 },
+          "type": "GROWTH",
+          "text": {
+            "ko": "옆에서 아이와 책을 읽던 다른 유학생 엄마와 서로의 전공과 육아 상황을 공유한다.",
+            "en": "Chat with another student mom nearby, sharing course info and parenting experiences."
+          },
+          "feedback": {
+            "ko": "★ 대박! 캠퍼스 내 '유학생 부모 모임(Student Parent Group)' 소식을 전해 듣고 연락처를 주고받았습니다.",
+            "en": "★ Amazing! Learned about the 'Student Parent Group' on campus and exchanged contact info."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 20,
+            "english": 20,
+            "insight": 20,
+            "stamina": -5,
+            "relation": 30
+          },
           "nextScenarioId": 1003
         },
         {
           "type": "REALIST",
-          "text": { "ko": "내일을 위해 일찍 잠자리에 들 준비를 한다.", "en": "Prepare to go to bed early for tomorrow." },
-          "feedback": { "ko": "★ 성공! 켄은 최상의 컨디션을 위해 휴식을 선택합니다. 내일은 대망의 첫 등교일입니다.", "en": "★ Success! Ken chooses rest for peak condition. Tomorrow is the long-awaited first day." },
-          "statChanges": { "funds": 0, "mental": 15, "english": 0, "insight": 15, "stamina": 35, "relation": 5 },
+          "text": {
+            "ko": "체력이 방전되어 아이에게 그림책을 쥐여주고 매트 구석에서 잠시 눈을 붙인다.",
+            "en": "Hand picture books to Jaden and catch a quick power nap on the mat corner due to fatigue."
+          },
+          "feedback": {
+            "ko": "잠시나마 체력을 비축했습니다. 제이든이 얌전히 그림책을 봐주어 다행이었습니다.",
+            "en": "Restored a bit of physical energy. Fortunate that Jaden stayed quiet looking at pictures."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 10,
+            "english": 0,
+            "insight": 5,
+            "stamina": 25,
+            "relation": 0
+          },
           "nextScenarioId": 1003
         }
       ]
@@ -565,62 +815,196 @@
       "id": 1003,
       "type": "SUMMARY",
       "day": 3,
-      "episode": 11,
-      "title": { "ko": "Day 3 회고: 일상을 되찾고 준비하다", "en": "Day 3 Reflection" },
+      "episode": 4,
+      "week": 1,
+      "title": {
+        "ko": "Day 3 회고: 캠퍼스 속 유학맘의 터전 발견",
+        "en": "Day 3 Reflection: Discovering Student-Parent Safe Havens"
+      },
       "backgroundKey": "city_night",
       "description": {
-        "ko": "드디어 짐을 찾고 학교 갈 준비까지 마친 켄(Ken). 밴쿠버에서의 3일은 혹독했지만 값진 시간이었습니다.",
-        "en": "Finally having his bags and preparing for school, Ken's 3 days in Vancouver were harsh yet invaluable."
+        "ko": "유모차 버스 이동부터 학식 키즈밀 팁 절약, 도서관 어린이 구역에서의 소통까지! 소라는 캠퍼스 내에서 아이와 함께 공존하는 법을 익혀가고 있습니다.",
+        "en": "From stroller transit to saving money on kid meals and networking in the library Children's Zone! Sora is mastering campus life with her child."
       },
-      "statChanges": { "funds": 0, "mental": 40, "english": 0, "insight": 25, "stamina": 80, "relation": 20 },
-      "nextScenarioId": 31,
-      "choices": [
-        {
-          "type": "STABLE",
-          "text": { "ko": "설레는 마음으로 잠자리에 든다.", "en": "Go to bed with excitement." },
-          "feedback": { "ko": "켄의 진짜 대학 생활이 내일 시작됩니다.", "en": "Ken's real college life starts tomorrow." },
-          "statChanges": { "funds": 0, "mental": 0, "english": 0, "insight": 0, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 31
-        }
-      ]
+      "tip": {
+        "ko": "캠퍼스 리소스 활용: 대학 내 Family-friendly 공간과 유학생 부모 모임은 긴 유학 생활의 핵심 지원군입니다.",
+        "en": "Leveraging campus resources: Family spaces and student-parent groups are key allies for long-term success."
+      },
+      "statChanges": {
+        "funds": 0,
+        "mental": 35,
+        "english": 15,
+        "insight": 20,
+        "stamina": 35,
+        "relation": 25
+      },
+      "nextScenarioId": 30,
+      "choices": []
     }
   },
   "Day4": {
+    "30": {
+      "id": 30,
+      "type": "NORMAL",
+      "day": 4,
+      "episode": 1,
+      "week": 1,
+      "mainEpisode": 1,
+      "title": {
+        "ko": "첫 수업 날 아침: 아이 데이케어 등원 길의 눈물",
+        "en": "First Day of Class: Tears at Daycare Drop-off"
+      },
+      "backgroundKey": "dorm_hall",
+      "description": {
+        "ko": "드디어 소라의 첫 수업 날입니다. 제이든을 캠퍼스 내 데이케어센터에 처음 맡기는데, 제이든이 엄마 바지를 잡고 서럽게 웁니다. 선생님이 따뜻하게 아이를 안아주며 다독입니다.",
+        "en": "Sora's first class day. Dropping Jaden off at the campus daycare for the first time, he cries holding your pants. The teacher kindly hugs him."
+      },
+      "tip": {
+        "ko": "💡 북미 데이케어에서는 아이의 적응기(Drop-off anxiety) 동안 의연하고 빠르게 인사하고 돌아서는 것이 아이의 불안을 줄여줍니다.",
+        "en": "💡 During drop-off anxiety, a calm, quick hug and confident goodbye help lower your child's fear."
+      },
+      "choices": [
+        {
+          "type": "STABLE",
+          "text": {
+            "ko": "아이 눈을 맞추며 \"엄마 수업 끝나는 3시에 꼭 데리러 올게!\" 약속하고 씩씩하게 인사한다.",
+            "en": "Look into Jaden's eyes, promise 'I will pick you up at 3 PM after class!' and give a confident hug."
+          },
+          "feedback": {
+            "ko": "★ 울컥... 마음은 아프지만 약속을 들은 제이든이 눈물을 닦고 선생님 손을 잡습니다.",
+            "en": "★ Choked up... Heart aching, but Jaden wipes his tears and holds the teacher's hand after hearing your promise."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 15,
+            "english": 5,
+            "insight": 15,
+            "stamina": -5,
+            "relation": 20
+          },
+          "nextScenarioId": 31
+        },
+        {
+          "type": "GROWTH",
+          "text": {
+            "ko": "선생님에게 \"Thank you. Please text me if he keeps crying\"이라며 당부의 말을 남긴다.",
+            "en": "Tell the teacher in English: 'Thank you. Please text me if he keeps crying.'"
+          },
+          "feedback": {
+            "ko": "선생님이 웃으며 \"Don't worry mama, he'll be fine!\" 하고 안심시켜 줍니다.",
+            "en": "The teacher smiles warmly: 'Don't worry mama, he'll be fine!' easing your mind."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 10,
+            "english": 15,
+            "insight": 15,
+            "stamina": 0,
+            "relation": 15
+          },
+          "nextScenarioId": 31
+        },
+        {
+          "type": "REALIST",
+          "text": {
+            "ko": "발걸음이 떨어지지 않아 밖에서 창문 너머로 10분 동안 아이를 지켜본다.",
+            "en": "Unable to leave, linger outside the window watching Jaden for 10 minutes."
+          },
+          "feedback": {
+            "ko": "아이 걱정에 첫 수업에 지각할 뻔하여 허겁지겁 강의실로 달렸습니다.",
+            "en": "Nearly late for your very first class due to worrying, forcing a nervous sprint."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": -15,
+            "english": 0,
+            "insight": 5,
+            "stamina": -20,
+            "relation": -5
+          },
+          "nextScenarioId": 31
+        }
+      ]
+    },
     "31": {
       "id": 31,
       "type": "NORMAL",
       "day": 4,
-      "episode": 1,
-      "title": { "ko": "첫 등교, 떨리는 버스 정류장", "en": "First Day, Nervous at the Bus Stop" },
-      "backgroundKey": "busstop",
+      "episode": 2,
+      "week": 1,
+      "mainEpisode": 2,
+      "title": {
+        "ko": "첫 오리엔테이션 강의: 엄마라는 아이덴티티와 학업",
+        "en": "First Orientation Lecture: Balancing Motherhood & Academics"
+      },
+      "backgroundKey": "classroom",
       "description": {
-        "ko": "드디어 첫 등교 날입니다. 켄(Ken)은 마크가 알려준 정류장에서 버스를 기다립니다. 밴쿠버의 아침 공기는 상쾌하면서도 왠지 모를 긴장감을 줍니다.",
-        "en": "Finally, the first day of school. Ken waits for the bus at the stop Mark told him about. The morning air is crisp but filled with a strange tension."
+        "ko": "강의실에 도착해 첫 오리엔테이션 수업이 시작되었습니다. 교수가 수강생들에게 간단한 자기소개를 요청합니다.",
+        "en": "Arriving at the classroom as the orientation starts. The professor asks students for brief self-introductions."
       },
       "tip": {
-        "ko": "밴쿠버 버스는 한국처럼 실내 전광판이 친절하지 않은 경우가 많습니다. 구글 맵의 GPS를 뚫어지게 보지 않으면 엉뚱한 숲속에 내리는 매운맛을 볼 수 있습니다.",
-        "en": "Vancouver buses often have unreliable displays. If you don't stare at your GPS, you might end up in the middle of a forest."
+        "ko": "💡 북미 대학은 다양한 배경(일하는 부모, 유학맘 등)의 학생들을 매우 존중합니다. 솔직한 자기소개가 호감을 사기 좋습니다.",
+        "en": "💡 North American universities deeply respect diverse student backgrounds, including student parents."
       },
       "choices": [
         {
           "type": "GROWTH",
-          "text": { "ko": "옆에 있는 학생에게 캠퍼스행 버스가 맞는지 묻는다.", "en": "Ask the student next to you if this is the bus for campus." },
-          "feedback": { "ko": "★ 성공! 켄은 용기를 내어 말을 걸었습니다. 같은 수업을 듣는 친구일지도 모른다는 생각에 설렙니다.", "en": "★ Success! Ken plucked up the courage to speak. He's excited that they might be in the same class." },
-          "statChanges": { "funds": 0, "mental": 5, "english": 15, "insight": 10, "stamina": -5, "relation": 10 },
+          "text": {
+            "ko": "\"I'm Sora from Korea, raising a 4-year-old while pursuing my passion here!\" 당당하게 소개한다.",
+            "en": "Introduce yourself proudly: 'I'm Sora from Korea, raising a 4-year-old while pursuing my passion here!'"
+          },
+          "feedback": {
+            "ko": "★ 대박! 클래스 전체에서 격려의 박수가 쏟아졌고 교수님도 당당한 모습에 깊은 인상을 받았습니다.",
+            "en": "★ Amazing! Warm applause erupts across the room, and the professor is deeply impressed."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 25,
+            "english": 25,
+            "insight": 20,
+            "stamina": -10,
+            "relation": 35
+          },
           "nextScenarioId": 32
         },
         {
           "type": "STABLE",
-          "text": { "ko": "버스 앱을 반복해서 확인하며 침착하게 기다린다.", "en": "Calmly wait while repeatedly checking the bus app." },
-          "feedback": { "ko": "켄은 철저한 확인을 통해 불안감을 지웁니다. 실수를 줄이는 것이 켄의 가장 큰 무기입니다.", "en": "Ken erases anxiety through thorough checking. Reducing mistakes is Ken's greatest weapon." },
-          "statChanges": { "funds": 0, "mental": 15, "english": 0, "insight": 15, "stamina": 5, "relation": 0 },
+          "text": {
+            "ko": "전공에 대한 흥미와 한국에서의 경험 위주로 차분하게 자기소개를 마친다.",
+            "en": "Calmly introduce your academic interests and career experience in Korea."
+          },
+          "feedback": {
+            "ko": "무난하고 정돈된 발표로 깔끔한 첫인상을 남겼습니다.",
+            "en": "Delivered a neat and organized introduction, leaving a favorable first impression."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 15,
+            "english": 10,
+            "insight": 10,
+            "stamina": -5,
+            "relation": 15
+          },
           "nextScenarioId": 32
         },
         {
           "type": "REALIST",
-          "text": { "ko": "환불받지 못할 수 있으니 트래블 카드의 잔액을 확인한다.", "en": "Check the Travel Card balance as it might not be refundable." },
-          "feedback": { "ko": "★ 아차... 잔액이 아슬아슬하네요. 켄은 미리 확인하길 잘했다고 생각하며 가슴을 쓸어내립니다.", "en": "★ Oops... The balance is low. Ken is relieved he checked in advance." },
-          "statChanges": { "funds": 0, "mental": -5, "english": 0, "insight": 25, "stamina": 0, "relation": 0 },
+          "text": {
+            "ko": "영어가 틀릴까 봐 조용히 준비해 둔 서식대로 대본만 읽듯 짧게 넘어간다.",
+            "en": "Read briefly from a pre-written script fearing potential English mistakes."
+          },
+          "feedback": {
+            "ko": "발표는 끝났지만 다른 학생들과 인상 깊은 연결고리를 만들지는 못했습니다.",
+            "en": "Finished the intro, but missed making a strong connection with classmates."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 0,
+            "english": 5,
+            "insight": 5,
+            "stamina": 0,
+            "relation": 0
+          },
           "nextScenarioId": 32
         }
       ]
@@ -629,333 +1013,81 @@
       "id": 32,
       "type": "NORMAL",
       "day": 4,
-      "episode": 2,
-      "title": { "ko": "UBC의 웅장함, 그리고 상실감", "en": "UBC's Grandeur, and Feeling Lost" },
-      "backgroundKey": "adaptation",
-      "description": {
-        "ko": "버스에서 내린 켄(Ken)을 맞이한 것은 끝도 없이 펼쳐진 캠퍼스입니다. 건물이 너무 많아 어디로 가야 할지 갈피를 잡을 수 없습니다.",
-        "en": "A campus that stretches forever welcomes Ken. With so many buildings, he has no idea where to go."
-      },
-      "tip": {
-        "ko": "캠퍼스가 너무 넓어 건물 간 이동에만 20분 이상 소요될 수 있습니다. 길을 잃는 순간 지각이라는 매운맛 결말이 기다립니다.",
-        "en": "Moving between buildings can take over 20 minutes. Getting lost leads to the spicy ending of being late."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "지나가는 과잠을 입은 학생에게 길을 묻는다.", "en": "Ask a student in a varsity jacket for directions." },
-          "feedback": { "ko": "★ 대박! 켄은 적극적으로 소통하여 지름길을 알아냈습니다. 영어 실력이 1점 상승한 기분입니다.", "en": "★ Amazing! Ken actively communicated and found a shortcut. He feels his English has improved." },
-          "statChanges": { "funds": 0, "mental": 10, "english": 20, "insight": 15, "stamina": -10, "relation": 15 },
-          "nextScenarioId": 33
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "캠퍼스 지도를 보며 천천히 걸어간다.", "en": "Walk slowly while looking at the campus map." },
-          "feedback": { "ko": "켄은 여유를 가지고 캠퍼스 분위기를 만끽합니다. 서두르지 않는 것이 오늘 켄의 전략입니다.", "en": "Ken takes his time to enjoy the campus vibe. Not rushing is Ken's strategy today." },
-          "statChanges": { "funds": 0, "mental": 20, "english": 0, "insight": 10, "stamina": 5, "relation": 0 },
-          "nextScenarioId": 33
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "시간을 아끼기 위해 킥보드 대여를 알아본다.", "en": "Look into renting a scooter to save time." },
-          "feedback": { "ko": "★ 뼈아픈... 대여 비용이 생각보다 너무 비쌉니다. 켄은 자신의 빈약한 자금을 생각하며 포기합니다.", "en": "★ Painful... The rental cost is way too high. Ken gives up, thinking of his meager funds." },
-          "statChanges": { "funds": -5, "mental": -20, "english": 5, "insight": 20, "stamina": -10, "relation": 0 },
-          "nextScenarioId": 33
-        }
-      ]
-    },
-    "33": {
-      "id": 33,
-      "type": "NORMAL",
-      "day": 4,
       "episode": 3,
-      "title": { "ko": "강의실 도착, 낯선 시선들", "en": "Arriving at the Classroom, Unfamiliar Gazes" },
-      "backgroundKey": "office",
+      "week": 1,
+      "mainEpisode": 3,
+      "title": {
+        "ko": "하원 시간(3 PM): 제이든의 밝은 미소와 첫날 감동",
+        "en": "Pick-up Time (3 PM): Jaden's Bright Smile & Relief"
+      },
+      "backgroundKey": "dorm_hall",
       "description": {
-        "ko": "드디어 강의실 문을 엽니다. 이미 많은 학생이 앉아 이야기를 나누고 있습니다. 켄(Ken)은 어디에 앉아야 할지 고민에 빠집니다.",
-        "en": "Finally opening the classroom door. Many students are already chatting. Ken wonders where to sit."
+        "ko": "수업이 끝나자마자 헐레벌떡 데이케어로 달려왔습니다. 문이 열리자 제이든이 그려둔 그림을 들고 \"엄마~!\" 하며 달려와 품에 안깁니다.",
+        "en": "Sprinting to the daycare right after class. The door opens and Jaden runs into your arms holding his drawing: 'Mommy~!'"
       },
       "tip": {
-        "ko": "밴쿠버 대학 수업은 토론 중심이 많습니다. 구석에 앉으면 교수님의 타겟이 될 수 있으니 눈치를 잘 봐야 합니다.",
-        "en": "University classes in Vancouver are discussion-heavy. Sitting in the corner might make you a target for the professor."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "가장 앞자리에 앉아 교수님과 눈을 맞춘다.", "en": "Sit in the front row and make eye contact with the professor." },
-          "feedback": { "ko": "★ 대박! 켄은 학구열을 불태웁니다. 교수님이 켄의 열정적인 눈빛을 눈여겨보는 것 같습니다.", "en": "★ Amazing! Ken fuels his passion for learning. The professor seems to notice Ken's enthusiastic gaze." },
-          "statChanges": { "funds": 0, "mental": 10, "english": 5, "insight": 30, "stamina": -15, "relation": 10 },
-          "nextScenarioId": 34
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "중간쯤 빈자리에 앉아 주변을 살핀다.", "en": "Sit in a middle seat and observe surroundings." },
-          "feedback": { "ko": "켄은 튀지 않으면서도 흐름을 놓치지 않으려 합니다. 안정적인 시작을 선택했네요.", "en": "Ken tries to fit in without missing the flow. He chose a stable start." },
-          "statChanges": { "funds": 0, "mental": 20, "english": 0, "insight": 10, "stamina": 5, "relation": 5 },
-          "nextScenarioId": 34
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "콘센트가 있는 자리를 찾아 노트북을 세팅한다.", "en": "Find a seat with an outlet and set up the laptop." },
-          "feedback": { "ko": "★ 성공! 배터리 걱정 없이 수업에 집중할 수 있게 되었습니다. 역시 개발자다운 실용적인 선택입니다.", "en": "★ Success! Now he can focus without battery worries. A practical choice befitting a developer." },
-          "statChanges": { "funds": 0, "mental": 15, "english": 0, "insight": 25, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 34
-        }
-      ]
-    },
-    "34": {
-      "id": 34,
-      "type": "NORMAL",
-      "day": 4,
-      "episode": 4,
-      "title": { "ko": "첫 강의, 쏟아지는 영어의 홍수", "en": "First Lecture, A Flood of English" },
-      "backgroundKey": "office",
-      "description": {
-        "ko": "수업이 시작되었습니다. 교수님의 빠른 영어와 전문 용어들이 켄(Ken)의 귓가를 스쳐 지나갑니다. 암호학 수업이라 그런지 더 어렵게 느껴집니다.",
-        "en": "Class has started. Fast English and jargon brush past Ken's ears. Being a cryptography class, it feels even harder."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "모르는 용어를 즉시 받아 적고 질문을 준비한다.", "en": "Instantly write down unknown terms and prepare questions." },
-          "feedback": { "ko": "★ 성공! 켄은 어려움 속에서도 배움의 끈을 놓지 않습니다. 영어와 전공 지식이 동시에 상승합니다.", "en": "★ Success! Ken doesn't let go of the thread of learning. English and major knowledge rise together." },
-          "statChanges": { "funds": 0, "mental": -15, "english": 20, "insight": 25, "stamina": -20, "relation": 0 },
-          "nextScenarioId": 35
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "전체적인 맥락을 파악하며 녹음을 시작한다.", "en": "Understand the context and start recording." },
-          "feedback": { "ko": "켄은 나중을 기약하며 기록에 집중합니다. 지금은 다 이해하지 못해도 괜찮다고 스스로를 다독입니다.", "en": "Ken focuses on recording for later. He comforts himself that it's okay not to understand everything now." },
-          "statChanges": { "funds": 0, "mental": 10, "english": 5, "insight": 15, "stamina": -5, "relation": 0 },
-          "nextScenarioId": 35
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "교안 파일의 텍스트를 번역기에 돌린다.", "en": "Run the lecture material's text through a translator." },
-          "feedback": { "ko": "★ 아차... 번역 결과가 더 암호 같습니다. 켄은 역시 공짜로 얻는 지식은 없다는 걸 깨닫습니다.", "en": "★ Oops... The translation looks more like a code. Ken realizes there's no free lunch in knowledge." },
-          "statChanges": { "funds": 0, "mental": -20, "english": 0, "insight": 10, "stamina": -10, "relation": 0 },
-          "nextScenarioId": 35
-        }
-      ]
-    },
-    "35": {
-      "id": 35,
-      "type": "NORMAL",
-      "day": 4,
-      "episode": 5,
-      "title": { "ko": "자기소개의 시간, 심장이 멎을 듯한 위기", "en": "Self-Intro Time, Heart-Stopping Crisis" },
-      "backgroundKey": "office",
-      "description": {
-        "ko": "교수님이 갑자기 돌아가며 자기소개를 시킵니다. 앞 학생들의 유창한 영어를 들을수록 켄(Ken)의 손바닥에 땀이 맺힙니다.",
-        "en": "The professor suddenly asks everyone to introduce themselves. Hearing others' fluent English makes Ken's palms sweat."
-      },
-      "tip": {
-        "ko": "밴쿠버에서는 겸손보다 자신감이 중요합니다. 목소리가 작으면 영어 실력보다 자신감 부족으로 무시당하는 매운맛을 볼 수 있습니다.",
-        "en": "Confidence is more important than modesty in Vancouver. Small voices can lead to the spicy result of being ignored."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "서툴러도 준비한 자신의 경력을 당당하게 말한다.", "en": "Boldly talk about your career despite the broken English." },
-          "feedback": { "ko": "★ 대박! 12년 차 개발자의 포스가 서툰 영어를 압도했습니다. 학생들의 눈빛이 경외심으로 바뀝니다.", "en": "★ Amazing! The aura of a 12-year dev overwhelmed the broken English. Students look at him with awe." },
-          "statChanges": { "funds": 0, "mental": 15, "english": 25, "insight": 20, "stamina": -25, "relation": 30 },
-          "nextScenarioId": 36
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "짧고 정중한 인사로 마무리한다.", "en": "End with a short and polite greeting." },
-          "feedback": { "ko": "켄은 큰 무리 없이 첫인사를 마쳤습니다. 안도감이 밀려오며 긴장이 조금 풀립니다.", "en": "Ken finished his first intro without major issues. Relief washes over as tension eases slightly." },
-          "statChanges": { "funds": 0, "mental": 10, "english": 5, "insight": 5, "stamina": -10, "relation": 15 },
-          "nextScenarioId": 36
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "나이와 경력을 생략하고 학생 신분만 강조한다.", "en": "Omit age and career, only emphasize student status." },
-          "feedback": { "ko": "★ 저런... 너무 무난했나요? 학생들의 관심이 금세 다른 곳으로 쏠립니다. 켄은 조금 씁쓸해집니다.", "en": "★ Oh dear... Was it too plain? Students' interest shifts elsewhere. Ken feels a bit bitter." },
-          "statChanges": { "funds": 0, "mental": -20, "english": 0, "insight": 10, "stamina": -5, "relation": -10 },
-          "nextScenarioId": 36
-        }
-      ]
-    },
-    "36": {
-      "id": 36,
-      "type": "NORMAL",
-      "day": 4,
-      "episode": 6,
-      "title": { "ko": "쉬는 시간, 제이와의 첫 대화", "en": "Break Time, First Chat with Jay" },
-      "backgroundKey": "cafe",
-      "description": {
-        "ko": "잠시 쉬는 시간, 옆자리에 앉은 '제이'가 말을 걸어옵니다. 켄(Ken)은 당황하면서도 친구를 사귈 기회라고 생각합니다.",
-        "en": "During the break, 'Jay' from the next seat talks to him. Ken is flustered but thinks it's a chance to make a friend."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "용기를 내어 수업 내용에 대해 먼저 물어본다.", "en": "Take courage and ask about the class content first." },
-          "feedback": { "ko": "★ 대박! 제이가 켄의 열정에 호응하며 친절하게 답해줍니다. 공부 파트너가 생길 것 같네요.", "en": "★ Amazing! Jay responds to Ken's passion kindly. Seems like a study partner is born." },
-          "statChanges": { "funds": 0, "mental": 15, "english": 20, "insight": 15, "stamina": -5, "relation": 40 },
-          "nextScenarioId": 37
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "어디서 왔는지 가벼운 스몰 토크를 나눈다.", "en": "Have a light small talk about where he's from." },
-          "feedback": { "ko": "켄은 제이와 웃으며 대화를 이어갑니다. 밴쿠버에서의 첫 인간관계가 시작되었습니다.", "en": "Ken continues the conversation with a smile. The first relationship in Vancouver has begun." },
-          "statChanges": { "funds": 0, "mental": 20, "english": 10, "insight": 5, "stamina": 5, "relation": 30 },
-          "nextScenarioId": 37
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "연락처를 교환하자고 제안한다.", "en": "Suggest exchanging contact information." },
-          "feedback": { "ko": "★ 아차... 제이가 조금 당황한 눈치입니다. 서구권에서는 너무 급한 연락처 공유는 조심해야 합니다.", "en": "★ Oops... Jay seems a bit taken aback. Be careful with hasty contact sharing in the West." },
-          "statChanges": { "funds": 0, "mental": -15, "english": 5, "insight": 25, "stamina": 0, "relation": -10 },
-          "nextScenarioId": 37
-        }
-      ]
-    },
-    "37": {
-      "id": 37,
-      "type": "NORMAL",
-      "day": 4,
-      "episode": 7,
-      "title": { "ko": "학생증 발급, 본격적인 관문", "en": "Issuing Student ID, The Real Gateway" },
-      "backgroundKey": "office",
-      "description": {
-        "ko": "수업 후 켄(Ken)은 학생증을 발급받으러 갑니다. 줄이 길게 늘어서 있고 행정 직원의 태도는 무척이나 사무적입니다.",
-        "en": "After class, Ken goes to get his student ID. The line is long and the staff's attitude is very business-like."
-      },
-      "tip": {
-        "ko": "학생증은 대중교통 할인(U-Pass)의 핵심입니다. 발급이 늦어지면 교통비 폭탄이라는 매운맛을 경험하게 됩니다.",
-        "en": "Student ID is key for U-Pass. Delays in issuance will lead to a spicy bomb of transportation costs."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "영어로 당당하게 필요 서류를 확인하고 질문한다.", "en": "Confirm required documents and ask questions boldly in English." },
-          "feedback": { "ko": "★ 성공! 켄은 막힘없이 업무를 처리합니다. 행정 절차에 대한 자신감이 한층 높아집니다.", "en": "★ Success! Ken handles the task without a hitch. His confidence in administrative procedures grows." },
-          "statChanges": { "funds": 0, "mental": 10, "english": 15, "insight": 20, "stamina": -15, "relation": 5 },
-          "nextScenarioId": 38
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "조용히 내 차례를 기다리며 주변을 구경한다.", "en": "Quietly wait for your turn and look around." },
-          "feedback": { "ko": "켄은 인내심을 가지고 기다립니다. 다양한 국적의 학생들을 보며 밴쿠버의 다양성을 느낍니다.", "en": "Ken waits patiently. He feels Vancouver's diversity while looking at students of various nationalities." },
-          "statChanges": { "funds": 0, "mental": 15, "english": 0, "insight": 15, "stamina": -5, "relation": 0 },
-          "nextScenarioId": 38
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "줄이 너무 기니 내일 다시 올지 고민한다.", "en": "Consider coming back tomorrow since the line is too long." },
-          "feedback": { "ko": "★ 뼈아픈... 내일도 줄은 여전히 길 것입니다. 켄은 포기하려다 마크의 조언을 떠올리며 마음을 다잡습니다.", "en": "★ Painful... The line will still be long tomorrow. Ken almost gave up but recalled Mark's advice." },
-          "statChanges": { "funds": 0, "mental": -30, "english": 0, "insight": 10, "stamina": -10, "relation": 0 },
-          "nextScenarioId": 38
-        }
-      ]
-    },
-    "38": {
-      "id": 38,
-      "type": "NORMAL",
-      "day": 4,
-      "episode": 8,
-      "title": { "ko": "학생 식당에서의 첫 끼", "en": "First Meal at the Student Cafeteria" },
-      "backgroundKey": "cafe",
-      "description": {
-        "ko": "드디어 허기가 몰려옵니다. 켄(Ken)은 학생회관(SUB) 식당가에 도착했습니다. 다양한 음식 냄새가 켄을 유혹합니다.",
-        "en": "Hunger finally sets in. Ken arrives at the SUB food court. Various food smells tempt him."
-      },
-      "tip": {
-        "ko": "캠퍼스 식당 가격도 만만치 않습니다. 매일 사 먹다간 한 달 치 생활비가 일주일 만에 로그아웃되는 매운맛을 봅니다.",
-        "en": "Campus food isn't cheap. Eating out every day will logout your monthly budget in a week."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "현지 학생들이 가장 많이 줄 선 곳을 찾아 주문한다.", "en": "Find the place where local students are lined up most and order." },
-          "feedback": { "ko": "★ 성공! 켄은 밴쿠버 대학생들이 좋아하는 맛을 발견했습니다. 메뉴 선택은 대성공입니다.", "en": "★ Success! Ken discovered the taste Vancouver students love. The menu choice is a hit." },
-          "statChanges": { "funds": -15, "mental": 20, "english": 5, "insight": 25, "stamina": 15, "relation": 10 },
-          "nextScenarioId": 39
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "가장 익숙한 브랜드의 샌드위치를 고른다.", "en": "Pick a sandwich from a familiar brand." },
-          "feedback": { "ko": "켄은 아는 맛을 선택해 실패를 줄입니다. 안정적인 식사 덕분에 오후를 버틸 힘이 생깁니다.", "en": "Ken chooses a known taste to reduce failure. A stable meal gives him strength for the afternoon." },
-          "statChanges": { "funds": -10, "mental": 15, "english": 0, "insight": 5, "stamina": 20, "relation": 0 },
-          "nextScenarioId": 39
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "학생 할인이 되는 메뉴가 있는지 샅샅이 뒤진다.", "en": "Scour for menus with student discounts." },
-          "feedback": { "ko": "★ 아차... 학생 할인은 이미 학생증이 있어야 가능합니다. 켄은 아까 발급받지 않은 것을 후회합니다.", "en": "★ Oops... Student discounts require the ID. Ken regrets not getting it earlier." },
-          "statChanges": { "funds": -20, "mental": -25, "english": 0, "insight": 20, "stamina": 5, "relation": 0 },
-          "nextScenarioId": 39
-        }
-      ]
-    },
-    "39": {
-      "id": 39,
-      "type": "NORMAL",
-      "day": 4,
-      "episode": 9,
-      "title": { "ko": "도서관 답사, 공부의 열기", "en": "Library Scout, Heat of Study" },
-      "backgroundKey": "office",
-      "description": {
-        "ko": "식사 후 켄(Ken)은 도서관에 들릅니다. 방대한 책들과 열정적으로 공부하는 학생들의 모습에 압도당합니다.",
-        "en": "After eating, Ken stops by the library. He is overwhelmed by the vast books and passionate students."
-      },
-      "choices": [
-        {
-          "type": "GROWTH",
-          "text": { "ko": "오늘 수업 시간에 들은 전문 서적을 찾아본다.", "en": "Look for the professional books mentioned in class." },
-          "feedback": { "ko": "★ 대박! 켄은 필요한 정보를 정확히 찾아냈습니다. 12년 차 개발자의 정보 검색 능력이 빛을 발합니다.", "en": "★ Amazing! Ken found exactly the info he needed. His 12-year dev search skills shine." },
-          "statChanges": { "funds": 0, "mental": 10, "english": 10, "insight": 40, "stamina": -15, "relation": 0 },
-          "nextScenarioId": 40
-        },
-        {
-          "type": "STABLE",
-          "text": { "ko": "공부하기 좋은 조용한 자리를 미리 찜해둔다.", "en": "Pick out a quiet spot good for studying in advance." },
-          "feedback": { "ko": "켄은 자신만의 명당을 발견했습니다. 앞으로 이곳이 켄의 아지트가 될 것 같네요.", "en": "Ken found his own perfect spot. Seems like this will be his hideout." },
-          "statChanges": { "funds": 0, "mental": 25, "english": 0, "insight": 20, "stamina": -5, "relation": 5 },
-          "nextScenarioId": 40
-        },
-        {
-          "type": "REALIST",
-          "text": { "ko": "도서관의 와이파이 속도를 체크한다.", "en": "Check the library's Wi-Fi speed." },
-          "feedback": { "ko": "★ 성공! 엄청난 속도에 감탄합니다. 켄은 이제 이곳에서 과제 할 생각에 벌써 든든합니다.", "en": "★ Success! Impressed by the speed. Ken feels secure about doing assignments here." },
-          "statChanges": { "funds": 0, "mental": 15, "english": 0, "insight": 30, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 40
-        }
-      ]
-    },
-    "40": {
-      "id": 40,
-      "type": "NORMAL",
-      "day": 4,
-      "episode": 10,
-      "title": { "ko": "집으로 오는 길, 첫 등교의 무게", "en": "Way Home, Weight of the First Day" },
-      "backgroundKey": "busstop",
-      "description": {
-        "ko": "하루가 저뭅니다. 켄(Ken)은 버스 창에 머리를 기대고 오늘 하루를 떠올립니다. 몸은 지쳤지만 마음은 무언가로 가득 찬 기분입니다.",
-        "en": "The day ends. Ken leans against the bus window, reflecting. Exhausted body, but a full heart."
+        "ko": "💡 픽업 시간 준수는 데이케어의 가장 중요한 규칙입니다. 지연 시 분당 높은 늦은 픽업 벌금(Late pick-up fee)이 부과됩니다.",
+        "en": "💡 Timely pick-up is strictly enforced. Late pick-ups incur steep per-minute penalty fees."
       },
       "choices": [
         {
           "type": "STABLE",
-          "text": { "ko": "오늘 사귄 제이에게 짧은 안부 문자를 보낸다.", "en": "Send a short text to Jay, whom you met today." },
-          "feedback": { "ko": "★ 성공! 제이에게서 내일 보자는 답장이 왔습니다. 켄의 밴쿠버 인맥이 한 명 더 늘었습니다.", "en": "★ Success! Jay replied saying 'See you tomorrow.' Ken's network grows by one." },
-          "statChanges": { "funds": 0, "mental": 30, "english": 5, "insight": 10, "stamina": 10, "relation": 35 },
+          "text": {
+            "ko": "제이든을 꼬욱 안아주며 \"우리 제이든 오늘 정말 대견하다!\"라며 폭풍 칭찬해 준다.",
+            "en": "Hug Jaden tightly and shower him with praise: 'I'm so proud of you today, Jaden!'"
+          },
+          "feedback": {
+            "ko": "★ 울컥... 제이든이 안도하며 환하게 웃습니다. 하루의 피로가 싹 가시는 최고의 감동적인 순간입니다.",
+            "en": "★ Choked up... Jaden smiles brightly in relief. Pure joy washes away all your daily exhaustion."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 35,
+            "english": 0,
+            "insight": 10,
+            "stamina": 20,
+            "relation": 30
+          },
           "nextScenarioId": 1004
         },
         {
           "type": "GROWTH",
-          "text": { "ko": "오늘 배운 암호학 용어들을 다시 복습한다.", "en": "Review the cryptography terms learned today." },
-          "feedback": { "ko": "★ 대박! 켄의 열정은 식지 않습니다. 피곤함도 잊은 채 켄은 배움의 즐거움에 빠집니다.", "en": "★ Amazing! Ken's passion doesn't cool down. Forgetting fatigue, he enjoys the pleasure of learning." },
-          "statChanges": { "funds": 0, "mental": 10, "english": 15, "insight": 40, "stamina": -20, "relation": 0 },
+          "text": {
+            "ko": "데이케어 선생님에게 오늘 아이의 하루 상태와 적응 과정에 대해 영어로 물어본다.",
+            "en": "Ask the teacher in English about Jaden's behavior and adaptation during the day."
+          },
+          "feedback": {
+            "ko": "선생님이 제이든이 친구들과 블록놀이를 즐겁게 했다며 오늘 그린 그림을 전달해 줍니다.",
+            "en": "Teacher shares that Jaden enjoyed block building with friends and hands over his artwork."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": 20,
+            "english": 15,
+            "insight": 20,
+            "stamina": -5,
+            "relation": 20
+          },
           "nextScenarioId": 1004
         },
         {
           "type": "REALIST",
-          "text": { "ko": "내일 지출을 줄이기 위해 도시락 메뉴를 고민한다.", "en": "Think of a lunch menu to save money for tomorrow." },
-          "feedback": { "ko": "★ 아차... 재료가 없네요. 켄은 마트를 다시 가야 한다는 사실에 한숨을 쉽니다.", "en": "★ Oops... No ingredients. Ken sighs at the fact that he has to go to the mart again." },
-          "statChanges": { "funds": 0, "mental": -15, "english": 0, "insight": 25, "stamina": -5, "relation": 0 },
+          "text": {
+            "ko": "혹시 픽업 늦어서 벌금이 나올까 봐 허둥지둥 아이를 챙겨 집으로 향한다.",
+            "en": "Hurriedly pack Jaden's belongings fearing late pick-up fees and head home."
+          },
+          "feedback": {
+            "ko": "다행히 정시에 픽업하여 벌금은 면했지만, 엄마의 가빠른 숨소리에 아이가 눈치를 봅니다.",
+            "en": "Avoided fines by arriving on time, though your rushed breath makes Jaden slightly nervous."
+          },
+          "statChanges": {
+            "funds": 0,
+            "mental": -5,
+            "english": 0,
+            "insight": 10,
+            "stamina": -15,
+            "relation": -5
+          },
           "nextScenarioId": 1004
         }
       ]
@@ -964,24 +1096,31 @@
       "id": 1004,
       "type": "SUMMARY",
       "day": 4,
-      "episode": 11,
-      "title": { "ko": "Day 4 회고: 첫 등교의 전율", "en": "Day 4 Reflection" },
+      "episode": 4,
+      "week": 1,
+      "title": {
+        "ko": "Day 4 회고: 유학맘의 첫 학업과 가정 완벽 양립",
+        "en": "Day 4 Reflection: Successfully Balancing School & Motherhood"
+      },
       "backgroundKey": "city_night",
       "description": {
-        "ko": "켄(Ken)은 오늘 성공적으로 첫 등교를 마쳤습니다. 쏟아지는 영어와 낯선 환경 속에서도 켄은 자신만의 길을 찾아내고 있습니다.",
-        "en": "Ken successfully finished his first day. Amidst floods of English and a new environment, Ken is finding his way."
+        "ko": "데이케어 등원 첫날의 눈물부터 당당한 첫 오리엔테이션 발표, 그리고 벅찬 하원 감동까지! 소라는 엄마로서의 책무와 학생으로서의 도전을 완벽히 해냈습니다.",
+        "en": "From morning tears at drop-off to a confident orientation presentation and emotional pick-up reunion! Sora balanced motherhood and academic goals perfectly."
       },
-      "statChanges": { "funds": 0, "mental": 40, "english": 10, "insight": 30, "stamina": 70, "relation": 20 },
-      "nextScenarioId": 41,
-      "choices": [
-        {
-          "type": "STABLE",
-          "text": { "ko": "깊은 잠에 빠져든다.", "en": "Fall into a deep sleep." },
-          "feedback": { "ko": "내일은 더 멋진 하루가 될 것입니다.", "en": "Tomorrow will be a better day." },
-          "statChanges": { "funds": 0, "mental": 0, "english": 0, "insight": 0, "stamina": 0, "relation": 0 },
-          "nextScenarioId": 41
-        }
-      ]
+      "tip": {
+        "ko": "유학맘 1주 차 핵심 회고: 나 자신과 아이 모두를 정서적으로 지켜내는 것이 가장 위대한 성공입니다.",
+        "en": "Student Mom Week 1 Core Reflection: Emotional safety for both yourself and your child is the ultimate success."
+      },
+      "statChanges": {
+        "funds": 0,
+        "mental": 40,
+        "english": 20,
+        "insight": 25,
+        "stamina": 50,
+        "relation": 30
+      },
+
+      "choices": []
     }
   }
 }
