@@ -36,6 +36,9 @@ jobs:
       - name: Check localization
         run: npm run check:localization
 
+      - name: Validate Ken scenario
+        run: npm run validate:ken-scenario
+
       - name: Lint
         run: npm run lint
 
