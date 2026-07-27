@@ -91,17 +91,17 @@ are separated so release-critical logic can be tested without rendering screens.
 
 ```text
 ReadTheRoom/
-├── ReadTheRoom.App/
-│   ├── app/          Expo Router routes and screen orchestration
-│   ├── components/   Shared and screen components
-│   ├── domain/       Framework-light game rules
-│   ├── features/     Feature-scoped presentation modules
-│   ├── shared/       Registries and reusable infrastructure
-│   ├── utils/        Scenario, persistence, and result helpers
-│   ├── assets/       Runtime scenario data and images
-│   └── tests/        Unit and data-integrity tests
-├── docs/             Architecture, format, testing, and release docs
-└── README.md
+|-- ReadTheRoom.App/
+|   |-- app/          Expo Router routes and screen orchestration
+|   |-- components/   Shared and screen components
+|   |-- domain/       Framework-light game rules
+|   |-- features/     Feature-scoped presentation modules
+|   |-- shared/       Registries and reusable infrastructure
+|   |-- utils/        Scenario, persistence, and result helpers
+|   |-- assets/       Runtime scenario data and images
+|   `-- tests/        Unit and data-integrity tests
+|-- docs/             Architecture, format, testing, and release docs
+`-- README.md
 ```
 
 ## Current Status
@@ -168,6 +168,39 @@ not configured.
 - [Release Checklist](docs/release-checklist.md)
 - [Roadmap](docs/roadmap.md)
 - [Legacy Backend](docs/legacy-backend.md)
+
+## Commit Message Convention
+
+ReadTheRoom follows a Conventional Commits-style format:
+
+```text
+type: concise English summary
+```
+
+Common commit types:
+
+- `feat`: user-facing feature additions.
+- `fix`: bug fixes and broken behavior recovery.
+- `docs`: documentation-only changes.
+- `test`: test coverage, validators, or test infrastructure.
+- `ci`: GitHub Actions or CI/CD workflow changes.
+- `chore`: maintenance, tooling, or project policy updates.
+- `refactor`: code structure changes without behavior changes.
+- `data`: scenario JSON, character content, or other game data updates.
+- `style`: formatting-only changes that do not affect behavior.
+
+Examples:
+
+```text
+data: update Ken Day 3 scenario graph
+test: add scenario graph validation
+fix: restore corrupted Korean UI copy
+docs: update release checklist
+ci: add scenario validation to workflow
+chore: update CI Node runtime
+```
+
+## Legacy Backend
 
 The previous .NET Azure Functions backend is archived in Git history under
 `archive/server-backend-before-removal-2026-06-10`.
