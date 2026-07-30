@@ -1,0 +1,86 @@
+<svg width="526" height="760" viewBox="0 0 526 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="526" height="760" fill="#071326"/>
+  <rect x="0" y="0" width="526" height="760" fill="url(#bg)" opacity="0.9"/>
+
+  <rect x="12" y="14" width="502" height="724" rx="26" fill="#E8DCC7"/>
+  <rect x="12" y="14" width="502" height="724" rx="26" stroke="#F7ECD9" stroke-width="2"/>
+
+  <text x="24" y="48" fill="#4B3829" font-family="Arial, sans-serif" font-size="24" font-weight="800">스토리맵</text>
+  <circle cx="500" cy="42" r="18" fill="#FAF5EA"/>
+  <path d="M493 35L507 49M507 35L493 49" stroke="#6D5947" stroke-width="3" stroke-linecap="round"/>
+  <text x="24" y="76" fill="#5B4635" font-family="Arial, sans-serif" font-size="15" font-weight="800">W1 · Day 1 · 입국 심사</text>
+
+  <rect x="24" y="90" width="470" height="34" rx="10" fill="#8C6E54"/>
+  <circle cx="44" cy="107" r="7" fill="none" stroke="#FFF5E6" stroke-width="2"/>
+  <text x="42" y="111" fill="#FFF5E6" font-family="Arial, sans-serif" font-size="10" font-weight="800">i</text>
+  <text x="62" y="112" fill="#FFF8EE" font-family="Arial, sans-serif" font-size="13" font-weight="800">완료한 장면은 다시 눌러 돌아갈 수 있어요.</text>
+
+  <rect x="24" y="134" width="438" height="470" rx="16" fill="#F8ECD9"/>
+  <rect x="28" y="138" width="430" height="462" rx="14" stroke="#D5BE9F" stroke-width="1"/>
+  <text x="290" y="166" fill="#B49B7B" font-family="Arial, sans-serif" font-size="13" font-weight="800">VISA / VISAS · WEEK 1</text>
+  <path d="M88 178H424" stroke="#D4BEA0" stroke-width="3"/>
+
+  <g transform="translate(54 208) rotate(-8)">
+    <rect width="150" height="92" rx="10" fill="#F9EFE0" stroke="#CD635D" stroke-width="4"/>
+    <text x="75" y="34" text-anchor="middle" fill="#C65B56" font-family="Arial, sans-serif" font-size="20" font-weight="900">YVR</text>
+    <text x="75" y="58" text-anchor="middle" fill="#C65B56" font-family="Arial, sans-serif" font-size="18" font-weight="900">AIRPORT</text>
+    <text x="75" y="80" text-anchor="middle" fill="#C65B56" font-family="Arial, sans-serif" font-size="12" font-weight="900">DAY 01 · EP 01</text>
+  </g>
+  <text x="129" y="346" text-anchor="middle" fill="#5E4735" font-family="Arial, sans-serif" font-size="18" font-weight="900">입국 심사</text>
+
+  <g transform="translate(268 205) rotate(8)" opacity="0.56">
+    <rect width="150" height="92" rx="10" fill="#F9EFE0" stroke="#B9A995" stroke-width="3" stroke-dasharray="8 7"/>
+    <text x="75" y="35" text-anchor="middle" fill="#9A8874" font-family="Arial, sans-serif" font-size="12" font-weight="900">🔒</text>
+    <text x="75" y="58" text-anchor="middle" fill="#8A7968" font-family="Arial, sans-serif" font-size="16" font-weight="900">LOCKED</text>
+    <text x="75" y="80" text-anchor="middle" fill="#8A7968" font-family="Arial, sans-serif" font-size="12" font-weight="900">DAY 01 · EP 02</text>
+  </g>
+  <text x="340" y="346" text-anchor="middle" fill="#6A5643" opacity="0.72" font-family="Arial, sans-serif" font-size="17" font-weight="900">수상한 호의</text>
+
+  <g transform="translate(62 396) rotate(-7)" opacity="0.45">
+    <rect width="150" height="92" rx="10" fill="#F9EFE0" stroke="#B9A995" stroke-width="3" stroke-dasharray="8 7"/>
+    <text x="75" y="35" text-anchor="middle" fill="#9A8874" font-family="Arial, sans-serif" font-size="12" font-weight="900">🔒</text>
+    <text x="75" y="58" text-anchor="middle" fill="#8A7968" font-family="Arial, sans-serif" font-size="16" font-weight="900">LOCKED</text>
+    <text x="75" y="80" text-anchor="middle" fill="#8A7968" font-family="Arial, sans-serif" font-size="12" font-weight="900">DAY 01 · EP 03</text>
+  </g>
+  <text x="134" y="536" text-anchor="middle" fill="#6A5643" opacity="0.65" font-family="Arial, sans-serif" font-size="17" font-weight="900">이동 수단 선택</text>
+
+  <g transform="translate(274 396) rotate(7)" opacity="0.45">
+    <rect width="150" height="92" rx="10" fill="#F9EFE0" stroke="#B9A995" stroke-width="3" stroke-dasharray="8 7"/>
+    <text x="75" y="35" text-anchor="middle" fill="#9A8874" font-family="Arial, sans-serif" font-size="12" font-weight="900">🔒</text>
+    <text x="75" y="58" text-anchor="middle" fill="#8A7968" font-family="Arial, sans-serif" font-size="16" font-weight="900">LOCKED</text>
+    <text x="75" y="80" text-anchor="middle" fill="#8A7968" font-family="Arial, sans-serif" font-size="12" font-weight="900">DAY 01 · EP 04</text>
+  </g>
+  <text x="348" y="536" text-anchor="middle" fill="#6A5643" opacity="0.65" font-family="Arial, sans-serif" font-size="17" font-weight="900">기숙사 리셉션</text>
+
+  <g>
+    <rect x="474" y="134" width="44" height="64" rx="9" fill="#8F54B8"/>
+    <text x="496" y="163" text-anchor="middle" fill="#FFF" font-family="Arial, sans-serif" font-size="16" font-weight="900">W1</text>
+    <text x="496" y="181" text-anchor="middle" fill="#F3E5FF" font-family="Arial, sans-serif" font-size="10" font-weight="800">1-6</text>
+    <rect x="474" y="205" width="44" height="59" rx="8" fill="#E9DCC3" stroke="#D1C0A4"/>
+    <text x="496" y="235" text-anchor="middle" fill="#A8967E" font-family="Arial, sans-serif" font-size="13" font-weight="900">W2</text>
+    <rect x="474" y="271" width="44" height="59" rx="8" fill="#E9DCC3" stroke="#D1C0A4"/>
+    <text x="496" y="301" text-anchor="middle" fill="#A8967E" font-family="Arial, sans-serif" font-size="13" font-weight="900">W3</text>
+    <rect x="474" y="337" width="44" height="59" rx="8" fill="#E9DCC3" stroke="#D1C0A4"/>
+    <text x="496" y="367" text-anchor="middle" fill="#A8967E" font-family="Arial, sans-serif" font-size="13" font-weight="900">W4</text>
+    <rect x="474" y="403" width="44" height="59" rx="8" fill="#E9DCC3" stroke="#D1C0A4"/>
+    <text x="496" y="433" text-anchor="middle" fill="#A8967E" font-family="Arial, sans-serif" font-size="13" font-weight="900">W5</text>
+  </g>
+
+  <rect x="24" y="616" width="470" height="86" rx="16" fill="#F4E6CE" stroke="#D3BB98"/>
+  <text x="44" y="642" fill="#604936" font-family="Arial, sans-serif" font-size="15" font-weight="900">진행 관리</text>
+  <text x="44" y="662" fill="#8A725C" font-family="Arial, sans-serif" font-size="11" font-weight="700">게임 흐름을 바꾸는 버튼이라 확인창이 먼저 열립니다.</text>
+  <rect x="44" y="674" width="196" height="36" rx="12" fill="#FFF7EA" stroke="#A98763"/>
+  <text x="142" y="697" text-anchor="middle" fill="#704E32" font-family="Arial, sans-serif" font-size="14" font-weight="900">처음부터</text>
+  <rect x="254" y="674" width="220" height="36" rx="12" fill="#EEE1CE" stroke="#B99D7D"/>
+  <text x="364" y="697" text-anchor="middle" fill="#5F4937" font-family="Arial, sans-serif" font-size="14" font-weight="900">캐릭터 선택</text>
+
+  <text x="24" y="728" fill="#9B866D" font-family="Arial, sans-serif" font-size="11" font-weight="700">제안: 위험도가 큰 액션은 스토리맵 하단에 작게 배치하고, 누르면 확인창을 띄웁니다.</text>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="526" y2="760" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#091B33"/>
+      <stop offset="0.52" stop-color="#0A1424"/>
+      <stop offset="1" stop-color="#112844"/>
+    </linearGradient>
+  </defs>
+</svg>

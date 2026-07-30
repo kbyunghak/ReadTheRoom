@@ -126,7 +126,7 @@ export default function EndingScene({
                 {variant === 'failure' ? (
                   <TouchableOpacity style={styles.continueButton} onPress={onContinueAfterAd} activeOpacity={0.92}>
                     <Text style={styles.continueButtonText}>{text.continueAfterAd}</Text>
-                    <MaterialCommunityIcons name="play-box-outline" size={18} color="#284A6E" />
+                    <MaterialCommunityIcons name="youtube" size={20} color="#284A6E" />
                   </TouchableOpacity>
                 ) : null}
 

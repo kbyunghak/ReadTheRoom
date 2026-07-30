@@ -6,9 +6,12 @@ import {
   ImageSourcePropType,
   ScrollView,
   StyleSheet,
+  Text,
+  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -77,6 +80,96 @@ type Checkpoint = {
   playHistory: PlayedChoice[];
 };
 
+type TutorialStep = {
+  key: string;
+  title: string;
+  body: string;
+};
+
+const GAME_TUTORIAL_SEEN_KEY = 'readtheroom_game_tutorial_seen_v1';
+const ALWAYS_SHOW_TUTORIAL_FOR_TESTING = true;
+const TUTORIAL_CHARACTER_IDS = new Set(['ken', 'amy', 'sora']);
+
+const FAILURE_RECOVERY_STATS: GameStats = {
+  funds: 120,
+  mental: 70,
+  english: 70,
+  insight: 70,
+  stamina: 100,
+  relation: 60,
+};
+
+const GAME_TUTORIAL_TEXT = {
+  en: {
+    skip: 'Skip',
+    next: 'Next',
+    start: 'Start Game',
+    progress: 'Guide',
+    dontShowAgain: "Don't show again",
+    steps: [
+      {
+        key: 'storymap',
+        title: 'StoryMap',
+        body: 'Review your story progress and return to completed scenes.',
+      },
+      {
+        key: 'title',
+        title: 'Title',
+        body: 'Check the current day, episode number, and scene title.',
+      },
+      {
+        key: 'language',
+        title: 'Language',
+        body: 'Switch between Korean and English at any time.',
+      },
+      {
+        key: 'status',
+        title: 'Status',
+        body: 'Track your current condition, including stamina and other stats.',
+      },
+      {
+        key: 'situation',
+        title: 'Situation',
+        body: 'Read the local context, choose one of three options, and adapt through feedback.',
+      },
+    ],
+  },
+  ko: {
+    skip: '건너뛰기',
+    next: '다음',
+    start: '게임 시작',
+    progress: '가이드',
+    dontShowAgain: '다시 보지 않기',
+    steps: [
+      {
+        key: 'storymap',
+        title: '스토리맵',
+        body: '진행한 스토리를 확인하고 완료한 이전 장면으로 이동할 수 있습니다.',
+      },
+      {
+        key: 'title',
+        title: '타이틀',
+        body: '현재 진행 날짜, 에피소드 번호, 장면 제목을 확인할 수 있습니다.',
+      },
+      {
+        key: 'language',
+        title: '언어팩',
+        body: '한글과 영어 표시를 언제든지 선택할 수 있습니다.',
+      },
+      {
+        key: 'status',
+        title: '상태창',
+        body: '현재 상태와 스태미너를 포함한 주요 스탯을 확인할 수 있습니다.',
+      },
+      {
+        key: 'situation',
+        title: '상황 설명',
+        body: '현지 상황을 참고해 3가지 선택 중 하나를 고르세요. 선택에 따라 다른 결과와 피드백을 받으며 적응해 갑니다.',
+      },
+    ],
+  },
+} as const;
+
 const UI_TEXT = {
   en: {
     roadmapBtn: 'StoryMap',
@@ -107,6 +200,11 @@ const UI_TEXT = {
     closeButton: 'Close',
     daySummaryLabel: "Today's Summary",
     noStatChanges: 'No stat changes',
+    failureContinueTitle: 'Recover and continue?',
+    failureContinueMessage:
+      'Later, this can show a rewarded ad before restoring your condition. Continue for testing now?',
+    failureContinueYes: 'Yes',
+    failureContinueNo: 'No',
   },
   ko: {
     roadmapBtn: '스토리맵',
@@ -137,6 +235,11 @@ const UI_TEXT = {
     closeButton: '닫기',
     daySummaryLabel: '오늘의 정리',
     noStatChanges: '스탯 변화 없음',
+    failureContinueTitle: '상태를 회복하고 계속할까요?',
+    failureContinueMessage:
+      '나중에는 광고를 본 뒤 컨디션을 회복하고 계속 진행할 수 있게 연결할 예정입니다. 지금은 테스트용으로 계속할까요?',
+    failureContinueYes: '예',
+    failureContinueNo: '아니오',
   },
 } as const;
 
@@ -212,29 +315,16 @@ export default function GameScreen({
   const insets = useSafeAreaInsets();
   const activeInitialSession =
     initialSession?.characterId === character?.id ? initialSession : null;
-  const initialStats = useMemo(
+  const characterBaseStats = useMemo<GameStats>(
     () => ({
-      funds: activeInitialSession
-        ? activeInitialSession.stats.funds
-        : (character?.startingStats.funds ?? 1000),
-      mental: activeInitialSession
-        ? activeInitialSession.stats.mental
-        : (character?.startingStats.mental ?? 100),
-      english: activeInitialSession
-        ? activeInitialSession.stats.english
-        : (character?.startingStats.english ?? 30),
-      insight: activeInitialSession
-        ? activeInitialSession.stats.insight
-        : (character?.startingStats.insight ?? 50),
-      stamina: activeInitialSession
-        ? activeInitialSession.stats.stamina
-        : (character?.startingStats.stamina ?? 100),
-      relation: activeInitialSession
-        ? activeInitialSession.stats.relation
-        : (character?.startingStats.relation ?? 50),
+      funds: character?.startingStats.funds ?? 1000,
+      mental: character?.startingStats.mental ?? 100,
+      english: character?.startingStats.english ?? 30,
+      insight: character?.startingStats.insight ?? 50,
+      stamina: character?.startingStats.stamina ?? 100,
+      relation: character?.startingStats.relation ?? 50,
     }),
     [
-      activeInitialSession,
       character?.startingStats.english,
       character?.startingStats.funds,
       character?.startingStats.insight,
@@ -242,6 +332,29 @@ export default function GameScreen({
       character?.startingStats.relation,
       character?.startingStats.stamina,
     ],
+  );
+  const initialStats = useMemo(
+    () => ({
+      funds: activeInitialSession
+        ? activeInitialSession.stats.funds
+        : characterBaseStats.funds,
+      mental: activeInitialSession
+        ? activeInitialSession.stats.mental
+        : characterBaseStats.mental,
+      english: activeInitialSession
+        ? activeInitialSession.stats.english
+        : characterBaseStats.english,
+      insight: activeInitialSession
+        ? activeInitialSession.stats.insight
+        : characterBaseStats.insight,
+      stamina: activeInitialSession
+        ? activeInitialSession.stats.stamina
+        : characterBaseStats.stamina,
+      relation: activeInitialSession
+        ? activeInitialSession.stats.relation
+        : characterBaseStats.relation,
+    }),
+    [activeInitialSession, characterBaseStats],
   );
   const storyScrollRef = useRef<ScrollView | null>(null);
   const roadmapScrollRef = useRef<ScrollView | null>(null);
@@ -278,6 +391,11 @@ export default function GameScreen({
     summary: SituationSummary;
     nextScenarioId: number | null;
   } | null>(null);
+  const [failureRecoveryNextScenarioId, setFailureRecoveryNextScenarioId] =
+    useState<number | null>(null);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStepIndex, setTutorialStepIndex] = useState(0);
+  const [tutorialDontShowAgain, setTutorialDontShowAgain] = useState(false);
   const [checkpoints, setCheckpoints] = useState<Record<number, Checkpoint>>(
     activeInitialSession
       ? activeInitialSession.checkpoints
@@ -291,8 +409,16 @@ export default function GameScreen({
   );
 
   const t = UI_TEXT[lang];
+  const tutorialText = GAME_TUTORIAL_TEXT[lang];
+  const tutorialSteps: readonly TutorialStep[] = tutorialText.steps;
+  const tutorialStep = tutorialSteps[tutorialStepIndex] ?? tutorialSteps[0];
+  const isLastTutorialStep = tutorialStepIndex >= tutorialSteps.length - 1;
   const isKorean = lang === 'ko';
   const isNarrow = width <= 390;
+  const statusCardWidth = Math.min(
+    Math.round(width * (isNarrow ? 0.39 : 0.33)),
+    188,
+  );
   const headerHeight = 52;
   const headerHorizontalPadding = isNarrow ? 12 : 18;
   const characterTop = headerHeight;
@@ -309,6 +435,89 @@ export default function GameScreen({
     300,
     height - insets.top - insets.bottom - roadmapVerticalInset * 2,
   );
+  const tutorialBubbleWidth = Math.min(width - 36, 330);
+  const tutorialTopInset = insets.top + 8;
+  const tutorialAnchor = (() => {
+    switch (tutorialStep.key) {
+      case 'storymap':
+        return {
+          bubble: {
+            top: tutorialTopInset + headerHeight + 8,
+            left: 14,
+            width: tutorialBubbleWidth,
+          },
+          arrow: styles.tutorialArrowTopLeft,
+          focus: {
+            top: tutorialTopInset + 4,
+            left: 8,
+            width: 48,
+            height: 48,
+          },
+        };
+      case 'title':
+        return {
+          bubble: {
+            top: tutorialTopInset + headerHeight + 8,
+            left: Math.max(14, (width - tutorialBubbleWidth) / 2),
+            width: tutorialBubbleWidth,
+          },
+          arrow: styles.tutorialArrowTopCenter,
+          focus: {
+            top: tutorialTopInset + 8,
+            left: Math.max(64, width * 0.18),
+            right: Math.max(64, width * 0.18),
+            height: 36,
+          },
+        };
+      case 'language':
+        return {
+          bubble: {
+            top: tutorialTopInset + headerHeight + 8,
+            right: 14,
+            width: tutorialBubbleWidth,
+          },
+          arrow: styles.tutorialArrowTopRight,
+          focus: {
+            top: tutorialTopInset + 4,
+            right: 8,
+            width: 48,
+            height: 48,
+          },
+        };
+      case 'status':
+        return {
+          bubble: {
+            top: tutorialTopInset + headerHeight + 108,
+            right: 14,
+            width: tutorialBubbleWidth,
+          },
+          arrow: styles.tutorialArrowTopRight,
+          focus: {
+            top: tutorialTopInset + headerHeight + 8,
+            right: headerHorizontalPadding,
+            width: statusCardWidth,
+            height: 86,
+          },
+        };
+      case 'situation':
+      default:
+        return {
+          bubble: {
+            bottom:
+              scenarioPanelBottom + Math.min(250, scenarioPanelMaxHeight - 118),
+            left: 14,
+            width: tutorialBubbleWidth,
+          },
+          arrow: styles.tutorialArrowBottomLeft,
+          focus: {
+            left: 10,
+            right: 10,
+            bottom: scenarioPanelBottom,
+            height: Math.min(240, scenarioPanelMaxHeight),
+          },
+        };
+    }
+  })();
 
   useEffect(() => {
     setLang(activeInitialSession ? activeInitialSession.lang : initialLang);
@@ -340,9 +549,37 @@ export default function GameScreen({
               stats: initialStats,
               playHistory: [],
             },
-          },
+        },
     );
   }, [activeInitialSession, initialLang, initialStats, startScenarioId]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const characterId = character?.id;
+    const shouldConsiderTutorial =
+      Boolean(characterId) &&
+      (ALWAYS_SHOW_TUTORIAL_FOR_TESTING || !activeInitialSession) &&
+      TUTORIAL_CHARACTER_IDS.has(characterId ?? '');
+
+    if (!shouldConsiderTutorial) {
+      setShowTutorial(false);
+      setTutorialStepIndex(0);
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    void AsyncStorage.getItem(GAME_TUTORIAL_SEEN_KEY).then((seen) => {
+      if (!isMounted) return;
+      setTutorialStepIndex(0);
+      setTutorialDontShowAgain(seen === 'true');
+      setShowTutorial(ALWAYS_SHOW_TUTORIAL_FOR_TESTING || seen !== 'true');
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [activeInitialSession, character?.id]);
 
   useEffect(() => {
     const track = pendingSummary
@@ -620,6 +857,27 @@ export default function GameScreen({
     setShowLanguageMenu(false);
   };
 
+  const completeTutorial = () => {
+    setShowTutorial(false);
+    setTutorialStepIndex(0);
+    if (tutorialDontShowAgain) {
+      void AsyncStorage.setItem(GAME_TUTORIAL_SEEN_KEY, 'true');
+    } else {
+      void AsyncStorage.removeItem(GAME_TUTORIAL_SEEN_KEY);
+    }
+  };
+
+  const advanceTutorial = () => {
+    if (isLastTutorialStep) {
+      completeTutorial();
+      return;
+    }
+
+    setTutorialStepIndex((prev) =>
+      Math.min(prev + 1, tutorialSteps.length - 1),
+    );
+  };
+
   const handleChoice = (choice: Choice) => {
     setStats((prev) => applyStatChanges(prev, choice.statChanges));
     setPlayHistory((prev) => [
@@ -685,6 +943,9 @@ export default function GameScreen({
       });
 
       if (continuation.type === 'failure') {
+        setFailureRecoveryNextScenarioId(
+          nextScenario ? selectedChoice.nextScenarioId : null,
+        );
         setShowResult(false);
         setSelectedChoice(null);
         setEndingType('failure');
@@ -736,6 +997,7 @@ export default function GameScreen({
     setPlayHistory([]);
     setShowRoadmap(false);
     setPendingSummary(null);
+    setFailureRecoveryNextScenarioId(null);
     setCheckpoints({
       [startScenarioId]: {
         scenarioId: startScenarioId,
@@ -745,11 +1007,51 @@ export default function GameScreen({
     });
   };
 
-  const continueAfterFailure = () => {
-    setStats({ ...initialStats });
+  const recoverAfterFailure = () => {
+    setStats({
+      funds: Math.max(characterBaseStats.funds, FAILURE_RECOVERY_STATS.funds),
+      mental: Math.max(
+        characterBaseStats.mental,
+        FAILURE_RECOVERY_STATS.mental,
+      ),
+      english: Math.max(
+        characterBaseStats.english,
+        FAILURE_RECOVERY_STATS.english,
+      ),
+      insight: Math.max(
+        characterBaseStats.insight,
+        FAILURE_RECOVERY_STATS.insight,
+      ),
+      stamina: Math.max(
+        characterBaseStats.stamina,
+        FAILURE_RECOVERY_STATS.stamina,
+      ),
+      relation: Math.max(
+        characterBaseStats.relation,
+        FAILURE_RECOVERY_STATS.relation,
+      ),
+    });
+    if (failureRecoveryNextScenarioId) {
+      setCurrentScenarioId(failureRecoveryNextScenarioId);
+    }
+    setFailureRecoveryNextScenarioId(null);
+    setCurrentSituationChoices([]);
     setEndingType(null);
     setShowResult(false);
     setSelectedChoice(null);
+  };
+
+  const confirmContinueAfterFailure = () => {
+    Alert.alert(t.failureContinueTitle, t.failureContinueMessage, [
+      {
+        text: t.failureContinueNo,
+        style: 'cancel',
+      },
+      {
+        text: t.failureContinueYes,
+        onPress: recoverAfterFailure,
+      },
+    ]);
   };
 
   const jumpToRoadmapNode = (node: RoadmapNode) => {
@@ -760,17 +1062,13 @@ export default function GameScreen({
     setPlayHistory([...checkpoint.playHistory]);
     setCurrentSituationChoices([]);
     setPendingSummary(null);
+    setFailureRecoveryNextScenarioId(null);
     setShowResult(false);
     setSelectedChoice(null);
     setEndingType(null);
     setCurrentScenarioId(checkpoint.scenarioId);
     setShowRoadmap(false);
   };
-
-  const statusCardWidth = Math.min(
-    Math.round(width * (isNarrow ? 0.39 : 0.33)),
-    188,
-  );
 
   if (endingType) {
     return (
@@ -780,7 +1078,7 @@ export default function GameScreen({
         characterId={character?.id}
         failureRecap={failureRecap}
         onContinueAfterAd={
-          endingType === 'failure' ? continueAfterFailure : undefined
+          endingType === 'failure' ? confirmContinueAfterFailure : undefined
         }
         onTryAnotherChoice={() => {
           restartGame();
@@ -936,6 +1234,84 @@ export default function GameScreen({
             onCloseFeedback={() => setShowFeedbackModal(false)}
             onContinue={proceedToNextScenario}
           />
+
+          {showTutorial ? (
+            <View style={styles.tutorialOverlay}>
+              <View style={styles.tutorialScrim} />
+              <View
+                pointerEvents="none"
+                style={[styles.tutorialFocus, tutorialAnchor.focus]}
+              />
+              <View style={[styles.tutorialBubble, tutorialAnchor.bubble]}>
+                <View style={[styles.tutorialArrow, tutorialAnchor.arrow]} />
+                <View style={styles.tutorialHeader}>
+                  <View style={styles.tutorialBadge}>
+                    <Text style={styles.tutorialBadgeText}>
+                      {tutorialText.progress} {tutorialStepIndex + 1}/
+                      {tutorialSteps.length}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.tutorialSkipButton}
+                    onPress={completeTutorial}
+                    activeOpacity={0.86}
+                  >
+                    <Text style={styles.tutorialSkipText}>
+                      {tutorialText.skip}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <Text style={styles.tutorialTitle}>{tutorialStep.title}</Text>
+                <Text style={styles.tutorialBody}>{tutorialStep.body}</Text>
+
+                <View style={styles.tutorialDots}>
+                  {tutorialSteps.map((step, index) => (
+                    <View
+                      key={step.key}
+                      style={[
+                        styles.tutorialDot,
+                        index === tutorialStepIndex &&
+                          styles.tutorialDotActive,
+                      ]}
+                    />
+                  ))}
+                </View>
+
+                <TouchableOpacity
+                  style={styles.tutorialCheckboxRow}
+                  onPress={() => setTutorialDontShowAgain((prev) => !prev)}
+                  activeOpacity={0.86}
+                >
+                  <View
+                    style={[
+                      styles.tutorialCheckbox,
+                      tutorialDontShowAgain && styles.tutorialCheckboxChecked,
+                    ]}
+                  >
+                    {tutorialDontShowAgain ? (
+                      <Text style={styles.tutorialCheckboxMark}>✓</Text>
+                    ) : null}
+                  </View>
+                  <Text style={styles.tutorialCheckboxText}>
+                    {tutorialText.dontShowAgain}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.tutorialNextButton}
+                  onPress={advanceTutorial}
+                  activeOpacity={0.9}
+                >
+                  <Text style={styles.tutorialNextText}>
+                    {isLastTutorialStep
+                      ? tutorialText.start
+                      : tutorialText.next}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : null}
         </View>
       </ImageBackground>
 
@@ -1008,6 +1384,187 @@ const styles = StyleSheet.create({
     elevation: 7,
   },
   container: { flex: 1 },
+  tutorialOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 30,
+  },
+  tutorialScrim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(3, 9, 20, 0.62)',
+  },
+  tutorialFocus: {
+    position: 'absolute',
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: 'rgba(142, 200, 255, 0.92)',
+    backgroundColor: 'rgba(77, 151, 255, 0.08)',
+    shadowColor: '#64B4FF',
+    shadowOpacity: 0.45,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 20,
+  },
+  tutorialBubble: {
+    position: 'absolute',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(159, 203, 255, 0.46)',
+    backgroundColor: 'rgba(9, 24, 48, 0.96)',
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 15,
+    shadowColor: '#1D78FF',
+    shadowOpacity: 0.24,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 18,
+  },
+  tutorialArrow: {
+    position: 'absolute',
+    width: 0,
+    height: 0,
+    borderLeftWidth: 9,
+    borderRightWidth: 9,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+  },
+  tutorialArrowTopLeft: {
+    top: -9,
+    left: 22,
+    borderBottomWidth: 10,
+    borderBottomColor: 'rgba(9, 24, 48, 0.96)',
+  },
+  tutorialArrowTopCenter: {
+    top: -9,
+    left: '48%',
+    borderBottomWidth: 10,
+    borderBottomColor: 'rgba(9, 24, 48, 0.96)',
+  },
+  tutorialArrowTopRight: {
+    top: -9,
+    right: 22,
+    borderBottomWidth: 10,
+    borderBottomColor: 'rgba(9, 24, 48, 0.96)',
+  },
+  tutorialArrowBottomLeft: {
+    bottom: -9,
+    left: 26,
+    borderTopWidth: 10,
+    borderTopColor: 'rgba(9, 24, 48, 0.96)',
+  },
+  tutorialHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 10,
+  },
+  tutorialBadge: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(142, 194, 255, 0.42)',
+    backgroundColor: 'rgba(26, 82, 150, 0.7)',
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+  },
+  tutorialBadgeText: {
+    color: '#DCEEFF',
+    fontSize: 12,
+    lineHeight: 15,
+    fontWeight: '900',
+  },
+  tutorialSkipButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  tutorialSkipText: {
+    color: 'rgba(230, 238, 248, 0.72)',
+    fontSize: 13,
+    lineHeight: 16,
+    fontWeight: '800',
+  },
+  tutorialTitle: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    lineHeight: 25,
+    fontWeight: '900',
+    letterSpacing: -0.3,
+  },
+  tutorialBody: {
+    marginTop: 8,
+    color: '#DCE8F8',
+    fontSize: 14,
+    lineHeight: 21,
+    fontWeight: '700',
+  },
+  tutorialDots: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 7,
+    marginTop: 14,
+    marginBottom: 12,
+  },
+  tutorialDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: 'rgba(207, 226, 255, 0.32)',
+  },
+  tutorialDotActive: {
+    width: 18,
+    backgroundColor: '#8EC8FF',
+  },
+  tutorialCheckboxRow: {
+    minHeight: 34,
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 8,
+    marginBottom: 10,
+    paddingRight: 8,
+  },
+  tutorialCheckbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 6,
+    borderWidth: 1.4,
+    borderColor: 'rgba(220, 238, 255, 0.62)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  tutorialCheckboxChecked: {
+    borderColor: '#8EC8FF',
+    backgroundColor: '#2C74BB',
+  },
+  tutorialCheckboxMark: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    lineHeight: 17,
+    fontWeight: '900',
+  },
+  tutorialCheckboxText: {
+    color: 'rgba(230, 238, 248, 0.78)',
+    fontSize: 13,
+    lineHeight: 17,
+    fontWeight: '800',
+  },
+  tutorialNextButton: {
+    minHeight: 44,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#DCEEFF',
+    borderWidth: 1,
+    borderColor: 'rgba(168, 209, 255, 0.9)',
+  },
+  tutorialNextText: {
+    color: '#22496F',
+    fontSize: 15,
+    lineHeight: 19,
+    fontWeight: '900',
+  },
   topSection: {
     paddingHorizontal: 12,
     paddingTop: 0,
