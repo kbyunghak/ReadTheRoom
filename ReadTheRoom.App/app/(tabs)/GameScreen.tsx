@@ -204,9 +204,10 @@ const UI_TEXT = {
     closeButton: 'Close',
     daySummaryLabel: "Today's Summary",
     noStatChanges: 'No stat changes',
-    failureContinueTitle: 'Recover condition and continue?',
+    failureContinueBadge: 'Rewarded Ad',
+    failureContinueTitle: 'Recover with a rewarded ad?',
     failureContinueMessage:
-      'This is currently a test build. In the release version, you will be able to watch an ad to recover your condition and keep playing.\n\nFor now, would you like to recover your condition in test mode and continue?',
+      'This is currently a test build. In the release version, you can choose to watch a rewarded ad to recover your condition and continue from the next scene.\n\nFor now, would you like to apply the same recovery in test mode and continue?',
     failureContinueYes: 'Continue',
     failureContinueNo: 'Cancel',
   },
@@ -239,9 +240,10 @@ const UI_TEXT = {
     closeButton: '닫기',
     daySummaryLabel: '오늘의 정리',
     noStatChanges: '스탯 변화 없음',
-    failureContinueTitle: '상태를 회복하고 계속할까요?',
+    failureContinueBadge: '보상형 광고',
+    failureContinueTitle: '보상형 광고로 회복할까요?',
     failureContinueMessage:
-      '현재는 테스트 버전입니다. 정식 버전에서는 광고를 시청하여 컨디션을 회복한 후 이어서 플레이할 수 있습니다.\n\n지금은 테스트 모드로 컨디션을 회복하고 계속 진행하시겠습니까?',
+      '현재는 테스트 버전입니다. 정식 버전에서는 보상형 광고를 시청하면 컨디션을 회복하고 다음 장면부터 이어서 플레이할 수 있습니다.\n\n지금은 테스트 모드로 같은 회복 효과를 적용하고 계속 진행하시겠습니까?',
     failureContinueYes: '계속하기',
     failureContinueNo: '취소',
   },
@@ -1107,6 +1109,7 @@ export default function GameScreen({
         {endingType === 'failure' ? (
           <RecoveryConfirmModal
             visible={showRecoveryModal}
+            badgeLabel={t.failureContinueBadge}
             title={t.failureContinueTitle}
             message={t.failureContinueMessage}
             cancelLabel={t.failureContinueNo}
@@ -1421,6 +1424,7 @@ export default function GameScreen({
 
 type RecoveryConfirmModalProps = {
   visible: boolean;
+  badgeLabel: string;
   title: string;
   message: string;
   cancelLabel: string;
@@ -1431,6 +1435,7 @@ type RecoveryConfirmModalProps = {
 
 function RecoveryConfirmModal({
   visible,
+  badgeLabel,
   title,
   message,
   cancelLabel,
@@ -1450,10 +1455,10 @@ function RecoveryConfirmModal({
         <View style={styles.titleModalCard}>
           <View style={styles.titleModalHeader}>
             <View style={styles.recoveryModalBadge}>
-              <View style={styles.recoveryYoutubeBadge}>
-                <Text style={styles.recoveryYoutubePlay}>▶</Text>
+              <View style={styles.recoveryRewardIcon}>
+                <Text style={styles.recoveryRewardIconText}>AD</Text>
               </View>
-              <Text style={styles.titleModalBadgeText}>TEST RECOVERY</Text>
+              <Text style={styles.titleModalBadgeText}>{badgeLabel}</Text>
             </View>
             <TouchableOpacity
               style={styles.titleModalCloseButton}
@@ -1757,26 +1762,28 @@ const styles = StyleSheet.create({
     gap: 8,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(255, 112, 112, 0.36)',
-    backgroundColor: 'rgba(124, 30, 43, 0.38)',
+    borderColor: 'rgba(241, 198, 106, 0.42)',
+    backgroundColor: 'rgba(44, 79, 122, 0.50)',
     paddingLeft: 8,
     paddingRight: 11,
     paddingVertical: 5,
   },
-  recoveryYoutubeBadge: {
-    width: 24,
-    height: 17,
-    borderRadius: 5,
+  recoveryRewardIcon: {
+    minWidth: 26,
+    height: 18,
+    borderRadius: 7,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF0033',
+    backgroundColor: '#F1C66A',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 245, 214, 0.78)',
   },
-  recoveryYoutubePlay: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    lineHeight: 12,
+  recoveryRewardIconText: {
+    color: '#18314F',
+    fontSize: 9,
+    lineHeight: 11,
     fontWeight: '900',
-    marginLeft: 1,
+    letterSpacing: 0.6,
   },
   titleModalCloseButton: {
     width: 34,

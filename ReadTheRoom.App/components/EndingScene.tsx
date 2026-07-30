@@ -42,7 +42,7 @@ const END_TEXT = {
   ko: {
     successMessage: '시행착오도 있었지만, 잘 해내고 있어요.\n이 이야기는 아직 계속돼요. 다음에는 어떤 길을 선택해볼까요?',
     failureMessage: '이번 선택은 쉽지 않았어요.\n이번엔 다르게 해볼까요?',
-    continueAfterAd: '계속하기',
+    continueAfterAd: '광고 보고 계속하기',
     chooseAnother: '다른 캐릭터 선택하기',
     restart: '처음부터 다시 하기',
     viewMistakes: '내가 잘못한 점 보기',
@@ -50,7 +50,7 @@ const END_TEXT = {
   en: {
     successMessage: 'There were some missteps, but you are doing well.\nThis story is still unfolding. What path will you choose next?',
     failureMessage: 'This choice was not an easy one.\nWould you like to try a different path this time?',
-    continueAfterAd: 'Continue',
+    continueAfterAd: 'Watch Ad to Continue',
     chooseAnother: 'Choose Another Character',
     restart: 'Restart From the Beginning',
     viewMistakes: 'See What Went Wrong',
@@ -60,7 +60,7 @@ const END_TEXT = {
 const END_TEXT_KO = {
   successMessage: '시행착오는 있었지만 잘 해내고 있어요.\n이 이야기는 아직 계속돼요. 다음에는 어떤 길을 선택해볼까요?',
   failureMessage: '이번 선택은 쉽지 않았어요.\n이번엔 다르게 해볼까요?',
-  continueAfterAd: '계속하기',
+  continueAfterAd: '광고 보고 계속하기',
   chooseAnother: '다른 캐릭터 선택하기',
   restart: '처음부터 다시 하기',
   viewMistakes: '내가 잘못한 점 보기',
@@ -126,8 +126,8 @@ export default function EndingScene({
                 {variant === 'failure' ? (
                   <TouchableOpacity style={styles.continueButton} onPress={onContinueAfterAd} activeOpacity={0.92}>
                     <Text style={styles.continueButtonText}>{text.continueAfterAd}</Text>
-                    <View style={styles.youtubeBadge}>
-                      <MaterialCommunityIcons name="play" size={13} color="#FFFFFF" />
+                    <View style={styles.rewardAdBadge}>
+                      <MaterialCommunityIcons name="gift-outline" size={15} color="#FDE9A8" />
                     </View>
                   </TouchableOpacity>
                 ) : null}
@@ -296,15 +296,17 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#284A6E',
   },
-  youtubeBadge: {
-    width: 24,
-    height: 17,
-    borderRadius: 5,
+  rewardAdBadge: {
+    width: 28,
+    height: 22,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF0033',
-    shadowColor: '#C8001F',
-    shadowOpacity: 0.22,
+    backgroundColor: '#315C87',
+    borderWidth: 1,
+    borderColor: 'rgba(253, 221, 141, 0.68)',
+    shadowColor: '#284A6E',
+    shadowOpacity: 0.18,
     shadowRadius: 5,
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
