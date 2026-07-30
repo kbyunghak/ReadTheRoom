@@ -126,7 +126,9 @@ export default function EndingScene({
                 {variant === 'failure' ? (
                   <TouchableOpacity style={styles.continueButton} onPress={onContinueAfterAd} activeOpacity={0.92}>
                     <Text style={styles.continueButtonText}>{text.continueAfterAd}</Text>
-                    <MaterialCommunityIcons name="youtube" size={20} color="#284A6E" />
+                    <View style={styles.youtubeBadge}>
+                      <MaterialCommunityIcons name="play" size={13} color="#FFFFFF" />
+                    </View>
                   </TouchableOpacity>
                 ) : null}
 
@@ -140,7 +142,6 @@ export default function EndingScene({
                     activeOpacity={0.92}
                   >
                     <Text style={styles.tertiaryButtonText}>{text.viewMistakes}</Text>
-                    <MaterialCommunityIcons name="play-box-outline" size={18} color="#FFF7EF" />
                   </TouchableOpacity>
                 ) : null}
 
@@ -295,6 +296,19 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#284A6E',
   },
+  youtubeBadge: {
+    width: 24,
+    height: 17,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FF0033',
+    shadowColor: '#C8001F',
+    shadowOpacity: 0.22,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
   primaryButton: {
     width: '100%',
     maxWidth: '100%',
@@ -334,8 +348,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 8,
   },
   tertiaryButtonText: {
     fontSize: 16,

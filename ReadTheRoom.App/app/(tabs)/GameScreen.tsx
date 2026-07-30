@@ -4,6 +4,8 @@ import {
   Image,
   ImageBackground,
   ImageSourcePropType,
+  Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,6 +14,8 @@ import {
   View,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as NavigationBar from 'expo-navigation-bar';
+import { StatusBar } from 'expo-status-bar';
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -200,11 +204,11 @@ const UI_TEXT = {
     closeButton: 'Close',
     daySummaryLabel: "Today's Summary",
     noStatChanges: 'No stat changes',
-    failureContinueTitle: 'Recover and continue?',
+    failureContinueTitle: 'Recover condition and continue?',
     failureContinueMessage:
-      'Later, this can show a rewarded ad before restoring your condition. Continue for testing now?',
-    failureContinueYes: 'Yes',
-    failureContinueNo: 'No',
+      'This is currently a test build. In the release version, you will be able to watch an ad to recover your condition and keep playing.\n\nFor now, would you like to recover your condition in test mode and continue?',
+    failureContinueYes: 'Continue',
+    failureContinueNo: 'Cancel',
   },
   ko: {
     roadmapBtn: '스토리맵',
@@ -237,9 +241,9 @@ const UI_TEXT = {
     noStatChanges: '스탯 변화 없음',
     failureContinueTitle: '상태를 회복하고 계속할까요?',
     failureContinueMessage:
-      '나중에는 광고를 본 뒤 컨디션을 회복하고 계속 진행할 수 있게 연결할 예정입니다. 지금은 테스트용으로 계속할까요?',
-    failureContinueYes: '예',
-    failureContinueNo: '아니오',
+      '현재는 테스트 버전입니다. 정식 버전에서는 광고를 시청하여 컨디션을 회복한 후 이어서 플레이할 수 있습니다.\n\n지금은 테스트 모드로 컨디션을 회복하고 계속 진행하시겠습니까?',
+    failureContinueYes: '계속하기',
+    failureContinueNo: '취소',
   },
 } as const;
 
@@ -396,6 +400,7 @@ export default function GameScreen({
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialStepIndex, setTutorialStepIndex] = useState(0);
   const [tutorialDontShowAgain, setTutorialDontShowAgain] = useState(false);
+  const [showTitleModal, setShowTitleModal] = useState(false);
   const [checkpoints, setCheckpoints] = useState<Record<number, Checkpoint>>(
     activeInitialSession
       ? activeInitialSession.checkpoints
@@ -436,7 +441,14 @@ export default function GameScreen({
     height - insets.top - insets.bottom - roadmapVerticalInset * 2,
   );
   const tutorialBubbleWidth = Math.min(width - 36, 330);
-  const tutorialTopInset = insets.top + 8;
+  // The tutorial overlay is rendered inside SafeAreaView content, so header
+  // anchors should use local coordinates instead of adding the top inset again.
+  const tutorialTopInset = 8;
+  const tutorialHeaderIconFocus = {
+    top: 2,
+    width: 48,
+    height: 48,
+  };
   const tutorialAnchor = (() => {
     switch (tutorialStep.key) {
       case 'storymap':
@@ -448,10 +460,8 @@ export default function GameScreen({
           },
           arrow: styles.tutorialArrowTopLeft,
           focus: {
-            top: tutorialTopInset + 4,
-            left: 8,
-            width: 48,
-            height: 48,
+            ...tutorialHeaderIconFocus,
+            left: headerHorizontalPadding - 6,
           },
         };
       case 'title':
@@ -463,10 +473,10 @@ export default function GameScreen({
           },
           arrow: styles.tutorialArrowTopCenter,
           focus: {
-            top: tutorialTopInset + 8,
+            top: 6,
             left: Math.max(64, width * 0.18),
             right: Math.max(64, width * 0.18),
-            height: 36,
+            height: 40,
           },
         };
       case 'language':
@@ -478,10 +488,8 @@ export default function GameScreen({
           },
           arrow: styles.tutorialArrowTopRight,
           focus: {
-            top: tutorialTopInset + 4,
-            right: 8,
-            width: 48,
-            height: 48,
+            ...tutorialHeaderIconFocus,
+            right: headerHorizontalPadding - 6,
           },
         };
       case 'status':
@@ -493,7 +501,7 @@ export default function GameScreen({
           },
           arrow: styles.tutorialArrowTopRight,
           focus: {
-            top: tutorialTopInset + headerHeight + 8,
+            top: headerHeight + 8,
             right: headerHorizontalPadding,
             width: statusCardWidth,
             height: 86,
@@ -518,6 +526,19 @@ export default function GameScreen({
         };
     }
   })();
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return;
+    }
+
+    void NavigationBar.setBehaviorAsync('overlay-swipe');
+    void NavigationBar.setVisibilityAsync('hidden');
+
+    return () => {
+      void NavigationBar.setVisibilityAsync('visible');
+    };
+  }, []);
 
   useEffect(() => {
     setLang(activeInitialSession ? activeInitialSession.lang : initialLang);
@@ -1121,6 +1142,7 @@ export default function GameScreen({
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <StatusBar hidden />
       <Tabs.Screen
         options={{ headerShown: false, tabBarStyle: { display: 'none' } }}
       />
@@ -1163,12 +1185,7 @@ export default function GameScreen({
               language={lang}
               showLanguageMenu={showLanguageMenu}
               onOpenRoadmap={() => setShowRoadmap(true)}
-              onShowFullTitle={() =>
-                Alert.alert(
-                  isKorean ? '장면 제목' : 'Scene Title',
-                  headerTitle,
-                )
-              }
+              onShowFullTitle={() => setShowTitleModal(true)}
               onToggleLanguageMenu={() =>
                 setShowLanguageMenu((prev) => !prev)
               }
@@ -1314,6 +1331,48 @@ export default function GameScreen({
           ) : null}
         </View>
       </ImageBackground>
+
+      <Modal
+        visible={showTitleModal}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setShowTitleModal(false)}
+      >
+        <View style={styles.titleModalOverlay}>
+          <View style={styles.titleModalCard}>
+            <View style={styles.titleModalHeader}>
+              <View style={styles.titleModalBadge}>
+                <Text style={styles.titleModalBadgeText}>
+                  {isKorean ? '현재 장면' : 'Current Scene'}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.titleModalCloseButton}
+                onPress={() => setShowTitleModal(false)}
+                activeOpacity={0.88}
+              >
+                <Text style={styles.titleModalCloseText}>×</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.titleModalTitle}>
+              {isKorean ? '장면 제목' : 'Scene Title'}
+            </Text>
+            <Text style={styles.titleModalBody}>{headerTitle}</Text>
+
+            <TouchableOpacity
+              style={styles.titleModalButton}
+              onPress={() => setShowTitleModal(false)}
+              activeOpacity={0.9}
+            >
+              <Text style={styles.titleModalButtonText}>
+                {isKorean ? '확인' : 'OK'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       <RoadmapModal
         ref={roadmapScrollRef}
@@ -1560,6 +1619,95 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(168, 209, 255, 0.9)',
   },
   tutorialNextText: {
+    color: '#22496F',
+    fontSize: 15,
+    lineHeight: 19,
+    fontWeight: '900',
+  },
+  titleModalOverlay: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    backgroundColor: 'rgba(2, 8, 18, 0.68)',
+  },
+  titleModalCard: {
+    width: '100%',
+    maxWidth: 380,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(126, 190, 255, 0.52)',
+    backgroundColor: 'rgba(7, 20, 43, 0.97)',
+    paddingHorizontal: 18,
+    paddingTop: 16,
+    paddingBottom: 18,
+    shadowColor: '#1D78FF',
+    shadowOpacity: 0.24,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 22,
+  },
+  titleModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 14,
+  },
+  titleModalBadge: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(142, 194, 255, 0.42)',
+    backgroundColor: 'rgba(26, 82, 150, 0.7)',
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+  },
+  titleModalBadgeText: {
+    color: '#DCEEFF',
+    fontSize: 12,
+    lineHeight: 15,
+    fontWeight: '900',
+  },
+  titleModalCloseButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(207, 226, 255, 0.28)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  titleModalCloseText: {
+    color: '#EAF3FF',
+    fontSize: 25,
+    lineHeight: 29,
+    fontWeight: '700',
+  },
+  titleModalTitle: {
+    color: '#FFFFFF',
+    fontSize: 23,
+    lineHeight: 29,
+    fontWeight: '900',
+    letterSpacing: -0.3,
+  },
+  titleModalBody: {
+    marginTop: 12,
+    color: '#DCE8F8',
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: '800',
+  },
+  titleModalButton: {
+    minHeight: 46,
+    marginTop: 20,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#DCEEFF',
+    borderWidth: 1,
+    borderColor: 'rgba(168, 209, 255, 0.9)',
+  },
+  titleModalButtonText: {
     color: '#22496F',
     fontSize: 15,
     lineHeight: 19,
