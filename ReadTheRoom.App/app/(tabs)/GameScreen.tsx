@@ -401,6 +401,7 @@ export default function GameScreen({
   const [tutorialStepIndex, setTutorialStepIndex] = useState(0);
   const [tutorialDontShowAgain, setTutorialDontShowAgain] = useState(false);
   const [showTitleModal, setShowTitleModal] = useState(false);
+  const [showRecoveryModal, setShowRecoveryModal] = useState(false);
   const [checkpoints, setCheckpoints] = useState<Record<number, Checkpoint>>(
     activeInitialSession
       ? activeInitialSession.checkpoints
@@ -559,6 +560,7 @@ export default function GameScreen({
     setShowResult(false);
     setShowFeedbackModal(false);
     setSelectedChoice(null);
+    setShowRecoveryModal(false);
     setEndingType(null);
     setPendingSummary(null);
     setCheckpoints(
@@ -1057,22 +1059,14 @@ export default function GameScreen({
     }
     setFailureRecoveryNextScenarioId(null);
     setCurrentSituationChoices([]);
+    setShowRecoveryModal(false);
     setEndingType(null);
     setShowResult(false);
     setSelectedChoice(null);
   };
 
   const confirmContinueAfterFailure = () => {
-    Alert.alert(t.failureContinueTitle, t.failureContinueMessage, [
-      {
-        text: t.failureContinueNo,
-        style: 'cancel',
-      },
-      {
-        text: t.failureContinueYes,
-        onPress: recoverAfterFailure,
-      },
-    ]);
+    setShowRecoveryModal(true);
   };
 
   const jumpToRoadmapNode = (node: RoadmapNode) => {
@@ -1084,6 +1078,7 @@ export default function GameScreen({
     setCurrentSituationChoices([]);
     setPendingSummary(null);
     setFailureRecoveryNextScenarioId(null);
+    setShowRecoveryModal(false);
     setShowResult(false);
     setSelectedChoice(null);
     setEndingType(null);
@@ -1093,21 +1088,37 @@ export default function GameScreen({
 
   if (endingType) {
     return (
-      <EndingScene
-        lang={lang}
-        variant={endingType}
-        characterId={character?.id}
-        failureRecap={failureRecap}
-        onContinueAfterAd={
-          endingType === 'failure' ? confirmContinueAfterFailure : undefined
-        }
-        onTryAnotherChoice={() => {
-          restartGame();
-          onClearSavedGame?.();
-          onGoToCharacterSelect?.();
-        }}
-        onRestartFromBeginning={restartGame}
-      />
+      <>
+        <EndingScene
+          lang={lang}
+          variant={endingType}
+          characterId={character?.id}
+          failureRecap={failureRecap}
+          onContinueAfterAd={
+            endingType === 'failure' ? confirmContinueAfterFailure : undefined
+          }
+          onTryAnotherChoice={() => {
+            restartGame();
+            onClearSavedGame?.();
+            onGoToCharacterSelect?.();
+          }}
+          onRestartFromBeginning={restartGame}
+        />
+        {endingType === 'failure' ? (
+          <RecoveryConfirmModal
+            visible={showRecoveryModal}
+            title={t.failureContinueTitle}
+            message={t.failureContinueMessage}
+            cancelLabel={t.failureContinueNo}
+            continueLabel={t.failureContinueYes}
+            onCancel={() => setShowRecoveryModal(false)}
+            onContinue={() => {
+              setShowRecoveryModal(false);
+              recoverAfterFailure();
+            }}
+          />
+        ) : null}
+      </>
     );
   }
 
@@ -1408,6 +1419,78 @@ export default function GameScreen({
   );
 }
 
+type RecoveryConfirmModalProps = {
+  visible: boolean;
+  title: string;
+  message: string;
+  cancelLabel: string;
+  continueLabel: string;
+  onCancel: () => void;
+  onContinue: () => void;
+};
+
+function RecoveryConfirmModal({
+  visible,
+  title,
+  message,
+  cancelLabel,
+  continueLabel,
+  onCancel,
+  onContinue,
+}: RecoveryConfirmModalProps) {
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      statusBarTranslucent
+      onRequestClose={onCancel}
+    >
+      <View style={styles.titleModalOverlay}>
+        <View style={styles.titleModalCard}>
+          <View style={styles.titleModalHeader}>
+            <View style={styles.recoveryModalBadge}>
+              <View style={styles.recoveryYoutubeBadge}>
+                <Text style={styles.recoveryYoutubePlay}>▶</Text>
+              </View>
+              <Text style={styles.titleModalBadgeText}>TEST RECOVERY</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.titleModalCloseButton}
+              onPress={onCancel}
+              activeOpacity={0.88}
+            >
+              <Text style={styles.titleModalCloseText}>×</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.titleModalTitle}>{title}</Text>
+          <Text style={styles.titleModalBody}>{message}</Text>
+
+          <View style={styles.recoveryModalActions}>
+            <TouchableOpacity
+              style={styles.recoveryModalCancelButton}
+              onPress={onCancel}
+              activeOpacity={0.9}
+            >
+              <Text style={styles.recoveryModalCancelText}>{cancelLabel}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.recoveryModalContinueButton}
+              onPress={onContinue}
+              activeOpacity={0.9}
+            >
+              <Text style={styles.recoveryModalContinueText}>
+                {continueLabel}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#0E1B2D' },
   scenePlaceholder: {
@@ -1667,6 +1750,34 @@ const styles = StyleSheet.create({
     lineHeight: 15,
     fontWeight: '900',
   },
+  recoveryModalBadge: {
+    minHeight: 29,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 112, 112, 0.36)',
+    backgroundColor: 'rgba(124, 30, 43, 0.38)',
+    paddingLeft: 8,
+    paddingRight: 11,
+    paddingVertical: 5,
+  },
+  recoveryYoutubeBadge: {
+    width: 24,
+    height: 17,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FF0033',
+  },
+  recoveryYoutubePlay: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    lineHeight: 12,
+    fontWeight: '900',
+    marginLeft: 1,
+  },
   titleModalCloseButton: {
     width: 34,
     height: 34,
@@ -1708,6 +1819,43 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(168, 209, 255, 0.9)',
   },
   titleModalButtonText: {
+    color: '#22496F',
+    fontSize: 15,
+    lineHeight: 19,
+    fontWeight: '900',
+  },
+  recoveryModalActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 20,
+  },
+  recoveryModalCancelButton: {
+    flex: 1,
+    minHeight: 46,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(207, 226, 255, 0.34)',
+    backgroundColor: 'rgba(255, 255, 255, 0.07)',
+  },
+  recoveryModalContinueButton: {
+    flex: 1.18,
+    minHeight: 46,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#DCEEFF',
+    borderWidth: 1,
+    borderColor: 'rgba(168, 209, 255, 0.9)',
+  },
+  recoveryModalCancelText: {
+    color: 'rgba(232, 241, 255, 0.84)',
+    fontSize: 15,
+    lineHeight: 19,
+    fontWeight: '900',
+  },
+  recoveryModalContinueText: {
     color: '#22496F',
     fontSize: 15,
     lineHeight: 19,
