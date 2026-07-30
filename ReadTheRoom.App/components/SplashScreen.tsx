@@ -91,14 +91,12 @@ export default function SplashScreen({ onLoadComplete }: Props) {
             source={require('../assets/images/main.png')}
             style={{
               position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              width: '100%',
-              height: '100%',
+              top: '2.5%',
+              left: '2.5%',
+              width: '95%',
+              height: '95%',
             }}
-            resizeMode="cover"
+            resizeMode="contain"
           />
         ) : (
           <View
@@ -108,7 +106,7 @@ export default function SplashScreen({ onLoadComplete }: Props) {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: '#121B32',
+              backgroundColor: '#000000',
             }}
           />
         )}
@@ -222,6 +220,7 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
     overflow: 'hidden',
+    backgroundColor: '#000000',
   },
   backgroundImage: {
     ...StyleSheet.absoluteFillObject,

@@ -60,6 +60,7 @@ import {
   resolveChoiceContinuation,
   resolveSummaryContinuation,
 } from '../../domain/game/transitions';
+import { showRewardedRecoveryAd } from '../../utils/rewardedAdService';
 import {
   BACKGROUND_IMAGES,
   BACKGROUND_KEY_ALIASES,
@@ -91,7 +92,7 @@ type TutorialStep = {
 };
 
 const GAME_TUTORIAL_SEEN_KEY = 'readtheroom_game_tutorial_seen_v1';
-const ALWAYS_SHOW_TUTORIAL_FOR_TESTING = true;
+const ALWAYS_SHOW_TUTORIAL_FOR_TESTING = false;
 const TUTORIAL_CHARACTER_IDS = new Set(['ken', 'amy', 'sora']);
 
 const FAILURE_RECOVERY_STATS: GameStats = {
@@ -210,6 +211,13 @@ const UI_TEXT = {
       'This is currently a test build. In the release version, you can choose to watch a rewarded ad to recover your condition and continue from the next scene.\n\nFor now, would you like to apply the same recovery in test mode and continue?',
     failureContinueYes: 'Continue',
     failureContinueNo: 'Cancel',
+    failureContinueLoading: 'Preparing ad...',
+    failureAdClosedMessage:
+      'The reward was not completed. Watch the full ad to recover and continue.',
+    failureAdUnavailableMessage:
+      'Rewarded ads are not available in this build yet. Test recovery was applied.',
+    failureAdErrorMessage:
+      'The rewarded ad could not be loaded. Please try again in a moment.',
   },
   ko: {
     roadmapBtn: '스토리맵',
@@ -246,6 +254,13 @@ const UI_TEXT = {
       '현재는 테스트 버전입니다. 정식 버전에서는 보상형 광고를 시청하면 컨디션을 회복하고 다음 장면부터 이어서 플레이할 수 있습니다.\n\n지금은 테스트 모드로 같은 회복 효과를 적용하고 계속 진행하시겠습니까?',
     failureContinueYes: '계속하기',
     failureContinueNo: '취소',
+    failureContinueLoading: '광고 준비 중...',
+    failureAdClosedMessage:
+      '보상이 완료되지 않았습니다. 끝까지 시청하면 회복하고 계속할 수 있어요.',
+    failureAdUnavailableMessage:
+      '현재 빌드에서는 보상형 광고를 사용할 수 없어 테스트 회복을 적용합니다.',
+    failureAdErrorMessage:
+      '보상형 광고를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.',
   },
 } as const;
 
@@ -404,6 +419,8 @@ export default function GameScreen({
   const [tutorialDontShowAgain, setTutorialDontShowAgain] = useState(false);
   const [showTitleModal, setShowTitleModal] = useState(false);
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
+  const [isLoadingRewardAd, setIsLoadingRewardAd] = useState(false);
+  const [rewardAdMessage, setRewardAdMessage] = useState<string | null>(null);
   const [checkpoints, setCheckpoints] = useState<Record<number, Checkpoint>>(
     activeInitialSession
       ? activeInitialSession.checkpoints
@@ -535,12 +552,8 @@ export default function GameScreen({
       return;
     }
 
-    void NavigationBar.setBehaviorAsync('overlay-swipe');
-    void NavigationBar.setVisibilityAsync('hidden');
-
-    return () => {
-      void NavigationBar.setVisibilityAsync('visible');
-    };
+    void NavigationBar.setBehaviorAsync('overlay-swipe').catch(() => {});
+    void NavigationBar.setVisibilityAsync('hidden').catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -1068,7 +1081,39 @@ export default function GameScreen({
   };
 
   const confirmContinueAfterFailure = () => {
+    setRewardAdMessage(null);
     setShowRecoveryModal(true);
+  };
+
+  const handleRewardedRecoveryContinue = async () => {
+    if (isLoadingRewardAd) return;
+
+    setRewardAdMessage(null);
+    setIsLoadingRewardAd(true);
+
+    const result = await showRewardedRecoveryAd();
+
+    setIsLoadingRewardAd(false);
+
+    if (result.status === 'rewarded' || result.status === 'test-rewarded') {
+      if (result.status === 'test-rewarded') {
+        setRewardAdMessage(t.failureAdUnavailableMessage);
+      }
+      setShowRecoveryModal(false);
+      recoverAfterFailure();
+      return;
+    }
+
+    if (result.status === 'closed') {
+      setRewardAdMessage(t.failureAdClosedMessage);
+      return;
+    }
+
+    setRewardAdMessage(
+      result.status === 'unavailable'
+        ? t.failureAdUnavailableMessage
+        : t.failureAdErrorMessage,
+    );
   };
 
   const jumpToRoadmapNode = (node: RoadmapNode) => {
@@ -1112,13 +1157,20 @@ export default function GameScreen({
             badgeLabel={t.failureContinueBadge}
             title={t.failureContinueTitle}
             message={t.failureContinueMessage}
+            statusMessage={rewardAdMessage}
             cancelLabel={t.failureContinueNo}
-            continueLabel={t.failureContinueYes}
-            onCancel={() => setShowRecoveryModal(false)}
-            onContinue={() => {
+            continueLabel={
+              isLoadingRewardAd
+                ? t.failureContinueLoading
+                : t.failureContinueYes
+            }
+            isLoading={isLoadingRewardAd}
+            onCancel={() => {
+              if (isLoadingRewardAd) return;
               setShowRecoveryModal(false);
-              recoverAfterFailure();
+              setRewardAdMessage(null);
             }}
+            onContinue={handleRewardedRecoveryContinue}
           />
         ) : null}
       </>
@@ -1427,8 +1479,10 @@ type RecoveryConfirmModalProps = {
   badgeLabel: string;
   title: string;
   message: string;
+  statusMessage: string | null;
   cancelLabel: string;
   continueLabel: string;
+  isLoading: boolean;
   onCancel: () => void;
   onContinue: () => void;
 };
@@ -1438,8 +1492,10 @@ function RecoveryConfirmModal({
   badgeLabel,
   title,
   message,
+  statusMessage,
   cancelLabel,
   continueLabel,
+  isLoading,
   onCancel,
   onContinue,
 }: RecoveryConfirmModalProps) {
@@ -1471,18 +1527,31 @@ function RecoveryConfirmModal({
 
           <Text style={styles.titleModalTitle}>{title}</Text>
           <Text style={styles.titleModalBody}>{message}</Text>
+          {statusMessage ? (
+            <View style={styles.recoveryModalNotice}>
+              <Text style={styles.recoveryModalNoticeText}>{statusMessage}</Text>
+            </View>
+          ) : null}
 
           <View style={styles.recoveryModalActions}>
             <TouchableOpacity
-              style={styles.recoveryModalCancelButton}
+              style={[
+                styles.recoveryModalCancelButton,
+                isLoading && styles.recoveryModalButtonDisabled,
+              ]}
               onPress={onCancel}
+              disabled={isLoading}
               activeOpacity={0.9}
             >
               <Text style={styles.recoveryModalCancelText}>{cancelLabel}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.recoveryModalContinueButton}
+              style={[
+                styles.recoveryModalContinueButton,
+                isLoading && styles.recoveryModalButtonDisabled,
+              ]}
               onPress={onContinue}
+              disabled={isLoading}
               activeOpacity={0.9}
             >
               <Text style={styles.recoveryModalContinueText}>
@@ -1831,10 +1900,28 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     fontWeight: '900',
   },
+  recoveryModalNotice: {
+    marginTop: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(241, 198, 106, 0.34)',
+    backgroundColor: 'rgba(241, 198, 106, 0.11)',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  recoveryModalNoticeText: {
+    color: '#F8E2A8',
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: '800',
+  },
   recoveryModalActions: {
     flexDirection: 'row',
     gap: 10,
     marginTop: 20,
+  },
+  recoveryModalButtonDisabled: {
+    opacity: 0.58,
   },
   recoveryModalCancelButton: {
     flex: 1,

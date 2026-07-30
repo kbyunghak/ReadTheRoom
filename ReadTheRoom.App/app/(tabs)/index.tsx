@@ -95,7 +95,7 @@ export default function App() {
     <>
       <Tabs.Screen
         options={{
-          tabBarStyle: screen === 'game' ? { display: 'none' } : undefined,
+          tabBarStyle: { display: 'none' },
         }}
       />
       {children}
