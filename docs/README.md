@@ -10,6 +10,7 @@ This folder is the documentation hub for ReadTheRoom. It separates current proje
 - [Testing Strategy](testing-strategy.md): validation model, coverage reporting, and future UI testing priorities.
 - [Release Checklist](release-checklist.md): automated checks and Expo Go smoke-test checklist.
 - [Roadmap](roadmap.md): near-term product, content, and technical priorities.
+- [Play Store Release Kit](release/play-store/README.md): Play Store submission assets, listing copy, and upload checklist.
 
 ## Project Policies
 

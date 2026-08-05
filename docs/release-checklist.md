@@ -116,3 +116,20 @@ Before publishing:
 - Confirm scenario content scope.
 - Confirm test command output.
 - Confirm manual smoke-test result.
+
+## Play Store Assets
+
+See [`docs/release/play-store/`](release/play-store/README.md) for the store submission kit.
+
+Required items before Play Store submission:
+
+- Android App Bundle (`app-release.aab`)
+- App icon (`512x512`)
+- Feature graphic (`1024x500`)
+- At least 2 English screenshots
+- At least 2 Korean screenshots
+- English store listing copy
+- Korean store listing copy
+- Public privacy policy URL
+- Tester email list for closed testing if required
+- App access notes if review login is needed
