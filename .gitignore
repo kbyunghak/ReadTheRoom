@@ -9,3 +9,6 @@
 
 # Scenario backup references
 /ReadTheRoom.App/assets/data/backup/
+
+# Local store submission binaries and image exports
+/release-asset/
