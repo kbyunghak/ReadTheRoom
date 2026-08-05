@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
 import {
   ScrollView,
@@ -24,6 +25,7 @@ import type {
 
 const SCREEN_PADDING = 18;
 const MAX_CONTENT_WIDTH = 560;
+const STUDIO_URL = 'https://kbyunghak.github.io/JOYgleStudio/';
 export type { Character, CharacterStat, LocalizedText, StartingStats, StatKey };
 
 type Props = {
@@ -45,6 +47,10 @@ export default function CharacterSelectScreen({
   const cardHeight = Math.min(165, Math.max(140, height * 0.18));
   const imageWidth = Math.min(130, Math.max(105, height * 0.13));
   const useCompactCard = contentWidth < 330;
+
+  const openStudioSite = () => {
+    void WebBrowser.openBrowserAsync(STUDIO_URL);
+  };
 
   const renderCharacterCard = (character: Character) => {
     const displayStats = buildCoreCharacterStats(character.startingStats);
@@ -234,6 +240,17 @@ export default function CharacterSelectScreen({
             />
             <Text style={styles.footerHintText}>{text.settingsHint}</Text>
           </View>
+
+          <TouchableOpacity
+            style={styles.studioLink}
+            onPress={openStudioSite}
+            accessibilityRole="link"
+            accessibilityLabel="Open JOYgle Studio website"
+            activeOpacity={0.72}
+          >
+            <MaterialCommunityIcons name="open-in-new" size={12} color="#8F96AD" />
+            <Text style={styles.studioLinkText}>JOYgle Studio</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -467,5 +484,21 @@ const styles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 16,
     textAlign: 'center',
+  },
+  studioLink: {
+    alignSelf: 'center',
+    marginTop: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  studioLinkText: {
+    color: '#8F96AD',
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '700',
+    letterSpacing: 0.1,
   },
 });
