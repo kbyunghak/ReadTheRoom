@@ -30,5 +30,5 @@ npx eas-cli@latest build --platform android --profile production
 
 - The Play Store release uses an `.aab`, not an `.apk`.
 - `app-release.aab` is a build artifact and should not be committed to the repository.
-- The app package name is `com.spdshts.readtheroom`.
+- The app package name is `com.joygle.readtheroom`.
 - The Play Console app slug is `rtr`.

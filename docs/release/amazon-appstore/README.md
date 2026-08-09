@@ -6,7 +6,7 @@ This folder tracks the materials and checks required to submit Read The Room to 
 
 - Platform: Fire OS tablets
 - Submission format: Android App Bundle (`.aab`)
-- Package name: `com.spdshts.readtheroom`
+- Package name: `com.joygle.readtheroom`
 - Supported in-app languages: Korean and English
 - Login requirement: none
 - Current monetization: optional rewarded advertising; no in-app purchases are available in this release

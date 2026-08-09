@@ -4,7 +4,7 @@
 
 - [ ] Amazon Developer Console account profile is complete.
 - [ ] New app record is created as an Android / Fire OS tablet app.
-- [ ] Package name is confirmed as `com.spdshts.readtheroom`.
+- [ ] Package name is confirmed as `com.joygle.readtheroom`.
 - [ ] Customer support email is set to `joygle.dev@gmail.com`.
 - [ ] Fire TV is not selected as a supported target for this release.
 
