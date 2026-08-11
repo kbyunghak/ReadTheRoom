@@ -10,8 +10,16 @@ export type RewardedAdResult =
 
 const AD_LOAD_TIMEOUT_MS = 20000;
 
+const isRewardedAdTestMode = () =>
+  __DEV__ || Constants.expoConfig?.extra?.rewardedAdTestMode === true;
+
+const useTestRecoveryFallback = (reason: string): RewardedAdResult =>
+  isRewardedAdTestMode()
+    ? { status: 'test-rewarded', reason }
+    : { status: 'unavailable', reason };
+
 const getRewardedAdUnitId = (testRewardedId: string) => {
-  if (__DEV__) {
+  if (isRewardedAdTestMode()) {
     return testRewardedId;
   }
 
@@ -30,10 +38,9 @@ export async function showRewardedRecoveryAd(): Promise<RewardedAdResult> {
   }
 
   if (isExpoGo()) {
-    return {
-      status: __DEV__ ? 'test-rewarded' : 'unavailable',
-      reason: 'Rewarded ads require a native development or preview build.',
-    };
+    return useTestRecoveryFallback(
+      'Rewarded ads require a native development or preview build.',
+    );
   }
 
   try {
@@ -48,10 +55,9 @@ export async function showRewardedRecoveryAd(): Promise<RewardedAdResult> {
     const adUnitId = getRewardedAdUnitId(TestIds.REWARDED);
 
     if (!adUnitId) {
-      return {
-        status: 'unavailable',
-        reason: 'Rewarded ad unit ID is not configured for this platform.',
-      };
+      return useTestRecoveryFallback(
+        'Rewarded ad unit ID is not configured for this platform.',
+      );
     }
 
     await mobileAds().initialize();
@@ -73,7 +79,7 @@ export async function showRewardedRecoveryAd(): Promise<RewardedAdResult> {
       };
 
       const timeoutId = setTimeout(() => {
-        settle({ status: 'unavailable', reason: 'Rewarded ad load timed out.' });
+        settle(useTestRecoveryFallback('Rewarded ad load timed out.'));
       }, AD_LOAD_TIMEOUT_MS);
 
       unsubscribers.push(
@@ -89,6 +95,10 @@ export async function showRewardedRecoveryAd(): Promise<RewardedAdResult> {
           settle(earnedReward ? { status: 'rewarded' } : { status: 'closed' });
         }),
         rewardedAd.addAdEventListener(AdEventType.ERROR, (error) => {
+          if (isRewardedAdTestMode()) {
+            settle(useTestRecoveryFallback('Rewarded ad failed to load.'));
+            return;
+          }
           settle({ status: 'error', error });
         }),
       );
@@ -96,11 +106,10 @@ export async function showRewardedRecoveryAd(): Promise<RewardedAdResult> {
       rewardedAd.load();
     });
   } catch (error) {
-    if (__DEV__) {
-      return {
-        status: 'test-rewarded',
-        reason: 'Rewarded ad native module is unavailable in this test environment.',
-      };
+    if (isRewardedAdTestMode()) {
+      return useTestRecoveryFallback(
+        'Rewarded ad native module is unavailable in this test environment.',
+      );
     }
 
     return { status: 'error', error };
