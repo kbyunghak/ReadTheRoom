@@ -43,8 +43,13 @@ export default function CharacterSelectScreen({
 }: Props) {
   const { width, height } = useWindowDimensions();
   const text = locales[lang].characterSelect;
-  const contentWidth = Math.min(width - SCREEN_PADDING * 2, MAX_CONTENT_WIDTH);
-  const cardHeight = Math.min(165, Math.max(140, height * 0.18));
+  const isLandscape = width > height && width >= 700;
+  const contentWidth = isLandscape
+    ? Math.min(width - 48, 1200)
+    : Math.min(width - SCREEN_PADDING * 2, MAX_CONTENT_WIDTH);
+  const cardHeight = isLandscape
+    ? Math.min(Math.max(height - 170, 300), 410)
+    : Math.min(165, Math.max(140, height * 0.18));
   const imageWidth = Math.min(130, Math.max(105, height * 0.13));
   const useCompactCard = contentWidth < 330;
 
@@ -56,14 +61,22 @@ export default function CharacterSelectScreen({
     const displayStats = buildCoreCharacterStats(character.startingStats);
 
     return (
-      <View key={character.id} style={[styles.card, { height: cardHeight }]}>
+      <View
+        key={character.id}
+        style={[
+          styles.card,
+          { height: cardHeight },
+          isLandscape && styles.cardLandscape,
+        ]}
+      >
         <View
           style={[
             styles.cardImageFrame,
             {
-              width: imageWidth,
-              height: cardHeight,
+              width: isLandscape ? '100%' : imageWidth,
+              height: isLandscape ? Math.round(cardHeight * 0.48) : cardHeight,
             },
+            isLandscape && styles.cardImageFrameLandscape,
           ]}
         >
           <Image
@@ -77,6 +90,7 @@ export default function CharacterSelectScreen({
         <View
           style={[
             styles.cardBody,
+            isLandscape && styles.cardBodyLandscape,
             useCompactCard && {
               paddingHorizontal: 10,
             },
@@ -228,7 +242,7 @@ export default function CharacterSelectScreen({
             <Text style={styles.headerDescription}>{text.description}</Text>
           </View>
 
-          <View style={styles.cardList}>
+          <View style={[styles.cardList, isLandscape && styles.cardListLandscape]}>
             {BETA_CHARACTERS.map(renderCharacterCard)}
           </View>
 
@@ -320,7 +334,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   cardList: {
+    width: '100%',
     gap: 9,
+  },
+  cardListLandscape: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    gap: 14,
   },
   card: {
     flexDirection: 'row',
@@ -330,6 +350,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.12)',
   },
+  cardLandscape: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: 'column',
+  },
   cardImageFrame: {
     alignSelf: 'flex-end',
     position: 'relative',
@@ -337,6 +362,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     overflow: 'hidden',
     backgroundColor: '#24283B',
+  },
+  cardImageFrameLandscape: {
+    alignSelf: 'stretch',
   },
   cardImage: {
     width: '100%',
@@ -367,6 +395,10 @@ const styles = StyleSheet.create({
     minWidth: 0,
     paddingHorizontal: 11,
     paddingVertical: 8,
+  },
+  cardBodyLandscape: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
   },
   cardHeader: {
     flexDirection: 'row',

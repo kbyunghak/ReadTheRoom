@@ -439,28 +439,45 @@ export default function GameScreen({
   const tutorialStep = tutorialSteps[tutorialStepIndex] ?? tutorialSteps[0];
   const isLastTutorialStep = tutorialStepIndex >= tutorialSteps.length - 1;
   const isKorean = lang === 'ko';
-  const isNarrow = width <= 390;
+  const isLandscape = width > height && width >= 700;
+  // Use the whole available canvas. Landscape phones are often wider than
+  // 16:9, so constraining the game to a fixed ratio creates visible side bars.
+  const gameFrameWidth = width;
+  const gameFrameHeight = height;
+  const isCompactLandscape = isLandscape && gameFrameHeight <= 560;
+  const isNarrow = gameFrameWidth <= 390;
   const statusCardWidth = Math.min(
-    Math.round(width * (isNarrow ? 0.39 : 0.33)),
-    188,
+    Math.round(
+      gameFrameWidth * (isLandscape ? 0.24 : isNarrow ? 0.45 : 0.41),
+    ),
+    isLandscape ? 300 : 210,
   );
   const headerHeight = 52;
-  const headerHorizontalPadding = isNarrow ? 12 : 18;
+  const headerHorizontalPadding = isLandscape ? 20 : isNarrow ? 12 : 18;
   const characterTop = headerHeight;
-  const characterHeight = Math.round(height * (isNarrow ? 0.58 : 0.6));
-  const characterWidth = Math.round(width * 0.72);
+  const characterHeight = Math.round(
+    gameFrameHeight * (isLandscape ? 0.88 : isNarrow ? 0.58 : 0.6),
+  );
+  const characterWidth = Math.round(
+    gameFrameWidth * (isLandscape ? 0.44 : 0.72),
+  );
   const scenarioPanelBottom = Math.max(insets.bottom, 8);
   const scenarioPanelMaxHeight = Math.min(
     460,
-    Math.max(360, Math.round(height * 0.42)),
+    Math.max(
+      360,
+      Math.round(gameFrameHeight * (isLandscape ? 0.74 : 0.42)),
+    ),
   );
   const roadmapVerticalInset = isNarrow ? 12 : 16;
-  const roadmapPanelWidth = Math.min(Math.round(width * 0.92), 520);
+  const roadmapPanelWidth = isLandscape
+    ? Math.min(Math.round(gameFrameWidth * 0.94), 1024)
+    : Math.min(Math.round(gameFrameWidth * 0.92), 520);
   const roadmapPanelMaxHeight = Math.max(
     300,
-    height - insets.top - insets.bottom - roadmapVerticalInset * 2,
+    gameFrameHeight - insets.top - insets.bottom - roadmapVerticalInset * 2,
   );
-  const tutorialBubbleWidth = Math.min(width - 36, 330);
+  const tutorialBubbleWidth = Math.min(gameFrameWidth - 36, 330);
   // The tutorial overlay is rendered inside SafeAreaView content, so header
   // anchors should use local coordinates instead of adding the top inset again.
   const tutorialTopInset = 8;
@@ -488,14 +505,14 @@ export default function GameScreen({
         return {
           bubble: {
             top: tutorialTopInset + headerHeight + 8,
-            left: Math.max(14, (width - tutorialBubbleWidth) / 2),
+            left: Math.max(14, (gameFrameWidth - tutorialBubbleWidth) / 2),
             width: tutorialBubbleWidth,
           },
           arrow: styles.tutorialArrowTopCenter,
           focus: {
             top: 6,
-            left: Math.max(64, width * 0.18),
-            right: Math.max(64, width * 0.18),
+            left: Math.max(64, gameFrameWidth * 0.18),
+            right: Math.max(64, gameFrameWidth * 0.18),
             height: 40,
           },
         };
@@ -1212,11 +1229,32 @@ export default function GameScreen({
       <Tabs.Screen
         options={{ headerShown: false, tabBarStyle: { display: 'none' } }}
       />
-      <ImageBackground
-        source={currentBackground}
-        style={styles.backgroundImage}
-        imageStyle={styles.backgroundImageStyle}
-      >
+      <View style={styles.gameStage}>
+        {isLandscape ? (
+          <Image
+            source={currentBackground}
+            style={[
+              styles.landscapeBackgroundFill,
+              { width: gameFrameWidth, height: gameFrameHeight },
+            ]}
+            resizeMode="cover"
+            blurRadius={18}
+          />
+        ) : null}
+        <ImageBackground
+          source={currentBackground}
+          style={[
+            styles.backgroundImage,
+            isLandscape && styles.backgroundImageLandscape,
+            isLandscape
+              ? { width: gameFrameWidth, height: gameFrameHeight }
+              : null,
+          ]}
+          imageStyle={[
+            styles.backgroundImageStyle,
+            isLandscape && styles.backgroundImageLandscapeStyle,
+          ]}
+        >
         <View style={styles.backgroundScrim} />
         {currentCharacterOverlay && (
           <View
@@ -1285,7 +1323,10 @@ export default function GameScreen({
             scenario={currentScenario}
             language={lang}
             isNarrow={isNarrow}
+            layout={isLandscape ? 'landscape' : 'portrait'}
+            isCompactLandscape={isCompactLandscape}
             bottom={scenarioPanelBottom}
+            top={headerHeight + 4}
             maxHeight={scenarioPanelMaxHeight}
             showResult={showResult}
             showFeedbackModal={showFeedbackModal}
@@ -1396,7 +1437,8 @@ export default function GameScreen({
             </View>
           ) : null}
         </View>
-      </ImageBackground>
+        </ImageBackground>
+      </View>
 
       <Modal
         visible={showTitleModal}
@@ -1566,16 +1608,33 @@ function RecoveryConfirmModal({
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#0E1B2D' },
+  safeArea: { flex: 1, backgroundColor: '#03070E' },
   scenePlaceholder: {
     flex: 1,
     backgroundColor: '#0E1B2D',
   },
-  backgroundImage: { flex: 1 },
+  gameStage: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#03070E',
+  },
+  backgroundImage: { flex: 1, alignSelf: 'stretch' },
+  backgroundImageLandscape: {
+    flex: 0,
+  },
+  landscapeBackgroundFill: {
+    position: 'absolute',
+    opacity: 0.46,
+    transform: [{ scale: 1.08 }],
+  },
   backgroundImageStyle: {
     resizeMode: 'cover',
     width: '100%',
     height: '100%',
+  },
+  backgroundImageLandscapeStyle: {
+    resizeMode: 'contain',
   },
   backgroundScrim: {
     ...StyleSheet.absoluteFillObject,
@@ -2611,9 +2670,18 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 14 },
     elevation: 30,
   },
+  roadmapModalCardLandscape: {
+    borderRadius: 18,
+    paddingHorizontal: 10,
+    paddingTop: 9,
+    paddingBottom: 9,
+  },
   roadmapFixedHeader: {
     flexShrink: 0,
     paddingBottom: 10,
+  },
+  roadmapFixedHeaderLandscape: {
+    paddingBottom: 7,
   },
   roadmapHeaderRow: {
     flexDirection: 'row',
@@ -2644,6 +2712,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
+  roadmapPersistentHintLandscape: {
+    marginTop: 6,
+    borderRadius: 9,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+  },
   roadmapPersistentHintText: {
     flex: 1,
     color: '#FFF8EC',
@@ -2656,6 +2730,9 @@ const styles = StyleSheet.create({
     minHeight: 0,
     flexDirection: 'row',
     alignItems: 'stretch',
+  },
+  roadmapBodyLandscape: {
+    minHeight: 0,
   },
   roadmapPaperFrame: {
     flex: 1,
@@ -2678,10 +2755,20 @@ const styles = StyleSheet.create({
     paddingRight: 7,
     paddingBottom: 32,
   },
+  roadmapEpisodeContentLandscape: {
+    flexGrow: 1,
+    paddingRight: 0,
+    paddingBottom: 0,
+  },
   roadmapWeekTabs: {
     width: 44,
     marginLeft: 7,
     gap: 4,
+  },
+  roadmapWeekTabsLandscape: {
+    width: 48,
+    marginLeft: 8,
+    gap: 3,
   },
   roadmapWeekTab: {
     flex: 1,
@@ -2772,6 +2859,11 @@ const styles = StyleSheet.create({
     color: '#4E4034',
     marginBottom: 4,
   },
+  roadmapTitleLandscape: {
+    fontSize: 19,
+    lineHeight: 23,
+    marginBottom: 1,
+  },
   roadmapHint: {
     fontSize: 12,
     lineHeight: 18,
@@ -2805,6 +2897,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     elevation: 8,
   },
+  passportPageLandscape: {
+    minHeight: '100%',
+    borderLeftWidth: 4,
+    borderTopRightRadius: 14,
+    borderBottomRightRadius: 14,
+    paddingHorizontal: 12,
+    paddingTop: 10,
+    paddingBottom: 12,
+  },
   passportPageHeader: {
     fontSize: 12,
     textAlign: 'right',
@@ -2824,13 +2925,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     rowGap: 14,
   },
+  stampGridLandscape: {
+    flexWrap: 'nowrap',
+    justifyContent: 'flex-start',
+    columnGap: 8,
+    rowGap: 0,
+  },
   stampSlot: {
     width: '48%',
     minHeight: 178,
   },
+  stampSlotLandscape: {
+    minHeight: 0,
+  },
   stampFrame: {
     minHeight: 178,
     alignItems: 'center',
+  },
+  stampFrameLandscape: {
+    minHeight: 0,
   },
   stampFrameLocked: {
     opacity: 0.52,
@@ -2864,6 +2977,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.18)',
   },
+  stampBodyLandscape: {
+    width: '92%',
+    minHeight: 86,
+    marginTop: 11,
+    borderWidth: 2.4,
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 7,
+  },
   stampBodyCurrent: {
     backgroundColor: 'rgba(255, 250, 240, 0.92)',
     shadowColor: '#C9645A',
@@ -2884,6 +3006,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
     textAlign: 'center',
   },
+  stampPlaceLandscape: {
+    fontSize: 13,
+    lineHeight: 16,
+    letterSpacing: 0.55,
+  },
   stampDate: {
     marginTop: 6,
     paddingTop: 5,
@@ -2892,12 +3019,24 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
     textAlign: 'center',
   },
+  stampDateLandscape: {
+    marginTop: 4,
+    paddingTop: 4,
+    fontSize: 9,
+    lineHeight: 12,
+  },
   stampMeta: {
     marginTop: 6,
     fontSize: 9,
     fontWeight: '800',
     letterSpacing: 0.8,
     textAlign: 'center',
+  },
+  stampMetaLandscape: {
+    marginTop: 4,
+    fontSize: 8,
+    lineHeight: 10,
+    letterSpacing: 0.45,
   },
   stampTextLocked: {
     color: '#B7A793',
@@ -2909,6 +3048,13 @@ const styles = StyleSheet.create({
     color: '#5F4B3B',
     fontWeight: '700',
     textAlign: 'center',
+  },
+  stampCaptionLandscape: {
+    minHeight: 34,
+    marginTop: 9,
+    paddingHorizontal: 2,
+    fontSize: 12,
+    lineHeight: 16,
   },
   stampCaptionLocked: {
     color: '#655442',

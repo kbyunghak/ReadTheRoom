@@ -8,6 +8,7 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import { BACKGROUND_IMAGES } from '../../../shared/assets/registry';
@@ -84,6 +85,13 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
   },
   ref,
 ) {
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height && width >= 700;
+  const landscapeStampWidth = Math.max(
+    120,
+    Math.min(164, Math.floor((panelWidth - 126) / Math.max(nodes.length, 1))),
+  );
+
   return (
     <Modal
       visible={visible}
@@ -106,7 +114,8 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
         >
           <View
             style={[
-              styles.roadmapModalCard,
+            styles.roadmapModalCard,
+            isLandscape && styles.roadmapModalCardLandscape,
               {
                 width: panelWidth,
                 height: panelHeight,
@@ -114,10 +123,22 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
               },
             ]}
           >
-            <View style={styles.roadmapFixedHeader}>
+            <View
+              style={[
+                styles.roadmapFixedHeader,
+                isLandscape && styles.roadmapFixedHeaderLandscape,
+              ]}
+            >
               <View style={styles.roadmapHeaderRow}>
                 <View style={styles.roadmapHeaderCopy}>
-                  <Text style={styles.roadmapTitle}>{copy.title}</Text>
+                  <Text
+                    style={[
+                      styles.roadmapTitle,
+                      isLandscape && styles.roadmapTitleLandscape,
+                    ]}
+                  >
+                    {copy.title}
+                  </Text>
                   <Text
                     style={styles.roadmapLocationTitle}
                     numberOfLines={1}
@@ -140,7 +161,12 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
                 </TouchableOpacity>
               </View>
 
-              <View style={styles.roadmapPersistentHint}>
+              <View
+                style={[
+                  styles.roadmapPersistentHint,
+                  isLandscape && styles.roadmapPersistentHintLandscape,
+                ]}
+              >
                 <MaterialCommunityIcons
                   name="information-outline"
                   size={15}
@@ -150,7 +176,12 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
               </View>
             </View>
 
-            <View style={styles.roadmapBody}>
+            <View
+              style={[
+                styles.roadmapBody,
+                isLandscape && styles.roadmapBodyLandscape,
+              ]}
+            >
               <ImageBackground
                 source={require('../../../assets/images/paper.png')}
                 style={styles.roadmapPaperFrame}
@@ -168,18 +199,41 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
                         } as never)
                       : null,
                   ]}
-                  showsVerticalScrollIndicator={Platform.OS === 'web'}
+                  horizontal={isLandscape}
+                  showsHorizontalScrollIndicator={false}
+                  showsVerticalScrollIndicator={!isLandscape && Platform.OS === 'web'}
                   nestedScrollEnabled
                   bounces={false}
-                  contentContainerStyle={styles.roadmapEpisodeContent}
+                  contentContainerStyle={[
+                    styles.roadmapEpisodeContent,
+                    isLandscape && styles.roadmapEpisodeContentLandscape,
+                  ]}
                 >
-                  <View style={styles.passportPage}>
+                  <View
+                    style={[
+                      styles.passportPage,
+                      isLandscape && styles.passportPageLandscape,
+                      isLandscape
+                        ? {
+                            width: Math.max(
+                              panelWidth - 80,
+                              nodes.length * landscapeStampWidth,
+                            ),
+                          }
+                        : null,
+                    ]}
+                  >
                     <Text style={styles.passportPageHeader}>
                       {`VISA / VISAS · WEEK ${selectedWeek}`}
                     </Text>
                     <View style={styles.passportHeaderRule} />
 
-                    <View style={styles.stampGrid}>
+                    <View
+                      style={[
+                        styles.stampGrid,
+                        isLandscape && styles.stampGridLandscape,
+                      ]}
+                    >
                       {nodes.map((node, index) => {
                         const hasCheckpoint = completedScenarioIds.has(
                           node.scenarioId,
@@ -198,13 +252,20 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
                         return (
                           <View
                             key={`roadmap-${node.scenarioId}`}
-                            style={styles.stampSlot}
+                            style={[
+                              styles.stampSlot,
+                              isLandscape && styles.stampSlotLandscape,
+                              isLandscape ? { width: landscapeStampWidth } : null,
+                            ]}
                           >
                             <TouchableOpacity
                               activeOpacity={isAvailable ? 0.88 : 1}
                               disabled={!isAvailable}
                               onPress={() => onJump(node)}
-                              style={styles.stampFrame}
+                              style={[
+                                styles.stampFrame,
+                                isLandscape && styles.stampFrameLandscape,
+                              ]}
                             >
                               <View
                                 style={[
@@ -217,6 +278,7 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
                               <View
                                 style={[
                                   styles.stampBody,
+                                  isLandscape && styles.stampBodyLandscape,
                                   {
                                     borderColor: stampColor,
                                     transform: [{ rotate: rotation }],
@@ -237,6 +299,7 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
                                 <Text
                                   style={[
                                     styles.stampPlace,
+                                    isLandscape && styles.stampPlaceLandscape,
                                     {
                                       color:
                                         state === 'locked'
@@ -244,6 +307,9 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
                                           : stampColor,
                                     },
                                   ]}
+                                  numberOfLines={2}
+                                  adjustsFontSizeToFit
+                                  minimumFontScale={0.74}
                                 >
                                   {state === 'locked'
                                     ? 'LOCKED'
@@ -252,6 +318,7 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
                                 <Text
                                   style={[
                                     styles.stampDate,
+                                    isLandscape && styles.stampDateLandscape,
                                     {
                                       color:
                                         state === 'locked'
@@ -265,6 +332,7 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
                                 <Text
                                   style={[
                                     styles.stampMeta,
+                                    isLandscape && styles.stampMetaLandscape,
                                     {
                                       color:
                                         state === 'locked'
@@ -283,6 +351,7 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
                               <Text
                                 style={[
                                   styles.stampCaption,
+                                  isLandscape && styles.stampCaptionLandscape,
                                   state === 'locked' &&
                                     styles.stampCaptionLocked,
                                 ]}
@@ -299,7 +368,12 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
                 </ScrollView>
               </ImageBackground>
 
-              <View style={styles.roadmapWeekTabs}>
+              <View
+                style={[
+                  styles.roadmapWeekTabs,
+                  isLandscape && styles.roadmapWeekTabsLandscape,
+                ]}
+              >
                 {weeks.map((weekMeta) => {
                   const isSelected = selectedWeek === weekMeta.week;
                   const isUnlocked = unlockedWeeks.has(weekMeta.week);

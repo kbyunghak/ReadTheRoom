@@ -56,8 +56,9 @@ export default function FeedbackModal({
   onClose,
   onContinue,
 }: Props) {
-  const { height } = useWindowDimensions();
+  const { height, width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const isLandscape = width > height && width >= 700;
   const result = buildResultCardData(choice, language, tip);
   const choiceText = splitChoiceText(choice.text[language]);
   const toneColor =
@@ -85,10 +86,11 @@ export default function FeedbackModal({
         <View
           style={[
             styles.card,
+            isLandscape && styles.cardLandscape,
             {
               maxHeight: Math.min(
                 height - insets.top - insets.bottom - 28,
-                680,
+                isLandscape ? 560 : 680,
               ),
             },
           ]}
@@ -111,70 +113,77 @@ export default function FeedbackModal({
 
           <ScrollView
             style={styles.scroll}
-            contentContainerStyle={styles.content}
+            contentContainerStyle={[
+              styles.content,
+              isLandscape && styles.contentLandscape,
+            ]}
             showsVerticalScrollIndicator={false}
             bounces={false}
           >
-            <View style={[styles.section, styles.choiceSection]}>
-              <SectionHeading
-                icon="checkbox-marked-circle-outline"
-                color="#64B1FF"
-                label={copy.choiceLabel}
-              />
-              {choiceText.cue ? (
-                <Text style={styles.choiceCue}>{choiceText.cue}</Text>
-              ) : null}
-              <Text style={styles.choiceText}>{choiceText.body}</Text>
-            </View>
-
-            <View
-              style={[
-                styles.section,
-                {
-                  borderColor: `${toneColor}66`,
-                  backgroundColor: `${toneColor}12`,
-                },
-              ]}
-            >
-              <SectionHeading
-                icon={toneIcon}
-                color={toneColor}
-                label={copy.resultLabel}
-              />
-              <Text style={styles.resultText}>{result.feedbackText}</Text>
-            </View>
-
-            {result.changedStats.length ? (
-              <View style={styles.statsSection}>
+            <View style={[styles.primaryColumn, isLandscape && styles.modalColumnLandscape]}>
+              <View style={[styles.section, styles.choiceSection]}>
                 <SectionHeading
-                  icon="chart-line-variant"
-                  color="#B184FF"
-                  label={copy.statsLabel}
+                  icon="checkbox-marked-circle-outline"
+                  color="#64B1FF"
+                  label={copy.choiceLabel}
                 />
-                <View style={styles.statsGrid}>
-                  {result.changedStats.map((entry) => (
-                    <ResultStatItem
-                      key={`${choice.nextScenarioId}-${entry.statKey}`}
-                      statKey={entry.statKey}
-                      value={entry.value}
-                      compact
-                      label={statLabels[entry.statKey]}
-                    />
-                  ))}
+                {choiceText.cue ? (
+                  <Text style={styles.choiceCue}>{choiceText.cue}</Text>
+                ) : null}
+                <Text style={styles.choiceText}>{choiceText.body}</Text>
+              </View>
+
+              <View
+                style={[
+                  styles.section,
+                  {
+                    borderColor: `${toneColor}66`,
+                    backgroundColor: `${toneColor}12`,
+                  },
+                ]}
+              >
+                <SectionHeading
+                  icon={toneIcon}
+                  color={toneColor}
+                  label={copy.resultLabel}
+                />
+                <Text style={styles.resultText}>{result.feedbackText}</Text>
+              </View>
+            </View>
+
+            <View style={[styles.secondaryColumn, isLandscape && styles.modalColumnLandscape]}>
+              {result.changedStats.length ? (
+                <View style={styles.statsSection}>
+                  <SectionHeading
+                    icon="chart-line-variant"
+                    color="#B184FF"
+                    label={copy.statsLabel}
+                  />
+                  <View style={styles.statsGrid}>
+                    {result.changedStats.map((entry) => (
+                      <ResultStatItem
+                        key={`${choice.nextScenarioId}-${entry.statKey}`}
+                        statKey={entry.statKey}
+                        value={entry.value}
+                        compact
+                        label={statLabels[entry.statKey]}
+                      />
+                    ))}
+                  </View>
                 </View>
-              </View>
-            ) : null}
+              ) : null}
 
-            {result.tipText ? (
-              <View style={styles.tipSection}>
-                <SectionHeading
-                  icon="lightbulb-on-outline"
-                  color="#F4C542"
-                  label={copy.tipLabel}
-                />
-                <Text style={styles.tipText}>{result.tipText}</Text>
+              {result.tipText ? (
+                <View style={styles.tipSection}>
+                  <SectionHeading
+                    icon="lightbulb-on-outline"
+                    color="#F4C542"
+                    label={copy.tipLabel}
+                  />
+                  <Text style={styles.tipText}>{result.tipText}</Text>
+                </View>
+              ) : null}
               </View>
-            ) : null}
           </ScrollView>
 
           <View style={styles.actions}>
@@ -244,6 +253,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     elevation: 15,
   },
+  cardLandscape: {
+    maxWidth: 900,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -275,6 +287,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 14,
     paddingBottom: 18,
+  },
+  contentLandscape: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 14,
+    paddingHorizontal: 18,
+  },
+  primaryColumn: {
+    gap: 12,
+  },
+  secondaryColumn: {
+    gap: 12,
+  },
+  modalColumnLandscape: {
+    flex: 1,
+    minWidth: 0,
   },
   section: {
     borderWidth: 1,

@@ -79,7 +79,7 @@ export default function StatusCard({
       onPress={toggle}
       style={[styles.wrap, { width, right, top }]}
     >
-      <View style={[styles.stage, isFlipped && styles.stageFlipped]}>
+      <View style={styles.stage}>
         <Animated.View
           style={[styles.front, { transform: [{ perspective: 1000 }, { rotateY: frontRotate }] }]}
         >
@@ -115,6 +115,7 @@ export default function StatusCard({
         </Animated.View>
 
         <Animated.View
+          pointerEvents="none"
           style={[
             styles.card,
             styles.back,
@@ -180,9 +181,6 @@ const styles = StyleSheet.create({
   stage: {
     width: '100%',
     minHeight: 0,
-  },
-  stageFlipped: {
-    height: 356,
   },
   card: {
     width: '100%',

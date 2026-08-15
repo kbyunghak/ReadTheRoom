@@ -75,7 +75,7 @@ const FAILURE_OVERLAYS: Partial<Record<string, ImageSourcePropType>> = {
   jina: require('../assets/images/characters/jina_end.png'),
 };
 
-const MAX_GAME_CANVAS_WIDTH = 430;
+const MAX_PORTRAIT_CANVAS_WIDTH = 430;
 const COMPACT_HEIGHT = 700;
 
 export default function EndingScene({
@@ -93,8 +93,14 @@ export default function EndingScene({
   const text = lang === 'ko' ? END_TEXT_KO : END_TEXT.en;
   const failureOverlay = variant === 'failure' && characterId ? FAILURE_OVERLAYS[characterId] : undefined;
   const backgroundSource = failureOverlay ?? require('../assets/images/background/end.png');
-  const canvasWidth = Math.min(viewportWidth, MAX_GAME_CANVAS_WIDTH);
-  const isCompactHeight = viewportHeight < COMPACT_HEIGHT;
+  const isLandscape = viewportWidth > viewportHeight && viewportWidth >= 700;
+  const canvasWidth = isLandscape
+    ? Math.min(viewportWidth, Math.round(viewportHeight * (16 / 9)))
+    : Math.min(viewportWidth, MAX_PORTRAIT_CANVAS_WIDTH);
+  const canvasHeight = isLandscape
+    ? Math.min(viewportHeight, Math.round(viewportWidth * (9 / 16)))
+    : viewportHeight;
+  const isCompactHeight = !isLandscape && viewportHeight < COMPACT_HEIGHT;
 
   return (
     <View
@@ -105,7 +111,13 @@ export default function EndingScene({
         },
       ]}
     >
-      <View style={[styles.gameCanvas, { width: canvasWidth }]}>
+      <View
+        style={[
+          styles.gameCanvas,
+          isLandscape && styles.gameCanvasLandscape,
+          { width: canvasWidth, height: canvasHeight },
+        ]}
+      >
         <ImageBackground
           source={backgroundSource}
           style={styles.background}
@@ -115,14 +127,46 @@ export default function EndingScene({
           <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
             <View style={styles.scrim} />
 
-            <View style={[styles.content, isCompactHeight && styles.contentCompact]}>
-              <View style={[styles.messageCard, isCompactHeight && styles.messageCardCompact]}>
-                <Text style={[styles.messageText, isCompactHeight && styles.messageTextCompact]}>
-                  {variant === 'success' ? text.successMessage : text.failureMessage}
-                </Text>
-              </View>
+            <View
+              style={[
+                styles.content,
+                isLandscape && styles.contentLandscape,
+                isCompactHeight && styles.contentCompact,
+              ]}
+            >
+              <View
+                style={[
+                  styles.actionPanel,
+                  isLandscape && styles.actionPanelLandscape,
+                ]}
+              >
+                <View
+                  style={[
+                    styles.messageCard,
+                    isLandscape && styles.messageCardLandscape,
+                    isCompactHeight && styles.messageCardCompact,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.messageText,
+                      isLandscape && styles.messageTextLandscape,
+                      isCompactHeight && styles.messageTextCompact,
+                    ]}
+                  >
+                    {variant === 'success'
+                      ? text.successMessage
+                      : text.failureMessage}
+                  </Text>
+                </View>
 
-              <View style={[styles.buttonColumn, isCompactHeight && styles.buttonColumnCompact]}>
+                <View
+                  style={[
+                    styles.buttonColumn,
+                    isLandscape && styles.buttonColumnLandscape,
+                    isCompactHeight && styles.buttonColumnCompact,
+                  ]}
+                >
                 {variant === 'failure' ? (
                   <TouchableOpacity style={styles.continueButton} onPress={onContinueAfterAd} activeOpacity={0.92}>
                     <Text style={styles.continueButtonText}>{text.continueAfterAd}</Text>
@@ -152,6 +196,7 @@ export default function EndingScene({
                 <TouchableOpacity style={styles.secondaryButton} onPress={onRestartFromBeginning} activeOpacity={0.92}>
                   <Text style={styles.secondaryButtonText}>{text.restart}</Text>
                 </TouchableOpacity>
+                </View>
               </View>
             </View>
 
@@ -200,7 +245,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   gameCanvas: {
-    height: '100%',
     maxWidth: '100%',
     overflow: 'hidden',
     backgroundColor: '#1A1515',
@@ -209,6 +253,9 @@ const styles = StyleSheet.create({
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 0 },
     elevation: 12,
+  },
+  gameCanvasLandscape: {
+    alignSelf: 'center',
   },
   background: {
     flex: 1,
@@ -233,9 +280,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
+  contentLandscape: {
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    paddingHorizontal: 28,
+    paddingVertical: 24,
+  },
   contentCompact: {
     paddingHorizontal: 14,
     paddingBottom: 12,
+  },
+  actionPanel: {
+    width: '100%',
+    maxWidth: '100%',
+  },
+  actionPanelLandscape: {
+    width: '36%',
+    minWidth: 300,
+    maxWidth: 410,
   },
   messageCard: {
     width: '100%',
@@ -256,6 +318,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
+  messageCardLandscape: {
+    borderRadius: 18,
+    paddingHorizontal: 18,
+    paddingVertical: 15,
+  },
   messageText: {
     textAlign: 'center',
     fontSize: 17,
@@ -267,6 +334,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 21,
   },
+  messageTextLandscape: {
+    textAlign: 'left',
+    fontSize: 16,
+    lineHeight: 23,
+  },
   buttonColumn: {
     width: '100%',
     maxWidth: '100%',
@@ -276,6 +348,10 @@ const styles = StyleSheet.create({
   buttonColumnCompact: {
     marginTop: 10,
     gap: 10,
+  },
+  buttonColumnLandscape: {
+    marginTop: 10,
+    gap: 9,
   },
   continueButton: {
     width: '100%',

@@ -3,7 +3,7 @@
     "name": "Read The Room",
     "slug": "rtr",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/ReadTheRoom.png",
     "scheme": "readtheroomapp",
     "userInterfaceStyle": "automatic",
