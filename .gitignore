@@ -12,3 +12,6 @@
 
 # Local store submission binaries and image exports
 /release-asset/
+
+# Local historical documents
+/docs/release
