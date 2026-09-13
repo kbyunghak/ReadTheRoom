@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
+  BackHandler,
   Image,
   ImageBackground,
   ImageSourcePropType,
@@ -203,6 +204,13 @@ const UI_TEXT = {
     feedbackExplanation: 'Result',
     feedbackTip: 'TIP',
     closeButton: 'Close',
+    menuCharacterSelect: 'Change Character',
+    menuLanguage: 'Language · 한국어',
+    menuCancel: 'Cancel',
+    leaveGameTitle: 'Return home?',
+    leaveGameMessage: 'Your current progress will be saved before you return to character selection.',
+    leaveGameCancel: 'Stay',
+    leaveGameConfirm: 'Return home',
     daySummaryLabel: "Today's Summary",
     noStatChanges: 'No stat changes',
     failureContinueBadge: 'Rewarded Ad',
@@ -246,6 +254,13 @@ const UI_TEXT = {
     feedbackExplanation: '결과',
     feedbackTip: 'TIP',
     closeButton: '닫기',
+    menuCharacterSelect: '캐릭터 선택',
+    menuLanguage: '언어 · English',
+    menuCancel: '취소',
+    leaveGameTitle: '홈으로 이동할까요?',
+    leaveGameMessage: '현재 진행 상황을 저장한 뒤 캐릭터 선택 화면으로 이동합니다.',
+    leaveGameCancel: '계속하기',
+    leaveGameConfirm: '홈으로',
     daySummaryLabel: '오늘의 정리',
     noStatChanges: '스탯 변화 없음',
     failureContinueBadge: '보상형 광고',
@@ -406,8 +421,8 @@ export default function GameScreen({
     activeInitialSession ? activeInitialSession.playHistory : [],
   );
   const [showRoadmap, setShowRoadmap] = useState(false);
+  const [showGameMenu, setShowGameMenu] = useState(false);
   const [selectedRoadmapWeek, setSelectedRoadmapWeek] = useState(1);
-  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [pendingSummary, setPendingSummary] = useState<{
     summary: SituationSummary;
     nextScenarioId: number | null;
@@ -588,7 +603,7 @@ export default function GameScreen({
       activeInitialSession ? activeInitialSession.playHistory : [],
     );
     setShowRoadmap(false);
-    setShowLanguageMenu(false);
+    setShowGameMenu(false);
     setShowResult(false);
     setShowFeedbackModal(false);
     setSelectedChoice(null);
@@ -699,6 +714,14 @@ export default function GameScreen({
     [scenarios],
   );
   const headerTitle = getScenarioHeaderTitle(currentScenario, lang);
+  const headerStageTitle = (() => {
+    const stage = currentScenario.day ?? 1;
+    const episode = currentScenario.mainEpisode ?? currentScenario.episode;
+
+    return typeof episode === 'number'
+      ? `Stage ${stage} · EP ${String(episode).padStart(2, '0')}`
+      : `Stage ${stage}`;
+  })();
   const currentSituationTitleLocalized = {
     ko: getScenarioDisplayTitle(currentScenario, 'ko'),
     en: getScenarioDisplayTitle(currentScenario, 'en'),
@@ -907,10 +930,79 @@ export default function GameScreen({
     stats,
   ]);
 
-  const setLanguageAndClose = (nextLang: 'en' | 'ko') => {
-    setLang(nextLang);
-    setShowLanguageMenu(false);
-  };
+  const returnToCharacterSelect = useCallback(() => {
+    setShowGameMenu(false);
+    setShowRoadmap(false);
+
+    const session: SavedGameSession | null = character?.id
+      ? {
+          characterId: character.id,
+          lang,
+          currentScenarioId,
+          stats,
+          playHistory,
+          currentSituationChoices,
+          checkpoints,
+          updatedAt: new Date().toISOString(),
+        }
+      : null;
+
+    if (!session) {
+      onGoToCharacterSelect?.();
+      return;
+    }
+
+    void saveGame(session).finally(() => {
+      onGoToCharacterSelect?.();
+    });
+  }, [
+    character?.id,
+    checkpoints,
+    currentScenarioId,
+    currentSituationChoices,
+    lang,
+    onGoToCharacterSelect,
+    playHistory,
+    stats,
+  ]);
+
+  const confirmReturnToCharacterSelect = useCallback(() => {
+    Alert.alert(t.leaveGameTitle, t.leaveGameMessage, [
+      { text: t.leaveGameCancel, style: 'cancel' },
+      {
+        text: t.leaveGameConfirm,
+        onPress: returnToCharacterSelect,
+      },
+    ]);
+  }, [returnToCharacterSelect, t]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        if (showRoadmap) {
+          setShowRoadmap(false);
+          return true;
+        }
+
+        if (showGameMenu) {
+          setShowGameMenu(false);
+          return true;
+        }
+
+        confirmReturnToCharacterSelect();
+        return true;
+      },
+    );
+
+    return () => subscription.remove();
+  }, [
+    confirmReturnToCharacterSelect,
+    showGameMenu,
+    showRoadmap,
+  ]);
 
   const completeTutorial = () => {
     setShowTutorial(false);
@@ -1285,15 +1377,25 @@ export default function GameScreen({
             <GameHeaderBar
               height={headerHeight}
               horizontalPadding={headerHorizontalPadding}
-              title={headerTitle}
-              language={lang}
-              showLanguageMenu={showLanguageMenu}
+              menuTop={insets.top + headerHeight + 4}
+              title={headerStageTitle}
+              showGameMenu={showGameMenu}
+              menuCopy={{
+                storyMap: t.roadmapBtn,
+                characterSelect: t.menuCharacterSelect,
+                language: t.menuLanguage,
+                cancel: t.menuCancel,
+              }}
               onOpenRoadmap={() => setShowRoadmap(true)}
-              onShowFullTitle={() => setShowTitleModal(true)}
-              onToggleLanguageMenu={() =>
-                setShowLanguageMenu((prev) => !prev)
+              onToggleGameMenu={() => {
+                setShowGameMenu((prev) => !prev);
+              }}
+              onCloseGameMenu={() => setShowGameMenu(false)}
+              onGoToCharacterSelect={returnToCharacterSelect}
+              onToggleLanguage={() =>
+                setLang((prev) => (prev === 'ko' ? 'en' : 'ko'))
               }
-              onSelectLanguage={setLanguageAndClose}
+              onShowFullTitle={() => setShowTitleModal(true)}
             />
             {!showResult ? (
               <>

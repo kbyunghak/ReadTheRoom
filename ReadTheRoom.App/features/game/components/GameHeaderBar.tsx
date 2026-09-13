@@ -1,29 +1,47 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 type Props = {
   height: number;
   horizontalPadding: number;
+  menuTop: number;
   title: string;
-  language: 'ko' | 'en';
-  showLanguageMenu: boolean;
+  showGameMenu: boolean;
+  menuCopy: {
+    storyMap: string;
+    characterSelect: string;
+    language: string;
+    cancel: string;
+  };
   onOpenRoadmap: () => void;
+  onToggleGameMenu: () => void;
+  onCloseGameMenu: () => void;
+  onGoToCharacterSelect: () => void;
+  onToggleLanguage: () => void;
   onShowFullTitle: () => void;
-  onToggleLanguageMenu: () => void;
-  onSelectLanguage: (language: 'ko' | 'en') => void;
 };
 
 export default function GameHeaderBar({
   height,
   horizontalPadding,
+  menuTop,
   title,
-  language,
-  showLanguageMenu,
+  showGameMenu,
+  menuCopy,
   onOpenRoadmap,
+  onToggleGameMenu,
+  onCloseGameMenu,
+  onGoToCharacterSelect,
+  onToggleLanguage,
   onShowFullTitle,
-  onToggleLanguageMenu,
-  onSelectLanguage,
 }: Props) {
   return (
     <>
@@ -33,9 +51,9 @@ export default function GameHeaderBar({
           { height, paddingHorizontal: horizontalPadding },
         ]}
       >
-        <TouchableOpacity style={styles.iconButton} onPress={onOpenRoadmap}>
+        <TouchableOpacity style={styles.iconButton} onPress={onToggleGameMenu}>
           <MaterialCommunityIcons
-            name="map-outline"
+            name="menu"
             size={20}
             color="#F1F1EF"
           />
@@ -54,54 +72,66 @@ export default function GameHeaderBar({
             {title}
           </Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={onToggleLanguageMenu}
-        >
-          <MaterialCommunityIcons
-            name="translate"
-            size={20}
-            color="#F1F1EF"
-          />
-        </TouchableOpacity>
       </View>
 
-      {showLanguageMenu ? (
-        <View
-          style={[
-            styles.languageMenu,
-            { top: height + 4, right: horizontalPadding },
-          ]}
+      {showGameMenu ? (
+        <Modal
+          transparent
+          animationType="fade"
+          statusBarTranslucent
+          onRequestClose={onCloseGameMenu}
         >
-          <TouchableOpacity
-            style={styles.languageMenuItem}
-            onPress={() => onSelectLanguage('ko')}
-          >
-            <Text
+          <View style={styles.menuModalRoot}>
+            <Pressable style={StyleSheet.absoluteFill} onPress={onCloseGameMenu} />
+            <View
               style={[
-                styles.languageMenuText,
-                language === 'ko' && styles.languageMenuTextActive,
+                styles.gameMenu,
+                { top: menuTop, left: horizontalPadding },
               ]}
             >
-              한국어
-            </Text>
-          </TouchableOpacity>
-          <View style={styles.languageMenuDivider} />
-          <TouchableOpacity
-            style={styles.languageMenuItem}
-            onPress={() => onSelectLanguage('en')}
-          >
-            <Text
-              style={[
-                styles.languageMenuText,
-                language === 'en' && styles.languageMenuTextActive,
-              ]}
-            >
-              English
-            </Text>
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity
+                style={styles.gameMenuItem}
+                onPress={() => {
+                  onCloseGameMenu();
+                  onOpenRoadmap();
+                }}
+              >
+                <MaterialCommunityIcons name="map-outline" size={17} color="#DCEAFF" />
+                <Text style={styles.gameMenuText}>{menuCopy.storyMap}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.gameMenuItem}
+                onPress={() => {
+                  onCloseGameMenu();
+                  onGoToCharacterSelect();
+                }}
+              >
+                <MaterialCommunityIcons name="account-switch-outline" size={17} color="#F6CD6D" />
+                <Text style={[styles.gameMenuText, styles.gameMenuExitText]}>
+                  {menuCopy.characterSelect}
+                </Text>
+              </TouchableOpacity>
+              <View style={styles.gameMenuDivider} />
+              <TouchableOpacity
+                style={styles.gameMenuItem}
+                onPress={() => {
+                  onCloseGameMenu();
+                  onToggleLanguage();
+                }}
+              >
+                <MaterialCommunityIcons name="translate" size={17} color="#8FC7FF" />
+                <Text style={styles.gameMenuText}>{menuCopy.language}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.gameMenuItem}
+                onPress={onCloseGameMenu}
+              >
+                <MaterialCommunityIcons name="close" size={17} color="#B9C7D9" />
+                <Text style={styles.gameMenuText}>{menuCopy.cancel}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       ) : null}
     </>
   );
@@ -143,36 +173,42 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 6,
   },
-  languageMenu: {
+  gameMenu: {
     position: 'absolute',
-    minWidth: 108,
-    backgroundColor: 'rgba(7, 18, 38, 0.96)',
+    minWidth: 168,
+    backgroundColor: 'rgba(7, 18, 38, 0.98)',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(113, 175, 255, 0.42)',
     overflow: 'hidden',
     zIndex: 20,
     shadowColor: '#061121',
-    shadowOpacity: 0.28,
+    shadowOpacity: 0.32,
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 6 },
     elevation: 12,
   },
-  languageMenuItem: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+  menuModalRoot: {
+    flex: 1,
   },
-  languageMenuDivider: {
+  gameMenuItem: {
+    minHeight: 44,
+    paddingHorizontal: 13,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 9,
+  },
+  gameMenuDivider: {
     height: 1,
     backgroundColor: 'rgba(207,226,255,0.12)',
   },
-  languageMenuText: {
+  gameMenuText: {
     fontSize: 13,
-    lineHeight: 16,
+    lineHeight: 17,
     fontWeight: '700',
-    color: 'rgba(231,237,244,0.82)',
+    color: '#EAF2FF',
   },
-  languageMenuTextActive: {
-    color: '#FFFFFF',
+  gameMenuExitText: {
+    color: '#FFE1A0',
   },
 });
