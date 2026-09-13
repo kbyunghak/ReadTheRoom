@@ -8,6 +8,6 @@ export type RewardedAdResult =
 export async function showRewardedRecoveryAd(): Promise<RewardedAdResult> {
   return {
     status: 'unavailable',
-    reason: 'Rewarded ads are not available on this platform.',
+    reason: 'Rewarded ads are not available on web.',
   };
 }
