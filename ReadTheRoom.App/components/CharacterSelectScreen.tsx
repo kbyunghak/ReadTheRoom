@@ -25,7 +25,7 @@ import type {
 
 const SCREEN_PADDING = 18;
 const MAX_CONTENT_WIDTH = 560;
-const STUDIO_URL = 'https://kbyunghak.github.io/JOYgleStudio/';
+const STUDIO_URL = 'https://joyglestudio.com/';
 export type { Character, CharacterStat, LocalizedText, StartingStats, StatKey };
 
 type Props = {
