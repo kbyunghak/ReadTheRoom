@@ -30,6 +30,9 @@ export const getScenarioDisplayTitle = (
   scenario: Scenario,
   lang: ScenarioDisplayLanguage,
 ) => {
+  if (scenario.stageNumber !== undefined) {
+    return removeInternalTitleSuffix(resolveRawTitle(scenario, lang), lang);
+  }
   const day = scenario.day ?? 1;
 
   if (scenario.type === 'SUMMARY') {
@@ -43,14 +46,27 @@ export const getScenarioHeaderTitle = (
   scenario: Scenario,
   lang: ScenarioDisplayLanguage,
 ) => {
-  const day = scenario.day ?? 1;
+  const localizedTitle = removeInternalTitleSuffix(resolveRawTitle(scenario, lang), lang);
 
   if (scenario.type === 'SUMMARY') {
-    return lang === 'ko' ? `[Day ${day}] 종료` : `[Day ${day}] Complete`;
+    return localizedTitle || (lang === 'ko' ? '요약' : 'Summary');
   }
 
+  if (scenario.type === 'NORMAL') {
+    const episode = scenario.episodeNumber ?? scenario.mainEpisode;
+    const safeEpisode =
+      episode ?? (scenario.stageNumber !== undefined ? scenario.id : undefined);
+
+    if (typeof safeEpisode === 'number') {
+      const label = `EP${String(safeEpisode).padStart(2, '0')}`;
+      return localizedTitle ? `${label}: ${localizedTitle}` : label;
+    }
+  }
+
+  const day = scenario.day ?? 1;
+
   if (scenario.type === 'NORMAL' && typeof scenario.mainEpisode !== 'number') {
-    const specialTitle = getScenarioDisplayTitle(scenario, lang);
+    const specialTitle = localizedTitle;
     return specialTitle
       ? `[Day ${day}] ${specialTitle}`
       : lang === 'ko'
@@ -58,11 +74,5 @@ export const getScenarioHeaderTitle = (
         : `[Day ${day}] Special Event`;
   }
 
-  const episode = scenario.mainEpisode ?? scenario.episode;
-  const displayTitle = getScenarioDisplayTitle(scenario, lang);
-  if (typeof episode === 'number') {
-    return `[Day ${day}] EP ${String(episode).padStart(2, '0')}: ${displayTitle}`;
-  }
-
-  return `[Day ${day}] ${displayTitle}`;
+  return `[Day ${day}] ${localizedTitle}`;
 };

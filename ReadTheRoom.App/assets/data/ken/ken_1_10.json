@@ -1,0 +1,679 @@
+{
+  "1": {
+    "type": "NORMAL",
+    "title": {
+      "ko": "입국 질문",
+      "en": "Arrival Questions"
+    },
+    "backgroundKey": "airport",
+    "description": {
+      "ko": "긴 비행 끝에 YVR에 도착한 Ken. 입국 절차를 밟던 중 직원이 묻습니다. \"What's the purpose of your stay?\" 질문은 알아들었지만, 머릿속에서 완벽한 영어 문장을 만들려다 바로 대답이 나오지 않습니다.",
+      "en": "After a long flight, Ken arrives at YVR. During the arrival process, an officer asks, \"What's the purpose of your stay?\" Ken understands the question, but hesitates while trying to build a perfect sentence in his head."
+    },
+    "tip": {
+      "ko": "체류 목적을 묻는 질문에는 길게 설명하기보다 실제 목적을 짧고 명확하게 답하면 됩니다. 잘 못 들었다면 다시 물어봐도 괜찮습니다.",
+      "en": "A short, accurate answer is enough when asked about the purpose of your stay. If you did not hear the question clearly, it is okay to ask again."
+    },
+    "choices": [
+      {
+        "type": "GROWTH",
+        "text": {
+          "ko": "\"I'm here to study at UBC.\"",
+          "en": "\"I'm here to study at UBC.\""
+        },
+        "feedback": {
+          "ko": "직원은 몇 가지 확인 질문을 더 한 뒤 절차를 계속합니다. 생각보다 대화는 짧았습니다. 완벽한 문장보다 질문에 맞게 답하는 것이 더 중요했습니다.",
+          "en": "The officer asks a few follow-up questions and continues the process. The exchange is shorter than Ken expected. Answering the actual question matters more than building a perfect sentence."
+        },
+        "statChanges": {
+          "english": 10,
+          "mental": 5
+        },
+        "nextScenarioId": 2
+      },
+      {
+        "type": "STABLE",
+        "text": {
+          "ko": "입학 관련 서류부터 꺼내 보여준다.",
+          "en": "Show the admission documents first."
+        },
+        "feedback": {
+          "ko": "직원은 서류를 확인하지만 다시 묻습니다. \"Okay, but what's the purpose of your stay?\" 서류가 대답 자체를 대신해 주지는 않았습니다.",
+          "en": "The officer looks at the documents, then asks again, \"Okay, but what's the purpose of your stay?\" The paperwork does not replace an answer."
+        },
+        "statChanges": {
+          "mental": -5,
+          "insight": 5
+        },
+        "nextScenarioId": 2
+      },
+      {
+        "type": "REALIST",
+        "text": {
+          "ko": "잘못 말할까 걱정돼 \"Sorry?\"라고 다시 묻는다.",
+          "en": "Worried about answering incorrectly, ask, \"Sorry?\""
+        },
+        "feedback": {
+          "ko": "직원이 질문을 다시 말해줍니다. 처음에도 대충 알아들었지만 두 번째에는 긴장이 조금 풀려 대답할 수 있었습니다.",
+          "en": "The officer repeats the question. Ken mostly understood it the first time, but hearing it again gives him enough confidence to answer."
+        },
+        "statChanges": {
+          "english": 5,
+          "mental": -5
+        },
+        "nextScenarioId": 2
+      }
+    ]
+  },
+  "2": {
+    "type": "NORMAL",
+    "title": {
+      "ko": "수하물 지연",
+      "en": "Missing Baggage"
+    },
+    "backgroundKey": "arrival",
+    "description": {
+      "ko": "수하물 벨트가 거의 비었습니다. 그런데 Ken의 큰 캐리어 하나가 보이지 않습니다. 같은 비행편 승객들도 하나둘 자리를 떠납니다.",
+      "en": "The baggage carousel is almost empty, but one of Ken's large suitcases is nowhere to be seen. Other passengers from the flight are starting to leave."
+    },
+    "tip": {
+      "ko": "위탁 수하물이 나오지 않으면 baggage tag를 준비하고 해당 항공사의 수하물 서비스에 문의하는 것이 일반적인 절차입니다.",
+      "en": "If checked baggage does not arrive, keep your baggage tag ready and contact the airline's baggage service."
+    },
+    "choices": [
+      {
+        "type": "GROWTH",
+        "text": {
+          "ko": "직원에게 \"My bag didn't come out. Where should I go?\"라고 묻는다.",
+          "en": "Ask a staff member, \"My bag didn't come out. Where should I go?\""
+        },
+        "feedback": {
+          "ko": "직원이 해당 항공사의 baggage service 위치를 알려줍니다. Ken은 baggage tag와 캐리어 사진을 준비합니다.",
+          "en": "The staff member points Ken toward the airline's baggage service. Ken gets his baggage tag and a photo of the suitcase ready."
+        },
+        "statChanges": {
+          "english": 5,
+          "insight": 10
+        },
+        "nextScenarioId": 3
+      },
+      {
+        "type": "STABLE",
+        "text": {
+          "ko": "조금만 더 기다려본다.",
+          "en": "Wait a little longer."
+        },
+        "feedback": {
+          "ko": "10분을 더 기다렸지만 벨트는 그대로입니다. 결국 항공사 직원에게 가야 했습니다. 결과는 같았고 피로만 조금 더 쌓였습니다.",
+          "en": "Ten more minutes pass, but nothing changes. Ken eventually has to speak to the airline anyway. Same result, just a little more exhausted."
+        },
+        "statChanges": {
+          "stamina": -10,
+          "mental": -5
+        },
+        "nextScenarioId": 3
+      },
+      {
+        "type": "REALIST",
+        "text": {
+          "ko": "항공사 앱에서 baggage status부터 확인한다.",
+          "en": "Check the baggage status in the airline app first."
+        },
+        "feedback": {
+          "ko": "앱에서 기본 정보는 확인했지만 지금 무엇을 해야 하는지는 명확하지 않습니다. 결국 카운터로 가야 합니다.",
+          "en": "The app shows basic information, but it does not make the next step completely clear. Ken still has to visit the counter."
+        },
+        "statChanges": {
+          "insight": 5,
+          "stamina": -5
+        },
+        "nextScenarioId": 3
+      }
+    ]
+  },
+  "3": {
+    "type": "NORMAL",
+    "title": {
+      "ko": "배송 주소",
+      "en": "Delivery Address"
+    },
+    "backgroundKey": "airport",
+    "description": {
+      "ko": "항공사 직원이 delayed baggage report를 작성합니다. 그러다 묻습니다. \"Where are you staying?\" 짐을 찾으면 배송할 주소가 필요하다고 합니다. Ken은 residence 이름은 기억하지만 정확한 주소가 바로 떠오르지 않습니다.",
+      "en": "An airline employee starts a delayed baggage report and asks, \"Where are you staying?\" They need an address for delivery. Ken remembers the residence name, but not the exact address."
+    },
+    "tip": {
+      "ko": "새로운 도시로 이동할 때는 숙소의 정확한 주소와 연락처를 휴대폰에 저장해 두면 유용합니다.",
+      "en": "When arriving in a new city, keeping the exact address and contact information for your accommodation on your phone can save time."
+    },
+    "choices": [
+      {
+        "type": "GROWTH",
+        "text": {
+          "ko": "\"One second, please.\"라고 말하고 휴대폰에서 주소를 찾는다.",
+          "en": "Say, \"One second, please,\" and look up the address."
+        },
+        "feedback": {
+          "ko": "잠깐 시간이 걸렸지만 직원은 기다려줍니다. Ken은 정확한 주소를 찾아 보여줍니다.",
+          "en": "It takes a moment, but the employee waits. Ken finds the correct address and shows it."
+        },
+        "statChanges": {
+          "english": 5,
+          "mental": 5
+        },
+        "nextScenarioId": 4
+      },
+      {
+        "type": "STABLE",
+        "text": {
+          "ko": "Residence 안내 이메일을 찾아 정확한 정보를 확인한다.",
+          "en": "Find the residence email and confirm the exact address."
+        },
+        "feedback": {
+          "ko": "뒤에서 다른 승객이 기다리고 있어 조금 조급했지만 주소를 찾아 제대로 전달했습니다.",
+          "en": "Ken feels a little pressure with others waiting, but finds the correct address and provides it."
+        },
+        "statChanges": {
+          "mental": -5,
+          "insight": 10
+        },
+        "nextScenarioId": 4
+      },
+      {
+        "type": "REALIST",
+        "text": {
+          "ko": "\"UBC residence.\"라고만 말한다.",
+          "en": "Just say, \"UBC residence.\""
+        },
+        "feedback": {
+          "ko": "직원이 다시 묻습니다. \"Which residence?\" UBC만으로는 배송 위치를 특정할 수 없었습니다.",
+          "en": "The employee asks, \"Which residence?\" Saying only UBC is not enough to identify a delivery location."
+        },
+        "statChanges": {
+          "english": -5,
+          "mental": -5
+        },
+        "nextScenarioId": 4
+      }
+    ]
+  },
+  "4": {
+    "type": "NORMAL",
+    "title": {
+      "ko": "UBC 가는 길",
+      "en": "Getting to UBC"
+    },
+    "backgroundKey": "airport_exit",
+    "description": {
+      "ko": "YVR Arrivals로 나왔습니다. 손에는 기내용 가방과 도착한 캐리어 하나가 있습니다. 긴 비행 때문에 피곤하지만 이동 비용도 신경 쓰입니다.",
+      "en": "Ken steps out into YVR Arrivals with a carry-on and the suitcase that did arrive. He is exhausted from the flight, but transportation costs matter too."
+    },
+    "tip": {
+      "ko": "이동수단은 가격만으로 정하기보다 짐의 양, 피로도, 이동시간을 함께 고려하는 것이 현실적입니다.",
+      "en": "When choosing transportation, consider luggage, fatigue, travel time, and cost together."
+    },
+    "choices": [
+      {
+        "type": "GROWTH",
+        "text": {
+          "ko": "대중교통으로 이동한다.",
+          "en": "Take public transit."
+        },
+        "feedback": {
+          "ko": "비용은 적게 들었지만 캐리어를 끌고 이동하고 환승하는 과정이 생각보다 피곤했습니다.",
+          "en": "It costs less, but navigating transit and transfers with luggage is more tiring than Ken expected."
+        },
+        "statChanges": {
+          "funds": -5,
+          "stamina": -15,
+          "insight": 5
+        },
+        "nextScenarioId": 5
+      },
+      {
+        "type": "STABLE",
+        "text": {
+          "ko": "Ride-hailing 앱으로 차량을 부른다.",
+          "en": "Book a ride through a ride-hailing app."
+        },
+        "feedback": {
+          "ko": "비용은 더 들었지만 residence까지 바로 갈 수 있었습니다. 오늘은 체력을 돈으로 산 셈입니다.",
+          "en": "It costs more, but Ken gets directly to residence. Today, he essentially pays to preserve his energy."
+        },
+        "statChanges": {
+          "funds": -20,
+          "stamina": 5
+        },
+        "nextScenarioId": 5
+      },
+      {
+        "type": "REALIST",
+        "text": {
+          "ko": "택시 승강장으로 간다.",
+          "en": "Go to the taxi queue."
+        },
+        "feedback": {
+          "ko": "조금 기다린 뒤 택시에 탑니다. 앱을 설정하거나 픽업 위치를 찾을 필요는 없지만 비용은 만만치 않았습니다.",
+          "en": "After a short wait, Ken gets a taxi. There is no need to set up an app or find a pickup zone, but the fare is not cheap."
+        },
+        "statChanges": {
+          "funds": -20,
+          "mental": 5
+        },
+        "nextScenarioId": 5
+      }
+    ]
+  },
+  "5": {
+    "type": "NORMAL",
+    "title": {
+      "ko": "기숙사 체크인",
+      "en": "Residence Check-In"
+    },
+    "backgroundKey": "reception",
+    "description": {
+      "ko": "UBC residence front desk에 도착했습니다. 직원이 체크인을 진행하다가 Ken을 보며 말합니다. \"Long trip?\" Ken은 순간 이것도 체크인에 필요한 질문인지 생각합니다.",
+      "en": "Ken arrives at the residence front desk. During check-in, the staff member looks up and asks, \"Long trip?\" For a second, Ken wonders if this is part of the check-in process."
+    },
+    "tip": {
+      "ko": "서비스 직원과의 짧은 말은 절차상 질문이 아니라 가벼운 대화일 수도 있습니다. 길게 대답할 필요는 없습니다.",
+      "en": "Brief comments from service staff may simply be small talk rather than part of a procedure. A long answer is not necessary."
+    },
+    "choices": [
+      {
+        "type": "GROWTH",
+        "text": {
+          "ko": "\"Yeah. I'm pretty tired.\"",
+          "en": "\"Yeah. I'm pretty tired.\""
+        },
+        "feedback": {
+          "ko": "직원이 가볍게 웃고 다시 체크인을 계속합니다. 특별한 의미가 있는 질문은 아니었습니다.",
+          "en": "The staff member smiles briefly and continues the check-in. It was not a question with any deeper meaning."
+        },
+        "statChanges": {
+          "english": 5,
+          "mental": 5
+        },
+        "nextScenarioId": 6
+      },
+      {
+        "type": "STABLE",
+        "text": {
+          "ko": "\"About twelve hours.\"",
+          "en": "\"About twelve hours.\""
+        },
+        "feedback": {
+          "ko": "직원이 \"That's a long one.\"이라고 답하고 다시 화면을 봅니다. 짧은 대화가 자연스럽게 끝났습니다.",
+          "en": "The staff member replies, \"That's a long one,\" and returns to the screen. The short exchange ends naturally."
+        },
+        "statChanges": {
+          "english": 5
+        },
+        "nextScenarioId": 6
+      },
+      {
+        "type": "REALIST",
+        "text": {
+          "ko": "무슨 뜻인지 확신이 없어 서류만 건넨다.",
+          "en": "Not sure what they mean, just hand over the documents."
+        },
+        "feedback": {
+          "ko": "체크인은 별 문제 없이 계속됩니다. 하지만 Ken은 방으로 가는 동안 아까 무슨 말을 들었던 건지 계속 신경 씁니다.",
+          "en": "The check-in continues without any problem, but Ken keeps wondering what the staff member meant."
+        },
+        "statChanges": {
+          "mental": -5,
+          "insight": -5
+        },
+        "nextScenarioId": 6
+      }
+    ]
+  },
+  "6": {
+    "type": "NORMAL",
+    "title": {
+      "ko": "룸메이트",
+      "en": "Roommate"
+    },
+    "backgroundKey": "dorm_room",
+    "description": {
+      "ko": "방문을 열자 룸메이트 Alex가 먼저 와서 짐을 풀고 있습니다. 둘은 인사를 나눕니다. 그런데 책상과 수납공간 중 어느 쪽을 누가 사용하는지 아직 정하지 않았고, Alex의 물건도 몇 군데 놓여 있습니다.",
+      "en": "Ken opens the door and finds his roommate, Alex, already unpacking. They introduce themselves, but it is not obvious which desk and storage space belongs to whom, and some of Alex's things are already spread around."
+    },
+    "tip": {
+      "ko": "공동생활에서는 작은 공간 문제도 초기에 직접 확인하면 불필요한 오해를 줄일 수 있습니다.",
+      "en": "In shared living spaces, clarifying small practical details early can prevent unnecessary misunderstandings."
+    },
+    "choices": [
+      {
+        "type": "GROWTH",
+        "text": {
+          "ko": "\"Which side are you using?\"이라고 먼저 묻는다.",
+          "en": "Ask, \"Which side are you using?\""
+        },
+        "feedback": {
+          "ko": "Alex가 자기가 생각했던 쪽을 가리킵니다. \"I was thinking this side, if that's okay.\" 몇 초 만에 정리됐습니다.",
+          "en": "Alex points to the side he had in mind. \"I was thinking this side, if that's okay.\" The issue is settled in seconds."
+        },
+        "statChanges": {
+          "english": 5,
+          "relation": 10
+        },
+        "nextScenarioId": 7
+      },
+      {
+        "type": "STABLE",
+        "text": {
+          "ko": "Alex가 먼저 정해줄 때까지 기다린다.",
+          "en": "Wait for Alex to decide first."
+        },
+        "feedback": {
+          "ko": "Alex도 Ken이 어느 쪽을 원하는지 기다리고 있었습니다. 잠깐 애매한 침묵이 흐른 뒤 Alex가 먼저 묻습니다. \"Do you care which side?\"",
+          "en": "Alex was also waiting to see which side Ken wanted. After an awkward pause, Alex finally asks, \"Do you care which side?\""
+        },
+        "statChanges": {
+          "mental": -5,
+          "insight": 5
+        },
+        "nextScenarioId": 7
+      },
+      {
+        "type": "REALIST",
+        "text": {
+          "ko": "비어 보이는 쪽에 그냥 짐을 풀기 시작한다.",
+          "en": "Start unpacking on the side that looks empty."
+        },
+        "feedback": {
+          "ko": "잠시 후 Alex가 그쪽에 두었던 충전기를 가지러 옵니다. \"Oh, I left some stuff there.\" Ken은 몇 가지를 다시 옮깁니다.",
+          "en": "A little later, Alex comes over to grab a charger he left there. \"Oh, I left some stuff there.\" Ken has to move a few things again."
+        },
+        "statChanges": {
+          "mental": -5,
+          "relation": -5
+        },
+        "nextScenarioId": 7
+      }
+    ]
+  },
+  "7": {
+    "type": "NORMAL",
+    "title": {
+      "ko": "같이 갈래?",
+      "en": "Want to Come?"
+    },
+    "backgroundKey": "dorm_room",
+    "description": {
+      "ko": "짐을 대충 정리하고 있는데 Alex가 재킷을 집으며 말합니다. \"I'm gonna grab some food. You wanna come?\" Ken은 피곤하지만 배도 고픕니다.",
+      "en": "While Ken is roughly unpacking, Alex grabs his jacket and says, \"I'm gonna grab some food. You wanna come?\" Ken is exhausted, but he is also hungry."
+    },
+    "tip": {
+      "ko": "초대를 받아들이는 것만이 좋은 선택은 아닙니다. 자신의 체력과 상황에 따라 자연스럽게 거절해도 괜찮습니다.",
+      "en": "Accepting an invitation is not always the best choice. It is also reasonable to decline based on your energy and circumstances."
+    },
+    "choices": [
+      {
+        "type": "GROWTH",
+        "text": {
+          "ko": "\"Yeah, sure.\" 하고 같이 간다.",
+          "en": "Say, \"Yeah, sure,\" and go with him."
+        },
+        "feedback": {
+          "ko": "둘은 간단히 먹으러 갑니다. 계속 대화를 하는 것은 아니고 중간중간 각자 휴대폰도 봅니다. 그래도 처음 방에서 만났을 때보다는 조금 덜 어색해졌습니다.",
+          "en": "They go out for a quick meal. They do not talk constantly and both check their phones now and then, but things feel a little less awkward than before."
+        },
+        "statChanges": {
+          "funds": -10,
+          "stamina": -5,
+          "relation": 10
+        },
+        "nextScenarioId": 8
+      },
+      {
+        "type": "STABLE",
+        "text": {
+          "ko": "\"Thanks, but I'm exhausted. Maybe next time.\"",
+          "en": "\"Thanks, but I'm exhausted. Maybe next time.\""
+        },
+        "feedback": {
+          "ko": "Alex는 \"No worries.\"라고 하고 나갑니다. Ken은 혼자 조용히 쉴 수 있게 됐습니다. 거절했다고 관계가 나빠진 것도 아닙니다.",
+          "en": "Alex says, \"No worries,\" and heads out. Ken gets some quiet time to rest. Saying no does not damage the relationship."
+        },
+        "statChanges": {
+          "stamina": 10
+        },
+        "nextScenarioId": 8
+      },
+      {
+        "type": "REALIST",
+        "text": {
+          "ko": "거절하면 어색할 것 같아서 피곤하지만 따라간다.",
+          "en": "Go along even though you are exhausted because saying no feels awkward."
+        },
+        "feedback": {
+          "ko": "같이 나왔지만 Ken은 너무 피곤해서 대화에 집중하지 못합니다. Alex가 같은 질문을 두 번 해야 했습니다.",
+          "en": "Ken goes along, but he is too tired to follow the conversation well. Alex has to repeat one of his questions twice."
+        },
+        "statChanges": {
+          "stamina": -15,
+          "mental": -5,
+          "relation": 5
+        },
+        "nextScenarioId": 8
+      }
+    ]
+  },
+  "8": {
+    "type": "NORMAL",
+    "title": {
+      "ko": "Maya",
+      "en": "Maya"
+    },
+    "backgroundKey": "dorm_hall",
+    "description": {
+      "ko": "Residence 복도에서 같은 층 학생과 마주칩니다. \"Hey, are you new here too?\" 그 학생은 Maya라고 자신을 소개합니다. 잠깐 이야기하다가 말합니다. \"A few of us are hanging out in the lounge later.\"",
+      "en": "Ken runs into another student on the same floor. \"Hey, are you new here too?\" She introduces herself as Maya, then adds, \"A few of us are hanging out in the lounge later.\""
+    },
+    "tip": {
+      "ko": "가벼운 초대는 확정된 약속을 뜻하지 않을 수도 있습니다. 관심이 있다면 시간이나 장소를 자연스럽게 확인하면 됩니다.",
+      "en": "A casual invitation is not always a firm commitment. If you are interested, you can simply ask for the time or place."
+    },
+    "choices": [
+      {
+        "type": "GROWTH",
+        "text": {
+          "ko": "\"What time?\"이라고 묻는다.",
+          "en": "Ask, \"What time?\""
+        },
+        "feedback": {
+          "ko": "Maya가 대략적인 시간을 알려줍니다. 갈지 말지는 아직 정하지 않았지만 선택할 정보는 생겼습니다.",
+          "en": "Maya gives Ken a rough time. He has not decided whether to go, but now he has enough information to choose later."
+        },
+        "statChanges": {
+          "english": 5,
+          "relation": 5
+        },
+        "nextScenarioId": 9
+      },
+      {
+        "type": "STABLE",
+        "text": {
+          "ko": "\"Cool.\"이라고만 하고 방으로 들어간다.",
+          "en": "Just say, \"Cool,\" and head back to the room."
+        },
+        "feedback": {
+          "ko": "대화는 자연스럽게 끝납니다. 초대를 거절한 것도, 참석하겠다고 약속한 것도 아닙니다.",
+          "en": "The conversation ends naturally. Ken has not rejected the invitation, but he has not committed to it either."
+        },
+        "statChanges": {},
+        "nextScenarioId": 9
+      },
+      {
+        "type": "REALIST",
+        "text": {
+          "ko": "\"Okay, I'll definitely be there.\"",
+          "en": "\"Okay, I'll definitely be there.\""
+        },
+        "feedback": {
+          "ko": "Maya는 웃으며 내려갑니다. 문을 닫고 침대를 보자 Ken은 생각합니다. '내가 왜 definitely라고 했지…?'",
+          "en": "Maya smiles and heads off. Back in the room, Ken looks at the bed and thinks, 'Why did I say definitely...?'"
+        },
+        "statChanges": {
+          "mental": -5
+        },
+        "nextScenarioId": 9
+      }
+    ]
+  },
+  "9": {
+    "type": "NORMAL",
+    "title": {
+      "ko": "라운지 초대",
+      "en": "Lounge Invite"
+    },
+    "backgroundKey": "dorm_room",
+    "description": {
+      "ko": "밤이 됐습니다. 복도 너머 lounge에서 사람들 이야기하는 소리가 들립니다. 아까 Maya가 말한 모임인 것 같습니다. Ken은 피곤하지만 지금 안 가면 사람을 만날 기회를 놓치는 것 같기도 합니다.",
+      "en": "It is evening now. Ken can hear people talking in the lounge down the hall. It sounds like the gathering Maya mentioned. He is tired, but part of him worries he will miss a chance to meet people."
+    },
+    "tip": {
+      "ko": "새로운 환경에서 사람을 만나는 것도 중요하지만 모든 기회를 잡을 필요는 없습니다. 체력과 마음 상태도 중요한 자원입니다.",
+      "en": "Meeting people matters in a new environment, but you do not have to take every opportunity. Energy and mental bandwidth are resources too."
+    },
+    "choices": [
+      {
+        "type": "GROWTH",
+        "text": {
+          "ko": "잠깐만 얼굴을 비춰보기로 한다.",
+          "en": "Drop by for just a few minutes."
+        },
+        "feedback": {
+          "ko": "10분 정도 있다가 방으로 돌아옵니다. 이름은 절반도 기억하지 못하지만 복도에서 다시 만나면 인사할 얼굴 몇 명은 생겼습니다.",
+          "en": "Ken stays for about ten minutes, then heads back. He cannot remember half the names, but now there are a few familiar faces he will be able to greet in the hallway."
+        },
+        "statChanges": {
+          "stamina": -10,
+          "relation": 10,
+          "mental": 5
+        },
+        "nextScenarioId": 10
+      },
+      {
+        "type": "STABLE",
+        "text": {
+          "ko": "오늘은 그냥 쉬기로 한다.",
+          "en": "Stay in and rest tonight."
+        },
+        "feedback": {
+          "ko": "샤워하고 침대에 눕습니다. 사람들을 만나지는 못했지만 몸은 훨씬 편해졌습니다. 내일도 기회는 있습니다.",
+          "en": "Ken showers and lies down. He does not meet anyone tonight, but he feels much better physically. There will be other chances."
+        },
+        "statChanges": {
+          "stamina": 15,
+          "relation": -5
+        },
+        "nextScenarioId": 10
+      },
+      {
+        "type": "REALIST",
+        "text": {
+          "ko": "문 앞까지 갔다가 사람이 많은 걸 보고 다시 돌아온다.",
+          "en": "Walk to the lounge, see the crowd, and turn back."
+        },
+        "feedback": {
+          "ko": "아무도 Ken이 왔다가 돌아간 것을 눈치채지 못했습니다. 그런데 Ken 혼자 계속 그 장면을 떠올립니다.",
+          "en": "No one notices that Ken came and left. Still, Ken keeps replaying the moment in his head."
+        },
+        "statChanges": {
+          "mental": -10,
+          "stamina": -5
+        },
+        "nextScenarioId": 10
+      }
+    ]
+  },
+  "10": {
+    "type": "NORMAL",
+    "title": {
+      "ko": "엄마의 메시지",
+      "en": "Mom's Message"
+    },
+    "backgroundKey": "dorm_room_night",
+    "description": {
+      "ko": "방이 조용해졌습니다. 휴대폰 화면에 한국에서 온 메시지가 떠 있습니다. \"엄마: 도착했어?\" 방 한쪽에는 아직 풀지 못한 짐이 있고, 다른 캐리어는 언제 올지 모릅니다.",
+      "en": "The room is quiet now. A message from Korea appears on Ken's phone: \"Mom: Did you arrive?\" One side of the room is still covered in half-unpacked belongings, and Ken has no idea when the missing suitcase will arrive."
+    },
+    "tip": {
+      "ko": "낯선 환경에 적응하는 방식에는 정답이 없습니다. 누군가에게 이야기하는 것도, 잠깐 혼자 정리할 시간을 갖는 것도 각자의 선택입니다.",
+      "en": "There is no single correct way to process a new environment. Talking to someone or taking some time alone can both be reasonable choices."
+    },
+    "choices": [
+      {
+        "type": "GROWTH",
+        "text": {
+          "ko": "\"도착은 했는데 짐 하나가 안 왔어.\"",
+          "en": "\"I arrived, but one of my bags didn't.\""
+        },
+        "feedback": {
+          "ko": "곧바로 답장이 옵니다. \"뭐? 가방이 없어졌다고?\" 설명할 일이 하나 더 생겼지만 적어도 혼자 끌어안고 있지는 않게 됐습니다.",
+          "en": "A reply comes almost immediately: \"What? Your bag is missing?\" Now Ken has one more thing to explain, but at least he is not carrying the worry alone."
+        },
+        "statChanges": {
+          "mental": 5,
+          "stamina": -5
+        },
+        "nextScenarioId": 1001
+      },
+      {
+        "type": "STABLE",
+        "text": {
+          "ko": "\"응. 잘 도착했어.\"",
+          "en": "\"Yeah. I made it safely.\""
+        },
+        "feedback": {
+          "ko": "짧게 답장을 보내고 휴대폰을 내려놓습니다. 틀린 말은 아닙니다. 다만 오늘 있었던 일을 전부 설명하기에는 너무 피곤합니다.",
+          "en": "Ken sends the short reply and puts his phone down. It is not untrue. He is simply too tired to explain everything that happened today."
+        },
+        "statChanges": {
+          "mental": 5,
+          "stamina": -5
+        },
+        "nextScenarioId": 1001
+      },
+      {
+        "type": "REALIST",
+        "text": {
+          "ko": "답장은 내일 하기로 하고 휴대폰을 뒤집어 놓는다.",
+          "en": "Put the phone face down and decide to answer tomorrow."
+        },
+        "feedback": {
+          "ko": "몸은 쉬고 싶은데 알림이 한 번 더 울립니다. \"도착한 거 맞지?\" Ken은 화면을 잠깐 바라보다가 눈을 감습니다.",
+          "en": "Ken wants to rest, but the phone buzzes again. \"You arrived, right?\" He looks at the screen for a moment, then closes his eyes."
+        },
+        "statChanges": {
+          "mental": -10,
+          "stamina": 10
+        },
+        "nextScenarioId": 1001
+      }
+    ]
+  },
+  "1001": {
+    "type": "SUMMARY",
+    "title": {
+      "ko": "낯선 곳의 첫걸음",
+      "en": "First Steps in a New Place"
+    },
+    "backgroundKey": "dorm_room_night",
+    "description": {
+      "ko": "긴 비행 끝에 밴쿠버에 도착한 Ken은 입국 절차를 마치고, 나오지 않은 수하물을 신고하고, UBC 기숙사까지 이동했습니다. 기숙사에서는 룸메이트 Alex와 처음 공간을 나누고, 같은 층의 Maya와 짧게 인사를 나눴습니다. 모든 것이 아직 낯설고 잃어버린 캐리어도 돌아오지 않았지만, 처음 몇 시간 동안 Ken은 모르면 확인하고, 피곤하면 쉬고, 새로운 사람들과의 거리를 조금씩 맞춰가기 시작했습니다.",
+      "en": "After a long flight, Ken arrived in Vancouver, completed the arrival process, reported a delayed suitcase, and made his way to UBC residence. There, he began sharing space with his roommate Alex and briefly met Maya from the same floor. Almost everything still feels unfamiliar, and the missing suitcase has not returned yet, but during these first hours Ken has already started learning to check when he is unsure, rest when he needs to, and gradually find his footing around new people."
+    },
+    "tip": {
+      "ko": "새로운 환경에 적응할 때 모든 상황을 완벽하게 처리할 필요는 없습니다. 모르는 것은 확인하고, 자신의 체력과 상황을 고려하며, 새로운 사람들과의 관계도 서두르지 않고 조금씩 만들어가면 됩니다.",
+      "en": "You do not need to handle every situation perfectly when adjusting to a new environment. Ask when you are unsure, pay attention to your own energy and circumstances, and let new relationships develop gradually."
+    },
+    "statChanges": {},
+    "choices": [],
+    "nextScenarioId": 11
+  }
+}

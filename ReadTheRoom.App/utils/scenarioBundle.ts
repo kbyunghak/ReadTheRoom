@@ -2,6 +2,8 @@ import type { StatChanges } from '../domain/stats/types';
 
 export type LocalizedText = { en: string; ko: string };
 
+export const FINAL_CLEAR_SCENARIO_ID = 9999;
+
 export type ScenarioStatChanges = StatChanges;
 
 export type ScenarioChoiceType = 'GROWTH' | 'STABLE' | 'REALIST';
@@ -17,6 +19,8 @@ export type ScenarioChoice = {
 
 export type Scenario = {
   id: number;
+  stageNumber?: number;
+  episodeNumber?: number;
   type?: string;
   week?: number;
   day?: number;

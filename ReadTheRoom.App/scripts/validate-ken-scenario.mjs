@@ -1,193 +1,116 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const PROJECT_ROOT = process.cwd();
-const KEN_SCENARIO_PATH = path.join(
-  PROJECT_ROOT,
-  'assets',
-  'data',
-  'scenarios_ken.json',
-);
+const filePath = path.join(process.cwd(), 'assets', 'data', 'ken', 'ken_1_10.json');
+const SUMMARY_ID_BASE = 1000;
+const FINAL_CLEAR_SCENARIO_ID = 9999;
+const REQUIRED_STATS = ['funds', 'mental', 'english', 'insight', 'stamina', 'relation'];
 
-const REQUIRED_STATS = [
-  'funds',
-  'mental',
-  'english',
-  'insight',
-  'stamina',
-  'relation',
-];
-
-const isRecord = (value) =>
-  value !== null && typeof value === 'object' && !Array.isArray(value);
-
+const fail = (message) => {
+  throw new Error(message);
+};
 const assert = (condition, message) => {
-  if (!condition) {
-    throw new Error(message);
+  if (!condition) fail(message);
+};
+const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+const localized = (value, pathName) => {
+  assert(isRecord(value), `${pathName} must be an object`);
+  assert(typeof value.ko === 'string' && value.ko.trim(), `${pathName}.ko is required`);
+  assert(typeof value.en === 'string' && value.en.trim(), `${pathName}.en is required`);
+};
+const statChanges = (value, pathName) => {
+  assert(isRecord(value), `${pathName} must be an object`);
+  for (const key of Object.keys(value)) {
+    assert(REQUIRED_STATS.includes(key), `${pathName}.${key} is not supported`);
+    assert(typeof value[key] === 'number' && Number.isFinite(value[key]), `${pathName}.${key} must be numeric`);
   }
 };
 
-const validateLocalizedText = ({ nodeId, fieldName, value }) => {
-  assert(
-    isRecord(value),
-    `[i18n] Node ${nodeId} is missing localized field "${fieldName}".`,
-  );
-  assert(
-    typeof value.ko === 'string' && value.ko.trim().length > 0,
-    `[i18n] Node ${nodeId}.${fieldName}.ko must be a non-empty string.`,
-  );
-  assert(
-    typeof value.en === 'string' && value.en.trim().length > 0,
-    `[i18n] Node ${nodeId}.${fieldName}.en must be a non-empty string.`,
-  );
-};
+const validate = () => {
+  const nodes = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  assert(isRecord(nodes), 'Ken chunk root must be an object');
+  const ids = new Set(Object.keys(nodes).map(Number));
+  const referencedByChoices = [];
 
-const validateChoice = ({ nodeId, choice, index, referencedIds }) => {
-  validateLocalizedText({
-    nodeId,
-    fieldName: `choices[${index}].text`,
-    value: choice.text,
-  });
-  validateLocalizedText({
-    nodeId,
-    fieldName: `choices[${index}].feedback`,
-    value: choice.feedback,
-  });
+  for (const [key, node] of Object.entries(nodes)) {
+    assert(isRecord(node), `${key} must be an object`);
+    assert(String(Number(key)) === key, `${key} must be a canonical numeric ID`);
+    assert(!Object.hasOwn(node, 'id'), `${key}.id must not be duplicated inside a chunk node`);
+    assert(node.type === 'NORMAL' || node.type === 'SUMMARY', `${key}.type is invalid`);
+    localized(node.title, `${key}.title`);
+    localized(node.description, `${key}.description`);
+    if (node.tip !== undefined) localized(node.tip, `${key}.tip`);
+    assert(typeof node.backgroundKey === 'string' && node.backgroundKey, `${key}.backgroundKey is required`);
 
-  assert(
-    isRecord(choice.statChanges),
-    `[stat] Node ${nodeId} choice[${index}] is missing statChanges.`,
-  );
+    if (node.type === 'SUMMARY') {
+      assert(Number(key) > SUMMARY_ID_BASE, `${key} is outside the SUMMARY namespace`);
+      assert(Array.isArray(node.choices) && node.choices.length === 0, `${key}.choices must be empty`);
+      statChanges(node.statChanges ?? {}, `${key}.statChanges`);
+      continue;
+    }
 
-  REQUIRED_STATS.forEach((statKey) => {
-    assert(
-      typeof choice.statChanges[statKey] === 'number',
-      `[stat] Node ${nodeId} choice[${index}] missing numeric stat "${statKey}".`,
-    );
-  });
-
-  assert(
-    choice.nextScenarioId !== null,
-    `[graph] Node ${nodeId} choice[${index}] uses null nextScenarioId. Omit the field for terminal nodes.`,
-  );
-
-  if (choice.nextScenarioId !== undefined) {
-    assert(
-      typeof choice.nextScenarioId === 'number',
-      `[graph] Node ${nodeId} choice[${index}] nextScenarioId must be a number when present.`,
-    );
-    referencedIds.push({
-      fromId: nodeId,
-      targetId: choice.nextScenarioId,
-      field: `choices[${index}].nextScenarioId`,
+    assert(Number(key) < SUMMARY_ID_BASE, `${key} is outside the episode namespace`);
+    assert(Array.isArray(node.choices) && node.choices.length > 0, `${key}.choices must not be empty`);
+    node.choices.forEach((choice, index) => {
+      const choicePath = `${key}.choices[${index}]`;
+      assert(isRecord(choice), `${choicePath} must be an object`);
+      localized(choice.text, `${choicePath}.text`);
+      localized(choice.feedback, `${choicePath}.feedback`);
+      statChanges(choice.statChanges, `${choicePath}.statChanges`);
+      assert(Number.isSafeInteger(choice.nextScenarioId) && choice.nextScenarioId > 0, `${choicePath}.nextScenarioId is invalid`);
+      referencedByChoices.push({ from: Number(key), target: choice.nextScenarioId });
     });
   }
-};
 
-const validateKenScenario = (filePath) => {
-  const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  const allIds = new Set();
-  const referencedIds = [];
+  for (let episode = 1; episode <= 10; episode += 1) {
+    assert(nodes[String(episode)]?.type === 'NORMAL', `EP${String(episode).padStart(2, '0')} is missing`);
+  }
 
-  assert(
-    isRecord(data),
-    '[schema] Ken scenario root must be an object with Day{N} keys.',
-  );
+  const summaryId = SUMMARY_ID_BASE + 1;
+  const summary = nodes[String(summaryId)];
+  assert(summary?.type === 'SUMMARY', `Stage 1 Summary ${summaryId} is missing`);
+  assert(nodes['10'].choices.every((choice) => choice.nextScenarioId === summaryId), 'EP10 must lead to Summary 1001');
 
-  Object.entries(data).forEach(([dayKey, dayNodes]) => {
+  for (const { from, target } of referencedByChoices) {
+    assert(ids.has(target), `NORMAL ${from} references missing scenario ${target}`);
+  }
+
+  const expectedNextChunkStart = 11;
+  if (summary.nextScenarioId !== undefined) {
     assert(
-      /^Day\d+$/.test(dayKey),
-      `[schema] Invalid root key "${dayKey}". Expected Day{N}.`,
+      summary.nextScenarioId === expectedNextChunkStart || summary.nextScenarioId === FINAL_CLEAR_SCENARIO_ID,
+      `Summary 1001 must lead to ${expectedNextChunkStart}, ${FINAL_CLEAR_SCENARIO_ID}, or omit nextScenarioId`,
     );
-    assert(
-      isRecord(dayNodes),
-      `[schema] ${dayKey} must contain a node object keyed by scenario id.`,
-    );
+  }
 
-    Object.entries(dayNodes).forEach(([nodeKey, node]) => {
-      assert(isRecord(node), `[schema] ${dayKey}.${nodeKey} must be an object.`);
-      assert(
-        typeof node.id === 'number',
-        `[schema] ${dayKey}.${nodeKey} must include numeric id.`,
-      );
-      assert(
-        String(node.id) === nodeKey,
-        `[schema] Object key "${nodeKey}" does not match node.id ${node.id}.`,
-      );
-      assert(
-        !allIds.has(node.id),
-        `[schema] Duplicate global scenario id: ${node.id}.`,
-      );
-      allIds.add(node.id);
+  const reachable = new Set();
+  const queue = [1];
+  while (queue.length) {
+    const id = queue.shift();
+    if (reachable.has(id) || !ids.has(id)) continue;
+    reachable.add(id);
+    const node = nodes[String(id)];
+    node.choices.forEach((choice) => queue.push(choice.nextScenarioId));
+    if (node.type === 'SUMMARY' && ids.has(node.nextScenarioId)) queue.push(node.nextScenarioId);
+  }
+  const unreachable = [...ids].filter((id) => !reachable.has(id));
+  assert(unreachable.length === 0, `Unreachable scenarios: ${unreachable.join(', ')}`);
 
-      ['title', 'description', 'tip'].forEach((fieldName) => {
-        validateLocalizedText({ nodeId: node.id, fieldName, value: node[fieldName] });
-      });
-
-      if (node.type === 'SUMMARY') {
-        assert(
-          node.choices === undefined ||
-            (Array.isArray(node.choices) && node.choices.length === 0),
-          `[schema] SUMMARY node ${node.id} must omit choices or use an empty choices array.`,
-        );
-
-        assert(
-          node.nextScenarioId !== null,
-          `[graph] SUMMARY node ${node.id} uses null nextScenarioId. Omit the field for terminal summaries.`,
-        );
-
-        if (node.nextScenarioId !== undefined) {
-          assert(
-            typeof node.nextScenarioId === 'number',
-            `[graph] SUMMARY node ${node.id} nextScenarioId must be a number when present.`,
-          );
-          referencedIds.push({
-            fromId: node.id,
-            targetId: node.nextScenarioId,
-            field: 'nextScenarioId',
-          });
-        }
-
-        return;
-      }
-
-      assert(
-        node.type === 'NORMAL',
-        `[schema] Node ${node.id} has unsupported type "${node.type}".`,
-      );
-      assert(
-        Array.isArray(node.choices) && node.choices.length === 3,
-        `[schema] NORMAL node ${node.id} must contain exactly 3 choices.`,
-      );
-
-      node.choices.forEach((choice, index) => {
-        validateChoice({
-          nodeId: node.id,
-          choice,
-          index,
-          referencedIds,
-        });
-      });
-    });
-  });
-
-  referencedIds.forEach(({ fromId, targetId, field }) => {
-    assert(
-      allIds.has(targetId),
-      `[graph] Node ${fromId} ${field} references missing scenario id ${targetId}.`,
-    );
-  });
-
-  return allIds.size;
+  return {
+    nodes: ids.size,
+    summaryId,
+    futureTarget: ids.has(summary.nextScenarioId) ? null : summary.nextScenarioId,
+  };
 };
 
 try {
-  const totalNodes = validateKenScenario(KEN_SCENARIO_PATH);
-  console.log(
-    `[Pass] scenarios_ken.json strict validation completed. Total nodes: ${totalNodes}`,
-  );
+  const result = validate();
+  console.log(`[Pass] ken_1_10.json validation completed. Nodes: ${result.nodes}, Summary: ${result.summaryId}`);
+  if (result.futureTarget) {
+    console.warn(`[Info] Summary future target ${result.futureTarget} is not registered yet; runtime will show IN_PROGRESS.`);
+  }
 } catch (error) {
-  console.error('[Fail] scenarios_ken.json strict validation failed.');
+  console.error('[Fail] ken_1_10.json validation failed.');
   console.error(error instanceof Error ? error.message : error);
   process.exit(1);
 }

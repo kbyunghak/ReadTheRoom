@@ -4,6 +4,8 @@ import scenariosJinaData from '../assets/data/scenarios_jina.json';
 import scenariosKenData from '../assets/data/scenarios_ken.json';
 import scenariosSoraData from '../assets/data/scenarios_sora.json';
 import scenariosYoonData from '../assets/data/scenarios_yoon.json';
+import { loadCharacterScenarios } from './chunkedScenarios';
+import { newScenarioSources } from './scenarioChunkSources';
 import {
   createScenarioBundle,
   type Scenario,
@@ -28,13 +30,15 @@ const createBundle = (data: unknown) =>
 
 export const DEFAULT_SCENARIO_BUNDLE = createBundle(scenariosData);
 
-export const CHARACTER_SCENARIO_BUNDLES: Record<string, ScenarioBundle> = {
-  amy: createBundle(scenariosAmyData),
+export const createCharacterScenarioBundles = (sources: Record<string, readonly unknown[]>): Record<string, ScenarioBundle> => ({
+  amy: loadCharacterScenarios(sources.amy ?? [], scenariosAmyData),
   jina: createBundle(scenariosJinaData),
-  ken: createBundle(scenariosKenData),
-  sora: createBundle(scenariosSoraData),
+  ken: loadCharacterScenarios(sources.ken ?? [], scenariosKenData),
+  sora: loadCharacterScenarios(sources.sora ?? [], scenariosSoraData),
   yoon: createBundle(scenariosYoonData),
-};
+});
+
+export const CHARACTER_SCENARIO_BUNDLES = createCharacterScenarioBundles(newScenarioSources);
 
 export const DEFAULT_SCENARIOS = DEFAULT_SCENARIO_BUNDLE.scenarios;
 

@@ -69,7 +69,7 @@ test('display title falls back between legacy situation strings', () => {
   assert.equal(getScenarioDisplayTitle(englishFallbackScenario, 'en'), '한글만 있는 상황');
 });
 
-test('NORMAL header includes day, main episode, and display title', () => {
+test('NORMAL header uses a zero-padded episode and localized title', () => {
   const scenario: Scenario = {
     ...baseScenario,
     id: 2,
@@ -80,7 +80,24 @@ test('NORMAL header includes day, main episode, and display title', () => {
     },
   };
 
-  assert.equal(getScenarioHeaderTitle(scenario, 'ko'), '[Day 1] EP 01: 세컨더리 룸의 압박');
+  assert.equal(getScenarioHeaderTitle(scenario, 'ko'), 'EP01: 세컨더리 룸의 압박');
+  assert.equal(getScenarioHeaderTitle(scenario, 'en'), 'EP01: Pressure in the Secondary Room');
+});
+
+test('chunked headers prefer episode metadata and support EP11+', () => {
+  const scenario: Scenario = {
+    ...baseScenario,
+    id: 11,
+    stageNumber: 2,
+    episodeNumber: 11,
+    title: {
+      ko: '새로운 시작',
+      en: 'A New Beginning',
+    },
+  };
+
+  assert.equal(getScenarioHeaderTitle(scenario, 'ko'), 'EP11: 새로운 시작');
+  assert.equal(getScenarioHeaderTitle(scenario, 'en'), 'EP11: A New Beginning');
 });
 
 test('SPECIAL header does not force an episode number', () => {
@@ -121,13 +138,17 @@ test('header falls back to day and title when no episode number exists', () => {
   assert.equal(getScenarioHeaderTitle(scenario, 'ko'), '[Day 1] 엔딩');
 });
 
-test('SUMMARY header only shows the day completion label', () => {
+test('SUMMARY header shows only its localized JSON title', () => {
   const scenario: Scenario = {
     ...baseScenario,
     id: 1001,
     type: 'SUMMARY',
+    title: {
+      ko: '낯선 곳의 첫걸음',
+      en: 'First Steps in a New Place',
+    },
   };
 
-  assert.equal(getScenarioHeaderTitle(scenario, 'ko'), '[Day 1] 종료');
-  assert.equal(getScenarioHeaderTitle(scenario, 'en'), '[Day 1] Complete');
+  assert.equal(getScenarioHeaderTitle(scenario, 'ko'), '낯선 곳의 첫걸음');
+  assert.equal(getScenarioHeaderTitle(scenario, 'en'), 'First Steps in a New Place');
 });

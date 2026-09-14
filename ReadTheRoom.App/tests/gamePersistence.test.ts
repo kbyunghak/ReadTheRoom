@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'vitest';
-import { clearSavedGame, loadSavedGame, saveGame } from '../utils/gamePersistence.ts';
+import { clearSavedGame, isSavedGameCompatible, loadSavedGame, saveGame } from '../utils/gamePersistence.ts';
 import { createMemoryStorage, defaultSavedSession } from './fixtures/index.ts';
 
 test('saveGame persists a progressed session and loadSavedGame restores it', async () => {
@@ -133,4 +133,19 @@ test('saved checkpoints are preserved when the session is restored', async () =>
 
   assert.deepEqual(Object.keys(loaded?.checkpoints ?? {}), ['1', '11']);
   assert.equal(loaded?.checkpoints[11]?.scenarioId, 11);
+});
+
+test('legacy Ken saves do not restore into chunked content with different ID meanings', () => {
+  const legacyKen = defaultSavedSession();
+  const chunkedKen = defaultSavedSession({ contentVersion: 'episode-chunks-v1' });
+  const staleChunkedKen = defaultSavedSession({ contentVersion: 'episode-chunks-v0' });
+  const legacyAmy = defaultSavedSession({ characterId: 'amy' });
+  const legacySora = defaultSavedSession({ characterId: 'sora' });
+
+  assert.equal(isSavedGameCompatible(legacyKen, 'ken', 'episode-chunks-v1'), false);
+  assert.equal(isSavedGameCompatible(chunkedKen, 'ken', 'episode-chunks-v1'), true);
+  assert.equal(isSavedGameCompatible(staleChunkedKen, 'ken', 'episode-chunks-v1'), false);
+  assert.equal(isSavedGameCompatible(legacyAmy, 'amy', 'day-bucket-v1'), true);
+  assert.equal(isSavedGameCompatible(legacySora, 'sora', 'day-bucket-v1'), true);
+  assert.equal(isSavedGameCompatible(null, 'ken', 'episode-chunks-v1'), false);
 });

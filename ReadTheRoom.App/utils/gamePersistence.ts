@@ -30,6 +30,7 @@ type SavedCheckpoint = {
 
 export type SavedGameSession = {
   characterId: string;
+  contentVersion?: string;
   lang: 'en' | 'ko';
   currentScenarioId: number;
   stats: GameStats;
@@ -37,6 +38,20 @@ export type SavedGameSession = {
   currentSituationChoices: ScenarioChoice[];
   checkpoints: Record<number, SavedCheckpoint>;
   updatedAt: string;
+};
+
+export const isSavedGameCompatible = (
+  session: SavedGameSession | null,
+  characterId: string,
+  contentVersion: string,
+) => {
+  if (!session) return false;
+
+  return (
+    characterId !== 'ken' ||
+    contentVersion !== 'episode-chunks-v1' ||
+    session.contentVersion === contentVersion
+  );
 };
 
 const normalizeStats = (stats: GameStats): GameStats => ({
