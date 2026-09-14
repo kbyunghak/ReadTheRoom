@@ -2,12 +2,14 @@ import assert from 'node:assert/strict';
 import { test } from 'vitest';
 import {
   resolveChoiceContinuation,
+  resolveSurvivedFinishAction,
   resolveSummaryContinuation,
 } from '../domain/game/transitions.ts';
 import type {
   Scenario,
   ScenarioChoice,
 } from '../utils/scenarioBundle.ts';
+import { FINAL_CLEAR_SCENARIO_ID } from '../utils/scenarioBundle.ts';
 
 const stableStats = {
   funds: 500,
@@ -83,7 +85,19 @@ test('phase-end scenarios open a summary with an available next node', () => {
   assert.deepEqual(result, { type: 'summary', nextScenarioId: 2 });
 });
 
-test('phase-end scenarios keep a null target when the next node is missing', () => {
+test('JSON-summary mode advances to the registered SUMMARY node without creating a legacy summary', () => {
+  const result = resolveChoiceContinuation({
+    stats: stableStats,
+    scenario: { ...scenario, isPhaseEnd: true },
+    choice,
+    nextScenarioExists: true,
+    summaryMode: 'json-node',
+  });
+
+  assert.deepEqual(result, { type: 'advance', nextScenarioId: 2 });
+});
+
+test('normal scenarios never hide a missing target behind a summary', () => {
   const result = resolveChoiceContinuation({
     stats: stableStats,
     scenario: { ...scenario, isPhaseEnd: true },
@@ -91,10 +105,10 @@ test('phase-end scenarios keep a null target when the next node is missing', () 
     nextScenarioExists: false,
   });
 
-  assert.deepEqual(result, { type: 'summary', nextScenarioId: null });
+  assert.deepEqual(result, { type: 'missing', nextScenarioId: 2 });
 });
 
-test('summary nodes distinguish advance, missing target, and ending', () => {
+test('summary nodes distinguish advance, future content, final clear, and ending', () => {
   const summary = {
     ...scenario,
     id: 1001,
@@ -115,7 +129,14 @@ test('summary nodes distinguish advance, missing target, and ending', () => {
       scenario: summary,
       nextScenarioExists: false,
     }),
-    { type: 'missing', nextScenarioId: 2 },
+    { type: 'in_progress', nextScenarioId: 2 },
+  );
+  assert.deepEqual(
+    resolveSummaryContinuation({
+      scenario: { ...summary, nextScenarioId: FINAL_CLEAR_SCENARIO_ID },
+      nextScenarioExists: false,
+    }),
+    { type: 'final_clear' },
   );
   assert.deepEqual(
     resolveSummaryContinuation({
@@ -124,4 +145,10 @@ test('summary nodes distinguish advance, missing target, and ending', () => {
     }),
     { type: 'ending' },
   );
+});
+
+test('survived ending exits only on Android and uses character selection elsewhere', () => {
+  assert.equal(resolveSurvivedFinishAction('android'), 'exit_app');
+  assert.equal(resolveSurvivedFinishAction('ios'), 'character_select');
+  assert.equal(resolveSurvivedFinishAction('web'), 'character_select');
 });
