@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Modal,
   Pressable,
@@ -17,7 +17,7 @@ type Props = {
   showGameMenu: boolean;
   menuCopy: {
     storyMap: string;
-    characterSelect: string;
+    home: string;
     language: string;
     cancel: string;
   };
@@ -25,7 +25,8 @@ type Props = {
   onToggleGameMenu: () => void;
   onCloseGameMenu: () => void;
   onGoToCharacterSelect: () => void;
-  onToggleLanguage: () => void;
+  language: 'ko' | 'en';
+  onSelectLanguage: (language: 'ko' | 'en') => void;
   onShowFullTitle: () => void;
 };
 
@@ -40,9 +41,15 @@ export default function GameHeaderBar({
   onToggleGameMenu,
   onCloseGameMenu,
   onGoToCharacterSelect,
-  onToggleLanguage,
+  language,
+  onSelectLanguage,
   onShowFullTitle,
 }: Props) {
+  const [showLanguageOptions, setShowLanguageOptions] = useState(false);
+  const closeMenu = () => {
+    setShowLanguageOptions(false);
+    onCloseGameMenu();
+  };
   return (
     <>
       <View
@@ -79,10 +86,11 @@ export default function GameHeaderBar({
           transparent
           animationType="fade"
           statusBarTranslucent
-          onRequestClose={onCloseGameMenu}
+          onShow={() => setShowLanguageOptions(false)}
+          onRequestClose={closeMenu}
         >
           <View style={styles.menuModalRoot}>
-            <Pressable style={StyleSheet.absoluteFill} onPress={onCloseGameMenu} />
+            <Pressable style={StyleSheet.absoluteFill} onPress={closeMenu} />
             <View
               style={[
                 styles.gameMenu,
@@ -92,39 +100,60 @@ export default function GameHeaderBar({
               <TouchableOpacity
                 style={styles.gameMenuItem}
                 onPress={() => {
-                  onCloseGameMenu();
+                  closeMenu();
+                  onGoToCharacterSelect();
+                }}
+              >
+                <MaterialCommunityIcons name="home-outline" size={17} color="#DCEAFF" />
+                <Text style={styles.gameMenuText}>{menuCopy.home}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.gameMenuItem}
+                onPress={() => {
+                  closeMenu();
                   onOpenRoadmap();
                 }}
               >
                 <MaterialCommunityIcons name="map-outline" size={17} color="#DCEAFF" />
-                <Text style={styles.gameMenuText}>{menuCopy.storyMap}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.gameMenuItem}
-                onPress={() => {
-                  onCloseGameMenu();
-                  onGoToCharacterSelect();
-                }}
-              >
-                <MaterialCommunityIcons name="account-switch-outline" size={17} color="#F6CD6D" />
-                <Text style={[styles.gameMenuText, styles.gameMenuExitText]}>
-                  {menuCopy.characterSelect}
+                <Text style={styles.gameMenuText}>
+                  {menuCopy.storyMap}
                 </Text>
               </TouchableOpacity>
-              <View style={styles.gameMenuDivider} />
               <TouchableOpacity
                 style={styles.gameMenuItem}
-                onPress={() => {
-                  onCloseGameMenu();
-                  onToggleLanguage();
-                }}
+                onPress={() => setShowLanguageOptions(previous => !previous)}
+                accessibilityRole="button"
+                accessibilityState={{ expanded: showLanguageOptions }}
               >
                 <MaterialCommunityIcons name="translate" size={17} color="#8FC7FF" />
                 <Text style={styles.gameMenuText}>{menuCopy.language}</Text>
+                <Text style={styles.gameMenuValue}>
+                  {language === 'ko' ? '한국어' : 'English'}
+                </Text>
               </TouchableOpacity>
+              {showLanguageOptions ? (['ko', 'en'] as const).map(option => (
+                <TouchableOpacity
+                  key={option}
+                  style={[styles.gameMenuItem, styles.languageOption]}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: language === option }}
+                  onPress={() => {
+                    onSelectLanguage(option);
+                    closeMenu();
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name={language === option ? 'radiobox-marked' : 'radiobox-blank'}
+                    size={17}
+                    color="#8FC7FF"
+                  />
+                  <Text style={styles.gameMenuText}>{option === 'ko' ? '한국어' : 'English'}</Text>
+                </TouchableOpacity>
+              )) : null}
+              <View style={styles.gameMenuDivider} />
               <TouchableOpacity
                 style={styles.gameMenuItem}
-                onPress={onCloseGameMenu}
+                onPress={closeMenu}
               >
                 <MaterialCommunityIcons name="close" size={17} color="#B9C7D9" />
                 <Text style={styles.gameMenuText}>{menuCopy.cancel}</Text>
@@ -175,7 +204,7 @@ const styles = StyleSheet.create({
   },
   gameMenu: {
     position: 'absolute',
-    minWidth: 168,
+    minWidth: 210,
     backgroundColor: 'rgba(7, 18, 38, 0.98)',
     borderRadius: 12,
     borderWidth: 1,
@@ -208,7 +237,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#EAF2FF',
   },
-  gameMenuExitText: {
-    color: '#FFE1A0',
+  gameMenuValue: {
+    marginLeft: 'auto',
+    paddingLeft: 12,
+    fontSize: 13,
+    lineHeight: 17,
+    fontWeight: '700',
+    color: '#8FC7FF',
+  },
+  languageOption: {
+    paddingLeft: 26,
   },
 });

@@ -27,6 +27,9 @@ export type Character = {
   jobTitle: LocalizedText;
   image: ImageSourcePropType;
   cardImage: ImageSourcePropType;
+  stageVisual?: {
+    scale: number;
+  };
   description: {
     ko: string[];
     en: string[];

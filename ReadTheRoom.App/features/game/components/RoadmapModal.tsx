@@ -34,12 +34,14 @@ type Copy = {
 };
 
 type WeekMeta = {
+  label?: string;
   week: number;
   dayStart: number;
   dayEnd: number;
 };
 
 type Props = {
+  groupHeading?: string;
   visible: boolean;
   language: 'en' | 'ko';
   copy: Copy;
@@ -63,6 +65,7 @@ type Props = {
 
 const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
   {
+    groupHeading,
     visible,
     language,
     copy,
@@ -224,7 +227,7 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
                     ]}
                   >
                     <Text style={styles.passportPageHeader}>
-                      {`VISA / VISAS · WEEK ${selectedWeek}`}
+                      {groupHeading ?? `VISA / VISAS · WEEK ${selectedWeek}`}
                     </Text>
                     <View style={styles.passportHeaderRule} />
 
@@ -402,7 +405,7 @@ const RoadmapModal = forwardRef<ScrollView, Props>(function RoadmapModal(
                             isSelected && styles.roadmapWeekTabTitleSelected,
                           ]}
                         >
-                          {`W${weekMeta.week}`}
+                          {weekMeta.label ?? `W${weekMeta.week}`}
                         </Text>
                         {!isUnlocked ? (
                           <MaterialCommunityIcons

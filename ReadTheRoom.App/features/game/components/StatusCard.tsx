@@ -85,7 +85,7 @@ export default function StatusCard({
         >
           <View style={styles.frontHeader}>
             <View style={styles.frontTitleRow}>
-              <View style={[styles.badge, { borderColor: condition.color }]}>
+              <View style={styles.statusIcon}>
                 <MaterialCommunityIcons
                   name={
                     condition.icon as keyof typeof MaterialCommunityIcons.glyphMap
@@ -108,7 +108,7 @@ export default function StatusCard({
               style={styles.flipHint}
             />
           </View>
-          <View style={styles.divider} />
+          <View style={[styles.divider, styles.frontDivider]} />
           <Text style={styles.description} numberOfLines={2}>
             {condition.description}
           </Text>
@@ -125,14 +125,17 @@ export default function StatusCard({
           <Text style={styles.backTitle}>
             {language === 'ko' ? '상태 보기' : 'Status'}
           </Text>
-          <View style={styles.divider} />
+          <View style={[styles.divider, styles.backDivider]} />
           <View style={styles.grid}>
             {STATUS_ORDER.map((key) => {
               const metadata = STAT_METADATA[key];
               const max = key === 'funds' ? 1000 : 100;
 
               return (
-                <View key={key} style={styles.item}>
+                <View
+                  key={key}
+                  style={[styles.item, key === 'insight' && styles.lastItem]}
+                >
                   <MaterialCommunityIcons
                     name={metadata.icon}
                     size={20}
@@ -185,7 +188,7 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     paddingHorizontal: 11,
-    paddingVertical: 8,
+    paddingVertical: 6,
     borderRadius: 16,
     borderWidth: 1.1,
     borderColor: 'rgba(207,226,255,0.46)',
@@ -201,9 +204,9 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%',
     minHeight: 0,
-    paddingHorizontal: 11,
-    paddingTop: 8,
-    paddingBottom: 7,
+    paddingHorizontal: 9,
+    paddingTop: 5,
+    paddingBottom: 3,
     borderRadius: 16,
     borderWidth: 1.1,
     borderColor: 'rgba(207,226,255,0.46)',
@@ -226,16 +229,14 @@ const styles = StyleSheet.create({
     minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 7,
+    gap: 5,
   },
-  badge: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    borderWidth: 1.5,
+  statusIcon: {
+    width: 24,
+    height: 24,
+    flexShrink: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(34, 86, 200, 0.16)',
   },
   frontTitle: {
     flex: 1,
@@ -255,13 +256,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(207,226,255,0.18)',
   },
   description: {
-    marginTop: 5,
+    marginTop: 4,
     marginBottom: 0,
     padding: 0,
     fontSize: 10,
     lineHeight: 14,
     color: 'rgba(228,234,244,0.82)',
     fontWeight: '700',
+  },
+  frontDivider: {
+    marginTop: 4,
+  },
+  backDivider: {
+    marginTop: 4,
   },
   back: {
     position: 'absolute',
@@ -277,22 +284,25 @@ const styles = StyleSheet.create({
     color: '#F5F8FD',
   },
   grid: {
-    marginTop: 8,
-    gap: 6,
+    marginTop: 6,
+    gap: 4,
   },
   item: {
-    minHeight: 48,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(180, 209, 255, 0.12)',
-    paddingBottom: 6,
+    paddingBottom: 4,
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
   },
+  lastItem: {
+    borderBottomWidth: 0,
+    paddingBottom: 0,
+  },
   itemText: {
     flex: 1,
     minWidth: 0,
-    gap: 4,
+    gap: 2,
   },
   itemTopRow: {
     flexDirection: 'row',
@@ -316,13 +326,13 @@ const styles = StyleSheet.create({
   tonePill: {
     alignSelf: 'flex-start',
     minWidth: 48,
-    minHeight: 22,
+    minHeight: 18,
     borderRadius: 7,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 9,
-    paddingVertical: 3,
+    paddingVertical: 2,
   },
   tone: {
     fontSize: 10,

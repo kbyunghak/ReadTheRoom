@@ -1,4 +1,5 @@
 import type { Character } from './types';
+import { CHARACTER_STAGE_VISUALS } from './characterStageVisuals';
 
 export type {
   AppLanguage,
@@ -62,6 +63,7 @@ export const CHARACTERS: Character[] = [
     jobTitle: { ko: '유학생', en: 'International Student' },
     image: require('../assets/images/characters/ken.png'),
     cardImage: require('../assets/images/characters/ken_card.png'),
+    stageVisual: CHARACTER_STAGE_VISUALS.ken,
     description: {
       ko: [
         '밴쿠버에 막 도착한 20세 유학생입니다.',
@@ -100,6 +102,7 @@ export const CHARACTERS: Character[] = [
     jobTitle: { ko: '워홀러 겸 바리스타', en: 'Working Holiday Barista' },
     image: require('../assets/images/characters/amy.png'),
     cardImage: require('../assets/images/characters/amy_card.png'),
+    stageVisual: CHARACTER_STAGE_VISUALS.amy,
     description: {
       ko: [
         '카페에서 일하며 새로운 도시의 일상과 관계를 빠르게 익혀가는 워홀러입니다.',
@@ -182,6 +185,7 @@ export const CHARACTERS: Character[] = [
     jobTitle: { ko: '유학맘', en: 'Study Abroad Mom' },
     image: require('../assets/images/characters/sora.png'),
     cardImage: require('../assets/images/characters/sora_card.png'),
+    stageVisual: CHARACTER_STAGE_VISUALS.sora,
     description: {
       ko: [
         '아이와 함께 새로운 환경에 적응해가는 보호자형 캐릭터입니다.',

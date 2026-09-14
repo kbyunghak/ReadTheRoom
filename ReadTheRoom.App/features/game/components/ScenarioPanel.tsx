@@ -81,7 +81,7 @@ const ScenarioPanel = forwardRef<ScrollView, Props>(function ScenarioPanel(
       style={[
         styles.root,
         layout === 'landscape' && styles.rootLandscape,
-        layout === 'portrait' ? { bottom, maxHeight } : { top, bottom },
+        { top, bottom },
       ]}
       contentContainerStyle={[
         styles.rootContent,
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   rootContent: {
-    paddingTop: 28,
+    paddingTop: 10,
   },
   rootContentLandscape: {
     flexGrow: 1,

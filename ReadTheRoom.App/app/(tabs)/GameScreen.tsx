@@ -23,7 +23,7 @@ import {
 } from 'react-native-safe-area-context';
 import { Tabs } from 'expo-router';
 import type { Character } from '../../locales/types';
-import EndingScene from '../../components/EndingScene';
+import EndingScene, { type EndingVariant } from '../../components/EndingScene';
 import SituationSummaryScene from '../../components/SituationSummaryScene';
 import {
   applyStatChanges,
@@ -31,6 +31,7 @@ import {
   type StatChanges,
 } from '../../utils/gameStats';
 import { preloadAssetSources } from '../../utils/assetPreload';
+import { getAssetDimensions } from '../../utils/assetDimensions';
 import {
   getScenarioBundle,
   type LocalizedText,
@@ -41,7 +42,11 @@ import {
   buildSituationSummary,
   type SituationSummary,
 } from '../../utils/situationSummary';
-import { saveGame, type SavedGameSession } from '../../utils/gamePersistence';
+import {
+  isSavedGameCompatible,
+  saveGame,
+  type SavedGameSession,
+} from '../../utils/gamePersistence';
 import { playBgm } from '../../utils/bgmPlayer';
 import {
   getRoadmapProgressLabel,
@@ -53,12 +58,14 @@ import {
 } from '../../utils/scenarioDisplay';
 import GameHeaderBar from '../../features/game/components/GameHeaderBar';
 import StatusCard from '../../features/game/components/StatusCard';
+import { getChunkedRoadmapGroups, getStageLabel } from '../../utils/chunkedScenarios';
 import ScenarioPanel from '../../features/game/components/ScenarioPanel';
 import RoadmapModal, {
   type RoadmapNode,
 } from '../../features/game/components/RoadmapModal';
 import {
   resolveChoiceContinuation,
+  resolveSurvivedFinishAction,
   resolveSummaryContinuation,
 } from '../../domain/game/transitions';
 import { showRewardedRecoveryAd } from '../../utils/rewardedAdService';
@@ -178,7 +185,7 @@ const GAME_TUTORIAL_TEXT = {
 
 const UI_TEXT = {
   en: {
-    roadmapBtn: 'StoryMap',
+    roadmapBtn: 'Story Map',
     switchLangBtn: 'Korean',
     mentalHpLabel: 'Mental',
     fundsLabel: 'Funds',
@@ -204,8 +211,8 @@ const UI_TEXT = {
     feedbackExplanation: 'Result',
     feedbackTip: 'TIP',
     closeButton: 'Close',
-    menuCharacterSelect: 'Change Character',
-    menuLanguage: 'Language · 한국어',
+    menuHome: 'Home',
+    menuLanguage: 'Language',
     menuCancel: 'Cancel',
     leaveGameTitle: 'Return home?',
     leaveGameMessage: 'Your current progress will be saved before you return to character selection.',
@@ -254,8 +261,8 @@ const UI_TEXT = {
     feedbackExplanation: '결과',
     feedbackTip: 'TIP',
     closeButton: '닫기',
-    menuCharacterSelect: '캐릭터 선택',
-    menuLanguage: '언어 · English',
+    menuHome: '홈',
+    menuLanguage: '언어',
     menuCancel: '취소',
     leaveGameTitle: '홈으로 이동할까요?',
     leaveGameMessage: '현재 진행 상황을 저장한 뒤 캐릭터 선택 화면으로 이동합니다.',
@@ -349,8 +356,16 @@ export default function GameScreen({
 }: Props) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const scenarioBundle = useMemo(
+    () => getScenarioBundle(character?.id),
+    [character?.id],
+  );
   const activeInitialSession =
-    initialSession?.characterId === character?.id ? initialSession : null;
+    character?.id &&
+    initialSession?.characterId === character.id &&
+    isSavedGameCompatible(initialSession, character.id, scenarioBundle.version)
+      ? initialSession
+      : null;
   const characterBaseStats = useMemo<GameStats>(
     () => ({
       funds: character?.startingStats.funds ?? 1000,
@@ -396,10 +411,6 @@ export default function GameScreen({
   const roadmapScrollRef = useRef<ScrollView | null>(null);
   const [sceneAssetsReady, setSceneAssetsReady] = useState(false);
   const [lang, setLang] = useState<'en' | 'ko'>(initialLang);
-  const scenarioBundle = useMemo(
-    () => getScenarioBundle(character?.id),
-    [character?.id],
-  );
   const startScenarioId = scenarioBundle.startScenarioId;
   const scenarios = scenarioBundle.scenarios;
   const [currentScenarioId, setCurrentScenarioId] = useState<number>(
@@ -411,9 +422,7 @@ export default function GameScreen({
   const [showResult, setShowResult] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedChoice, setSelectedChoice] = useState<Choice | null>(null);
-  const [endingType, setEndingType] = useState<'success' | 'failure' | null>(
-    null,
-  );
+  const [endingType, setEndingType] = useState<EndingVariant | null>(null);
   const [currentSituationChoices, setCurrentSituationChoices] = useState<
     ScenarioChoice[]
   >(activeInitialSession ? activeInitialSession.currentSituationChoices : []);
@@ -461,29 +470,48 @@ export default function GameScreen({
   const gameFrameHeight = height;
   const isCompactLandscape = isLandscape && gameFrameHeight <= 560;
   const isNarrow = gameFrameWidth <= 390;
-  const statusCardWidth = Math.min(
-    Math.round(
-      gameFrameWidth * (isLandscape ? 0.24 : isNarrow ? 0.45 : 0.41),
-    ),
-    isLandscape ? 300 : 210,
-  );
   const headerHeight = 52;
   const headerHorizontalPadding = isLandscape ? 20 : isNarrow ? 12 : 18;
-  const characterTop = headerHeight;
-  const characterHeight = Math.round(
-    gameFrameHeight * (isLandscape ? 0.88 : isNarrow ? 0.58 : 0.6),
+  // The panel owns its vertical anchor; the character may extend behind it.
+  const portraitPanelTop = Math.max(
+    headerHeight + 112,
+    Math.round(gameFrameHeight * 0.5) - insets.top,
   );
-  const characterWidth = Math.round(
+  const statusCardWidth = Math.min(
+    Math.round(
+      gameFrameWidth * (isLandscape ? 0.24 : isNarrow ? 0.39 : 0.36),
+    ),
+    isLandscape ? 300 : 188,
+  );
+  const currentCharacterOverlay = character?.cardImage ?? character?.image;
+  const characterSource = getAssetDimensions(currentCharacterOverlay);
+  const characterBaseHeight = Math.round(
+    gameFrameHeight * (isLandscape ? 0.88 : 0.6),
+  );
+  const characterBaseWidth = Math.round(
     gameFrameWidth * (isLandscape ? 0.44 : 0.72),
   );
+  const characterAspect = characterSource?.width && characterSource?.height
+    ? characterSource.width / characterSource.height
+    : 2 / 3;
+  const characterDrawHeight = Math.min(characterBaseHeight, characterBaseWidth / characterAspect);
+  const characterScale = character?.stageVisual?.scale ?? 1.18;
+  const characterHeight = characterDrawHeight * characterScale;
+  const characterWidth = characterHeight * characterAspect;
+  // Keep the contained image's bottom anchor, unless its top reaches the header.
+  const characterBaseBottom = headerHeight + (characterBaseHeight + characterDrawHeight) / 2;
+  const characterTop = Math.max(headerHeight + 8, characterBaseBottom - characterHeight);
   const scenarioPanelBottom = Math.max(insets.bottom, 8);
-  const scenarioPanelMaxHeight = Math.min(
-    460,
-    Math.max(
-      360,
-      Math.round(gameFrameHeight * (isLandscape ? 0.74 : 0.42)),
-    ),
-  );
+  const scenarioPanelTop = isLandscape ? headerHeight + 4 : portraitPanelTop;
+  const scenarioPanelMaxHeight = isLandscape
+    ? Math.min(460, Math.max(360, Math.round(gameFrameHeight * 0.74)))
+    : Math.max(
+        250,
+        gameFrameHeight -
+          insets.top -
+          portraitPanelTop -
+          scenarioPanelBottom,
+      );
   const roadmapVerticalInset = isNarrow ? 12 : 16;
   const roadmapPanelWidth = isLandscape
     ? Math.min(Math.round(gameFrameWidth * 0.94), 1024)
@@ -683,7 +711,6 @@ export default function GameScreen({
     ? (BACKGROUND_KEY_ALIASES[currentScenario.backgroundKey] ?? 'arrival')
     : 'arrival';
   const currentBackground = BACKGROUND_IMAGES[resolvedBackgroundKey];
-  const currentCharacterOverlay = character?.cardImage ?? character?.image;
   const situationTitle = getScenarioDisplayTitle(currentScenario, lang);
 
   useEffect(() => {
@@ -714,14 +741,7 @@ export default function GameScreen({
     [scenarios],
   );
   const headerTitle = getScenarioHeaderTitle(currentScenario, lang);
-  const headerStageTitle = (() => {
-    const stage = currentScenario.day ?? 1;
-    const episode = currentScenario.mainEpisode ?? currentScenario.episode;
-
-    return typeof episode === 'number'
-      ? `Stage ${stage} · EP ${String(episode).padStart(2, '0')}`
-      : `Stage ${stage}`;
-  })();
+  const isChunkedScenario = scenarioBundle.version === 'episode-chunks-v1';
   const currentSituationTitleLocalized = {
     ko: getScenarioDisplayTitle(currentScenario, 'ko'),
     en: getScenarioDisplayTitle(currentScenario, 'en'),
@@ -780,6 +800,17 @@ export default function GameScreen({
     };
   }, [playHistory]);
   const roadmapNodes = useMemo(() => {
+    if (isChunkedScenario) {
+      return scenarioBundle.phases.flatMap(phase => phase.nodeIds.map(id => {
+        const node = scenarios[String(id)];
+        return {
+          scenarioId: id, week: node.stageNumber!, day: node.stageNumber!,
+          progressLabel: node.type === 'SUMMARY' ? 'Summary' : `EP ${String(node.episodeNumber).padStart(2, '0')}`,
+          title: node.title!,
+          stampLabel: node.type === 'SUMMARY' ? 'SUMMARY' : getRoadmapStampLabel(node.title!.en, id),
+        };
+      }));
+    }
     return Object.values(scenarios)
       .filter(
         (scenario) =>
@@ -812,9 +843,9 @@ export default function GameScreen({
           scenario.id,
         ),
       }));
-  }, [scenarios, usesMainEpisodeProgress]);
+  }, [isChunkedScenario, scenarioBundle.phases, scenarios, usesMainEpisodeProgress]);
   const currentRoadmapWeek =
-    currentScenario.week ?? Math.ceil((currentScenario.day ?? 1) / 6);
+    currentScenario.stageNumber ?? currentScenario.week ?? Math.ceil((currentScenario.day ?? 1) / 6);
   const unlockedRoadmapWeeks = useMemo(() => {
     const weeks = new Set<number>([currentRoadmapWeek]);
 
@@ -830,11 +861,14 @@ export default function GameScreen({
     () => roadmapNodes.filter((node) => node.week === selectedRoadmapWeek),
     [roadmapNodes, selectedRoadmapWeek],
   );
+  const roadmapGroups = isChunkedScenario ? getChunkedRoadmapGroups(scenarioBundle) : ROADMAP_WEEKS;
   const selectedRoadmapWeekMeta =
-    ROADMAP_WEEKS.find((item) => item.week === selectedRoadmapWeek) ??
-    ROADMAP_WEEKS[0];
+    roadmapGroups.find((item) => item.week === selectedRoadmapWeek) ??
+    roadmapGroups[0];
   const roadmapLocationTitle =
-    selectedRoadmapWeek === currentRoadmapWeek
+    isChunkedScenario
+      ? `${getStageLabel(selectedRoadmapWeek)} · EP ${selectedRoadmapWeekMeta.dayStart}–${selectedRoadmapWeekMeta.dayEnd}`
+      : selectedRoadmapWeek === currentRoadmapWeek
       ? `W${currentRoadmapWeek} · Day ${currentScenario.day ?? 1} · ${getRoadmapLocationLabel(
           situationTitle,
         )}`
@@ -909,6 +943,7 @@ export default function GameScreen({
 
     void saveGame({
       characterId: character.id,
+      contentVersion: scenarioBundle.version,
       lang,
       currentScenarioId,
       stats,
@@ -926,6 +961,7 @@ export default function GameScreen({
     lang,
     pendingSummary,
     playHistory,
+    scenarioBundle.version,
     showResult,
     stats,
   ]);
@@ -937,6 +973,7 @@ export default function GameScreen({
     const session: SavedGameSession | null = character?.id
       ? {
           characterId: character.id,
+          contentVersion: scenarioBundle.version,
           lang,
           currentScenarioId,
           stats,
@@ -963,6 +1000,7 @@ export default function GameScreen({
     lang,
     onGoToCharacterSelect,
     playHistory,
+    scenarioBundle.version,
     stats,
   ]);
 
@@ -1050,14 +1088,10 @@ export default function GameScreen({
         Boolean(scenarios[String(nextScenarioId)]),
     });
 
-    if (continuation.type === 'missing') {
-      Alert.alert(
-        isKorean ? '시나리오 오류' : 'Scenario Error',
-        isKorean
-          ? `다음 시나리오 ${continuation.nextScenarioId}를 찾을 수 없습니다.`
-          : `The next scenario ${continuation.nextScenarioId} could not be found.`,
+    if (continuation.type === 'in_progress' && __DEV__) {
+      console.warn(
+        `[Scenario] Summary nextScenarioId ${continuation.nextScenarioId} is not currently registered. Showing IN_PROGRESS ending.`,
       );
-      return;
     }
 
     if (currentScenario.statChanges) {
@@ -1069,9 +1103,15 @@ export default function GameScreen({
     setCurrentSituationChoices([]);
     setShowResult(false);
     setSelectedChoice(null);
+    setPendingSummary(null);
 
     if (continuation.type === 'advance') {
+      setEndingType(null);
       setCurrentScenarioId(continuation.nextScenarioId);
+    } else if (continuation.type === 'in_progress') {
+      setEndingType('in_progress');
+    } else if (continuation.type === 'final_clear') {
+      setEndingType('final_clear');
     } else {
       setEndingType('success');
     }
@@ -1087,7 +1127,22 @@ export default function GameScreen({
         scenario: currentScenario,
         choice: selectedChoice,
         nextScenarioExists: Boolean(nextScenario),
+        summaryMode: isChunkedScenario ? 'json-node' : 'legacy-generated',
       });
+
+      if (continuation.type === 'missing') {
+        console.error(
+          `[Scenario] Choice from ${currentScenario.id} references missing nextScenarioId ${continuation.nextScenarioId}.`,
+        );
+        Alert.alert(
+          isKorean ? '시나리오 오류' : 'Scenario Error',
+          isKorean
+            ? `다음 시나리오 ${continuation.nextScenarioId}를 찾을 수 없습니다.`
+            : `The next scenario ${continuation.nextScenarioId} could not be found.`,
+        );
+        setShowFeedbackModal(true);
+        return;
+      }
 
       if (continuation.type === 'failure') {
         setFailureRecoveryNextScenarioId(
@@ -1113,6 +1168,10 @@ export default function GameScreen({
       }
 
       if (continuation.type === 'advance') {
+        if (isChunkedScenario) {
+          setPendingSummary(null);
+          setEndingType(null);
+        }
         setCurrentSituationChoices(completedSituationChoices);
         setCurrentScenarioId(continuation.nextScenarioId);
       } else {
@@ -1254,11 +1313,30 @@ export default function GameScreen({
             endingType === 'failure' ? confirmContinueAfterFailure : undefined
           }
           onTryAnotherChoice={() => {
+            if (endingType === 'in_progress' || endingType === 'final_clear') {
+              returnToCharacterSelect();
+              return;
+            }
+
             restartGame();
             onClearSavedGame?.();
             onGoToCharacterSelect?.();
           }}
           onRestartFromBeginning={restartGame}
+          onViewJourney={() => {
+            setEndingType(null);
+            setSelectedRoadmapWeek(currentRoadmapWeek);
+            setShowRoadmap(true);
+          }}
+          onStopJourney={() => setEndingType('survived')}
+          onFinishJourney={() => {
+            if (resolveSurvivedFinishAction(Platform.OS) === 'exit_app') {
+              BackHandler.exitApp();
+              return;
+            }
+
+            onGoToCharacterSelect?.();
+          }}
         />
         {endingType === 'failure' ? (
           <RecoveryConfirmModal
@@ -1336,8 +1414,9 @@ export default function GameScreen({
         <ImageBackground
           source={currentBackground}
           style={[
-            styles.backgroundImage,
-            isLandscape && styles.backgroundImageLandscape,
+            isLandscape
+              ? styles.backgroundImageLandscape
+              : styles.backgroundImage,
             isLandscape
               ? { width: gameFrameWidth, height: gameFrameHeight }
               : null,
@@ -1378,11 +1457,11 @@ export default function GameScreen({
               height={headerHeight}
               horizontalPadding={headerHorizontalPadding}
               menuTop={insets.top + headerHeight + 4}
-              title={headerStageTitle}
+              title={headerTitle}
               showGameMenu={showGameMenu}
               menuCopy={{
                 storyMap: t.roadmapBtn,
-                characterSelect: t.menuCharacterSelect,
+                home: t.menuHome,
                 language: t.menuLanguage,
                 cancel: t.menuCancel,
               }}
@@ -1392,9 +1471,8 @@ export default function GameScreen({
               }}
               onCloseGameMenu={() => setShowGameMenu(false)}
               onGoToCharacterSelect={returnToCharacterSelect}
-              onToggleLanguage={() =>
-                setLang((prev) => (prev === 'ko' ? 'en' : 'ko'))
-              }
+              language={lang}
+              onSelectLanguage={setLang}
               onShowFullTitle={() => setShowTitleModal(true)}
             />
             {!showResult ? (
@@ -1428,7 +1506,7 @@ export default function GameScreen({
             layout={isLandscape ? 'landscape' : 'portrait'}
             isCompactLandscape={isCompactLandscape}
             bottom={scenarioPanelBottom}
-            top={headerHeight + 4}
+            top={scenarioPanelTop}
             maxHeight={scenarioPanelMaxHeight}
             showResult={showResult}
             showFeedbackModal={showFeedbackModal}
@@ -1600,7 +1678,8 @@ export default function GameScreen({
         locationTitle={roadmapLocationTitle}
         selectedWeek={selectedRoadmapWeek}
         nodes={selectedWeekRoadmapNodes}
-        weeks={ROADMAP_WEEKS}
+        weeks={roadmapGroups}
+        groupHeading={isChunkedScenario ? getStageLabel(selectedRoadmapWeek) : undefined}
         unlockedWeeks={unlockedRoadmapWeeks}
         completedScenarioIds={new Set(Object.keys(checkpoints).map(Number))}
         currentScenarioId={currentScenarioId}
@@ -1723,7 +1802,7 @@ const styles = StyleSheet.create({
   },
   backgroundImage: { flex: 1, alignSelf: 'stretch' },
   backgroundImageLandscape: {
-    flex: 0,
+    alignSelf: 'stretch',
   },
   landscapeBackgroundFill: {
     position: 'absolute',
