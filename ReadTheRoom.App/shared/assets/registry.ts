@@ -1,9 +1,15 @@
 import type { ImageSourcePropType } from 'react-native';
+import type { AudioSource } from 'expo-audio';
 
 export const LAUNCH_IMAGES = {
   main: require('../../assets/images/main.png'),
+  stamp: require('../../assets/images/Stamp.png'),
   warning: require('../../assets/images/background/dream.png'),
 } as const satisfies Record<string, ImageSourcePropType>;
+
+export const LAUNCH_AUDIO = {
+  stampImpact: require('../../assets/bgm/stamp_impact.wav'),
+} as const satisfies Record<string, AudioSource>;
 
 export const BACKGROUND_IMAGES = {
   adaptation: require('../../assets/images/background/adaptation.png'),

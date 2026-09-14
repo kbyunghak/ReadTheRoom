@@ -1,0 +1,15 @@
+export const STAMP_ANIMATION = {
+  impactAtMs: 380,
+  totalDurationMs: 650,
+  crossfadeDurationMs: 200,
+  initialScale: 1.4,
+  pullbackScale: 0.8,
+  impactScale: 1.05,
+  settledScale: 1,
+  initialRotation: -30,
+  pullbackRotation: -10,
+  settledRotation: 0,
+  initialOpacity: 0,
+  revealOpacity: 0.6,
+  settledOpacity: 1,
+} as const;

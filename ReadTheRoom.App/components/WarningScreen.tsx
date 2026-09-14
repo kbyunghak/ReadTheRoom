@@ -11,10 +11,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { preloadLaunchVisualAssets } from '../utils/assetPreload';
 
 type Props = {
+  active?: boolean;
   onComplete: () => void;
 };
 
-export default function WarningScreen({ onComplete }: Props) {
+export default function WarningScreen({ active = true, onComplete }: Props) {
   const opacity = useRef(new Animated.Value(0)).current;
   const hasCompleted = useRef(false);
   const [isReady, setIsReady] = useState(false);
@@ -45,7 +46,7 @@ export default function WarningScreen({ onComplete }: Props) {
   }, []);
 
   useEffect(() => {
-    if (!isReady) return;
+    if (!isReady || !active) return;
 
     Animated.timing(opacity, {
       toValue: 1,
@@ -58,10 +59,14 @@ export default function WarningScreen({ onComplete }: Props) {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [finish, isReady, opacity]);
+  }, [active, finish, isReady, opacity]);
 
   return (
-    <Pressable style={styles.pressable} onPress={finish}>
+    <Pressable
+      style={styles.pressable}
+      disabled={!active || !isReady}
+      onPress={active && isReady ? finish : undefined}
+    >
       {isReady ? (
         <ImageBackground
           source={require('../assets/images/background/dream.png')}

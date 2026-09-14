@@ -15,6 +15,12 @@ export default defineConfig({
       ],
     },
     include: [
+      'tests/splashLayout.test.ts',
+      'tests/stampAnimation.test.ts',
+      'tests/assetDimensions.test.ts',
+      'tests/endingLayout.test.ts',
+      'tests/characterStageVisuals.test.ts',
+      'tests/chunkedScenarios.test.ts',
       'tests/gameStats.test.ts',
       'tests/statMetadata.test.ts',
       'tests/gameTransitions.test.ts',

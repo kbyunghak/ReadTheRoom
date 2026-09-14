@@ -1,216 +1,390 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Image, StyleSheet, Animated, TouchableOpacity, useWindowDimensions } from 'react-native';
-import { preloadLaunchVisualAssets } from '../utils/assetPreload';
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Animated,
+  Easing,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import { createAudioPlayer, type AudioPlayer } from "expo-audio";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { preloadLaunchVisualAssets } from "../utils/assetPreload";
+import { LAUNCH_AUDIO } from "../shared/assets/registry";
+import { STAMP_ANIMATION } from "../utils/stampAnimation";
+import { getIntroCtaTop } from "../utils/splashLayout";
 
 type Props = {
+  onTransitionReady: () => void;
   onLoadComplete: () => void;
 };
 
-export default function SplashScreen({ onLoadComplete }: Props) {
-  const { width } = useWindowDimensions();
+export default function SplashScreen({
+  onTransitionReady,
+  onLoadComplete,
+}: Props) {
+  const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const [isBackgroundReady, setIsBackgroundReady] = useState(false);
-  const loadingProgress = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
-  const startButtonFade = useRef(new Animated.Value(1)).current;
-  const loadingFade = useRef(new Animated.Value(0)).current;
+  const stampOpacity = useRef(new Animated.Value(0)).current;
+  const stampScale = useRef(
+    new Animated.Value(STAMP_ANIMATION.initialScale),
+  ).current;
+  const stampRotation = useRef(
+    new Animated.Value(STAMP_ANIMATION.initialRotation),
+  ).current;
+  const screenShakeX = useRef(new Animated.Value(0)).current;
+  const screenShakeY = useRef(new Animated.Value(0)).current;
+  const stampAudioPlayerRef = useRef<AudioPlayer | null>(null);
+  const stampAudioCleanupTimerRef = useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
+  const hasStartedRef = useRef(false);
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
-    let isMounted = true;
+    isMountedRef.current = true;
+    const stampAudioPlayer = createAudioPlayer(LAUNCH_AUDIO.stampImpact, {
+      updateInterval: 250,
+      keepAudioSessionActive: true,
+    });
+    stampAudioPlayer.volume = 0.9;
+    stampAudioPlayerRef.current = stampAudioPlayer;
 
     void preloadLaunchVisualAssets().then(() => {
-      if (isMounted) {
+      if (isMountedRef.current) {
         setIsBackgroundReady(true);
       }
     });
 
     return () => {
-      isMounted = false;
+      isMountedRef.current = false;
+      fadeAnim.stopAnimation();
+      stampOpacity.stopAnimation();
+      stampScale.stopAnimation();
+      stampRotation.stopAnimation();
+      screenShakeX.stopAnimation();
+      screenShakeY.stopAnimation();
+
+      if (!hasStartedRef.current) {
+        stampAudioPlayer.remove();
+        stampAudioPlayerRef.current = null;
+      }
     };
-  }, []);
+  }, [
+    fadeAnim,
+    screenShakeX,
+    screenShakeY,
+    stampOpacity,
+    stampRotation,
+    stampScale,
+  ]);
 
-  useEffect(() => {
-    if (!hasStarted) return;
+  const handleStart = useCallback(async () => {
+    if (hasStartedRef.current) return;
 
-    Animated.parallel([
-      Animated.timing(startButtonFade, {
-        toValue: 0,
-        duration: 220,
-        useNativeDriver: true,
-      }),
-      Animated.timing(loadingFade, {
-        toValue: 1,
-        duration: 260,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    hasStartedRef.current = true;
+    setHasStarted(true);
 
-    Animated.timing(loadingProgress, {
-      toValue: 1,
-      duration: 2000,
-      delay: 120,
-      useNativeDriver: false,
-    }).start(() => {
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 500,
-        delay: 200,
-        useNativeDriver: true,
-      }).start(() => onLoadComplete());
+    const stampAudioPlayer = stampAudioPlayerRef.current;
+    if (stampAudioPlayer) {
+      stampAudioPlayer.play();
+      stampAudioCleanupTimerRef.current = setTimeout(() => {
+        stampAudioPlayer.pause();
+        stampAudioPlayer.remove();
+        if (stampAudioPlayerRef.current === stampAudioPlayer) {
+          stampAudioPlayerRef.current = null;
+        }
+        stampAudioCleanupTimerRef.current = null;
+      }, 1100);
+    }
+
+    try {
+      const [, stampFinished] = await Promise.all([
+        preloadLaunchVisualAssets(),
+        new Promise<boolean>((resolve) => {
+          Animated.parallel([
+            Animated.sequence([
+              Animated.timing(stampOpacity, {
+                toValue: STAMP_ANIMATION.revealOpacity,
+                duration: 150,
+                easing: Easing.out(Easing.quad),
+                useNativeDriver: true,
+              }),
+              Animated.timing(stampOpacity, {
+                toValue: STAMP_ANIMATION.settledOpacity,
+                duration: STAMP_ANIMATION.impactAtMs - 150,
+                easing: Easing.out(Easing.cubic),
+                useNativeDriver: true,
+              }),
+            ]),
+            Animated.sequence([
+              Animated.timing(stampScale, {
+                toValue: STAMP_ANIMATION.pullbackScale,
+                duration: 300,
+                easing: Easing.out(Easing.quad),
+                useNativeDriver: true,
+              }),
+              Animated.timing(stampScale, {
+                toValue: STAMP_ANIMATION.impactScale,
+                duration: STAMP_ANIMATION.impactAtMs - 300,
+                easing: Easing.out(Easing.cubic),
+                useNativeDriver: true,
+              }),
+              Animated.timing(stampScale, {
+                toValue: STAMP_ANIMATION.settledScale,
+                duration: 170,
+                easing: Easing.out(Easing.cubic),
+                useNativeDriver: true,
+              }),
+            ]),
+            Animated.sequence([
+              Animated.timing(stampRotation, {
+                toValue: STAMP_ANIMATION.pullbackRotation,
+                duration: 300,
+                easing: Easing.out(Easing.quad),
+                useNativeDriver: true,
+              }),
+              Animated.timing(stampRotation, {
+                toValue: STAMP_ANIMATION.settledRotation,
+                duration: STAMP_ANIMATION.impactAtMs - 300,
+                easing: Easing.out(Easing.cubic),
+                useNativeDriver: true,
+              }),
+            ]),
+            Animated.sequence([
+              Animated.delay(STAMP_ANIMATION.impactAtMs),
+              Animated.timing(screenShakeX, {
+                toValue: -6,
+                duration: 30,
+                useNativeDriver: true,
+              }),
+              Animated.timing(screenShakeX, {
+                toValue: 7,
+                duration: 35,
+                useNativeDriver: true,
+              }),
+              Animated.timing(screenShakeX, {
+                toValue: -4,
+                duration: 35,
+                useNativeDriver: true,
+              }),
+              Animated.timing(screenShakeX, {
+                toValue: 2,
+                duration: 30,
+                useNativeDriver: true,
+              }),
+              Animated.timing(screenShakeX, {
+                toValue: 0,
+                duration: 35,
+                useNativeDriver: true,
+              }),
+            ]),
+            Animated.sequence([
+              Animated.delay(STAMP_ANIMATION.impactAtMs),
+              Animated.timing(screenShakeY, {
+                toValue: 3,
+                duration: 30,
+                useNativeDriver: true,
+              }),
+              Animated.timing(screenShakeY, {
+                toValue: -3,
+                duration: 35,
+                useNativeDriver: true,
+              }),
+              Animated.timing(screenShakeY, {
+                toValue: 2,
+                duration: 35,
+                useNativeDriver: true,
+              }),
+              Animated.timing(screenShakeY, {
+                toValue: -1,
+                duration: 30,
+                useNativeDriver: true,
+              }),
+              Animated.timing(screenShakeY, {
+                toValue: 0,
+                duration: 35,
+                useNativeDriver: true,
+              }),
+            ]),
+            Animated.delay(STAMP_ANIMATION.totalDurationMs),
+          ]).start(({ finished }) => resolve(finished));
+        }),
+      ]);
+
+      if (!stampFinished) return;
+    } catch {
+      if (isMountedRef.current) {
+        stampOpacity.stopAnimation();
+        stampScale.stopAnimation();
+        stampRotation.stopAnimation();
+        screenShakeX.stopAnimation();
+        screenShakeY.stopAnimation();
+        hasStartedRef.current = false;
+        setHasStarted(false);
+        stampOpacity.setValue(0);
+        stampScale.setValue(STAMP_ANIMATION.initialScale);
+        stampRotation.setValue(STAMP_ANIMATION.initialRotation);
+        screenShakeX.setValue(0);
+        screenShakeY.setValue(0);
+      }
+      return;
+    }
+
+    if (!isMountedRef.current) return;
+
+    onTransitionReady();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!isMountedRef.current) return;
+
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: STAMP_ANIMATION.crossfadeDurationMs,
+          useNativeDriver: true,
+        }).start(({ finished }) => {
+          if (finished && isMountedRef.current) {
+            onLoadComplete();
+          }
+        });
+      });
     });
-  }, [fadeAnim, hasStarted, loadingFade, loadingProgress, onLoadComplete, startButtonFade]);
+  }, [
+    fadeAnim,
+    onLoadComplete,
+    onTransitionReady,
+    screenShakeX,
+    screenShakeY,
+    stampOpacity,
+    stampRotation,
+    stampScale,
+  ]);
 
-  const barWidth = loadingProgress.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0%', '100%'],
+  const stampRotationDegrees = stampRotation.interpolate({
+    inputRange: [
+      STAMP_ANIMATION.initialRotation,
+      STAMP_ANIMATION.settledRotation,
+    ],
+    outputRange: [
+      `${STAMP_ANIMATION.initialRotation}deg`,
+      `${STAMP_ANIMATION.settledRotation}deg`,
+    ],
   });
-  const posterWidth = Math.min(width, 420);
-  const ctaWidth = Math.min(Math.round(posterWidth * 0.78), 320);
+  const INTRO_IMAGE_WIDTH = 941;
+  const INTRO_IMAGE_HEIGHT = 1672;
+
+  const reservedBottom = Math.max(insets.bottom, 10);
+  const visualHeight = Math.max(height - reservedBottom, 1);
+
+  // main.png resizeMode="contain"과 동일한 scale
+  const imageScale = Math.min(
+    width / INTRO_IMAGE_WIDTH,
+    visualHeight / INTRO_IMAGE_HEIGHT,
+  );
+
+  const portraitImageScale = 360 / INTRO_IMAGE_WIDTH;
+
+  const ctaScale = Math.min(1, imageScale / portraitImageScale);
+  const ctaWidth = 340;
+  const ctaHeight = 64;
+
+  const visualWidth = Math.min(width, 420);
+
+  const ctaTop = getIntroCtaTop({
+    viewportWidth: width,
+    viewportHeight: height,
+    bottomInset: insets.bottom,
+    ctaHeight,
+  });
+
+  const stampWidth = Math.min(Math.round(visualWidth * 0.78), 340);
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          opacity: fadeAnim,
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-      ]}
-    >
-      <View
-        style={{
-          position: 'relative',
-          width: posterWidth,
-          height: '100%',
-          overflow: 'hidden',
-        }}
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+      <Animated.View
+        style={[
+          styles.visualContainer,
+          { marginBottom: Math.max(insets.bottom, 10) },
+          {
+            transform: [
+              { translateX: screenShakeX },
+              { translateY: screenShakeY },
+            ],
+          },
+        ]}
       >
         {isBackgroundReady ? (
           <Image
-            source={require('../assets/images/main.png')}
-            style={{
-              position: 'absolute',
-              top: '2.5%',
-              left: '2.5%',
-              width: '95%',
-              height: '95%',
-            }}
+            source={require("../assets/images/main.png")}
+            style={styles.backgroundImage}
             resizeMode="contain"
           />
         ) : (
-          <View
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: '#000000',
-            }}
-          />
+          <View style={styles.backgroundPlaceholder} />
         )}
+
+        <View pointerEvents="none" style={styles.darkOverlay} />
+
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.stampOverlay, { opacity: stampOpacity }]}
+        >
+          <View style={styles.stampBackdrop} />
+          <Animated.Image
+            source={require("../assets/images/Stamp.png")}
+            resizeMode="contain"
+            style={[
+              {
+                width: stampWidth,
+                height: stampWidth / (1278 / 1230),
+                transform: [
+                  { scale: stampScale },
+                  { rotate: stampRotationDegrees },
+                ],
+              },
+            ]}
+          />
+        </Animated.View>
 
         {isBackgroundReady ? (
           <View
-            style={{
-              position: 'absolute',
-              left: '50%',
-              bottom: 96,
-              width: ctaWidth,
-              minHeight: 74,
-              marginLeft: -(ctaWidth / 2),
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 2,
-            }}
+            style={[
+              styles.bottomContent,
+              {
+                top: ctaTop,
+                width: ctaWidth,
+                minHeight: ctaHeight,
+                transform: [{ scale: ctaScale }],
+              },
+            ]}
           >
-            <Animated.View
-              pointerEvents={hasStarted ? 'none' : 'auto'}
-              style={{
-                width: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: startButtonFade,
-                zIndex: 3,
-              }}
+            <TouchableOpacity
+              style={[
+                styles.startButton,
+                {
+                  height: ctaHeight,
+                  minHeight: ctaHeight,
+                },
+              ]}
+              activeOpacity={hasStarted ? 1 : 0.9}
+              disabled={hasStarted}
+              onPress={handleStart}
             >
-              <TouchableOpacity
-                style={{
-                  width: '100%',
-                  minHeight: 82,
-                  paddingLeft: 28,
-                  paddingRight: 22,
-                  paddingVertical: 14,
-                  borderRadius: 999,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  backgroundColor: '#F7C433',
-                  borderWidth: 2,
-                  borderColor: '#FFE9A3',
-                  shadowColor: '#FFBF1F',
-                  shadowOpacity: 0.58,
-                  shadowRadius: 18,
-                  shadowOffset: { width: 0, height: 0 },
-                  elevation: 10,
-                }}
-                activeOpacity={0.9}
-                onPress={() => setHasStarted(true)}
-              >
-                <View style={styles.startButtonCopy}>
-                  <Text style={styles.startButtonTitle}>Make your first choice</Text>
-                  <Text style={styles.startButtonSubtitle}>START YOUR STORY</Text>
-                </View>
-              </TouchableOpacity>
-            </Animated.View>
-
-            <Animated.View
-              pointerEvents="none"
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                width: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: loadingFade,
-                zIndex: 4,
-              }}
-            >
-              <View
-                style={{
-                  width: '100%',
-                  paddingHorizontal: 10,
-                  paddingVertical: 10,
-                  borderRadius: 999,
-                  backgroundColor: 'rgba(22, 31, 56, 0.34)',
-                  borderWidth: 1,
-                  borderColor: 'rgba(255,255,255,0.28)',
-                }}
-              >
-                <View
-                  style={{
-                    height: 8,
-                    backgroundColor: 'rgba(255,255,255,0.22)',
-                    borderRadius: 999,
-                    overflow: 'hidden',
-                  }}
-                >
-                  <Animated.View
-                    style={{
-                      width: barWidth,
-                      height: '100%',
-                      backgroundColor: '#FF8FB1',
-                      borderRadius: 999,
-                    }}
-                  />
-                </View>
+              <View style={styles.startButtonCopy}>
+                <Text style={styles.startButtonTitle}>
+                  MAKE YOUR FIRST CHOICE
+                </Text>
+                <Text style={styles.startButtonSubtitle}>START YOUR STORY</Text>
               </View>
-            </Animated.View>
+            </TouchableOpacity>
           </View>
         ) : null}
-      </View>
+      </Animated.View>
     </Animated.View>
   );
 }
@@ -218,134 +392,86 @@ export default function SplashScreen({ onLoadComplete }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: 'relative',
-    overflow: 'hidden',
-    backgroundColor: '#000000',
+    position: "relative",
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#000000",
+  },
+  visualContainer: {
+    flex: 1,
+    width: "100%",
+    position: "relative",
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#000000",
   },
   backgroundImage: {
     ...StyleSheet.absoluteFillObject,
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   backgroundPlaceholder: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#121B32',
+    backgroundColor: "#121B32",
   },
-  taglineMask: {
-    position: 'absolute',
-    left: 48,
-    right: 48,
-    bottom: 102,
-    height: 34,
-    borderRadius: 18,
-    backgroundColor: 'rgba(95, 83, 103, 0.20)',
+  darkOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.08)",
   },
-  taglineOverlay: {
-    position: 'absolute',
-    left: 24,
-    right: 24,
-    bottom: 126,
-    alignItems: 'center',
+  stampOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 3,
+    elevation: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  taglineText: {
-    fontSize: 18,
-    lineHeight: 24,
-    color: '#FFFFFF',
-    fontWeight: '500',
-    letterSpacing: 0.1,
-    textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.16)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 6,
+  stampBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.58)",
   },
   bottomContent: {
-    position: 'absolute',
-    left: 28,
-    right: 28,
-    bottom: 96,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 74,
-  },
-  ctaLayer: {
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  startLayer: {
-    position: 'relative',
-    zIndex: 3,
-  },
-  loadingLayer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    zIndex: 4,
+    position: "absolute",
+    alignItems: "center",
+    justifyContent: "center",
   },
   startButton: {
-    width: '100%',
-    maxWidth: 360,
-    minHeight: 82,
-    paddingLeft: 28,
-    paddingRight: 22,
-    paddingVertical: 14,
+    width: "100%",
+    minHeight: 64,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
     borderRadius: 999,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#F7C433',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F7C433",
     borderWidth: 2,
-    borderColor: '#FFE9A3',
-    shadowColor: '#FFBF1F',
+    borderColor: "#FFE9A3",
+    shadowColor: "#FFBF1F",
     shadowOpacity: 0.58,
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 0 },
     elevation: 10,
   },
   startButtonCopy: {
-    flex: 1,
-    alignItems: 'center',
-    paddingLeft: 12,
+    width: "100%",
+    alignItems: "center",
   },
   startButtonTitle: {
     fontSize: 19,
     lineHeight: 24,
-    fontWeight: '900',
-    color: '#272014',
+    fontWeight: "900",
+    color: "#272014",
     letterSpacing: -0.2,
-    textAlign: 'center',
+    textAlign: "center",
   },
   startButtonSubtitle: {
-    marginTop: 2,
+    marginTop: 0,
     fontSize: 13,
     lineHeight: 16,
-    fontWeight: '800',
-    color: '#6E4B09',
+    fontWeight: "800",
+    color: "#6E4B09",
     letterSpacing: 1.2,
-    textAlign: 'center',
-  },
-  startButtonArrow: {
-    marginLeft: 12,
-  },
-  loadingShell: {
-    width: '100%',
-    maxWidth: 270,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    borderRadius: 999,
-    backgroundColor: 'rgba(22, 31, 56, 0.34)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.28)',
-  },
-  barTrack: {
-    height: 8,
-    backgroundColor: 'rgba(255,255,255,0.22)',
-    borderRadius: 999,
-    overflow: 'hidden',
-  },
-  barFill: {
-    height: '100%',
-    backgroundColor: '#FF8FB1',
-    borderRadius: 999,
+    textAlign: "center",
   },
 });

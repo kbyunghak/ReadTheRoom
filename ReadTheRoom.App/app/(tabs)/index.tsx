@@ -14,6 +14,7 @@ import {
 } from '../../utils/scenarioRegistry';
 import {
   clearSavedGame,
+  isSavedGameCompatible,
   loadSavedGame,
   type SavedGameSession,
 } from '../../utils/gamePersistence';
@@ -48,6 +49,8 @@ export default function App() {
   );
   const [pendingCharacterStart, setPendingCharacterStart] =
     useState<PendingCharacterStart | null>(null);
+  const [isLaunchTransitionReady, setIsLaunchTransitionReady] =
+    useState(false);
 
   useEffect(() => {
     setSavedSession(null);
@@ -55,11 +58,19 @@ export default function App() {
   }, []);
 
   const loadCharacterProgress = async (character: Character) => {
-    const restored = await loadSavedGame(character.id);
+    const loaded = await loadSavedGame(character.id);
+    const bundle = getScenarioBundle(character.id);
+    const restored = isSavedGameCompatible(
+      loaded,
+      character.id,
+      bundle.version,
+    )
+      ? loaded
+      : null;
     let situationTitle: string | null = null;
 
     if (restored) {
-      const scenarios = getScenarioBundle(character.id).scenarios;
+      const scenarios = bundle.scenarios;
       const scenario = scenarios?.[String(restored.currentScenarioId)];
       situationTitle =
         typeof scenario?.situation === 'object' && scenario?.situation
@@ -111,15 +122,24 @@ export default function App() {
     </>
   );
 
-  if (screen === 'splash') {
+  if (screen === 'splash' || screen === 'warning') {
     return renderScreen(
-      <SplashScreen onLoadComplete={() => setScreen('warning')} />,
-    );
-  }
-
-  if (screen === 'warning') {
-    return renderScreen(
-      <WarningScreen onComplete={() => setScreen('characterSelect')} />,
+      <View style={styles.launchTransition}>
+        {screen === 'warning' || isLaunchTransitionReady ? (
+          <WarningScreen
+            active={screen === 'warning'}
+            onComplete={() => setScreen('characterSelect')}
+          />
+        ) : null}
+        {screen === 'splash' ? (
+          <View style={styles.launchOverlay}>
+            <SplashScreen
+              onTransitionReady={() => setIsLaunchTransitionReady(true)}
+              onLoadComplete={() => setScreen('warning')}
+            />
+          </View>
+        ) : null}
+      </View>,
     );
   }
 
@@ -309,6 +329,16 @@ function SavedGamePrompt({
 }
 
 const styles = StyleSheet.create({
+  launchTransition: {
+    flex: 1,
+    position: 'relative',
+    overflow: 'hidden',
+    backgroundColor: '#1A2030',
+  },
+  launchOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 2,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(8, 12, 22, 0.6)',
