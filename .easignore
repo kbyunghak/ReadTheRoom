@@ -1,0 +1,49 @@
+# Repository metadata (also removes the EAS staging clone).
+.git
+node_modules
+
+# App dependencies and generated output.
+/ReadTheRoom.App/node_modules
+/ReadTheRoom.App/.expo
+/ReadTheRoom.App/.expo-export-check
+/ReadTheRoom.App/dist
+/ReadTheRoom.App/dist-debug-two
+/ReadTheRoom.App/web-build
+/ReadTheRoom.App/coverage
+/ReadTheRoom.App/expo-env.d.ts
+/ReadTheRoom.App/.kotlin
+/ReadTheRoom.App/android
+/ReadTheRoom.App/ios
+/ReadTheRoom.App/app-example
+
+# Existing repository exclusions. Keep all app assets, including backups.
+/docs/**/archive/
+/docs/release
+/release-asset
+
+# Existing app secret exclusions; development uses remote signing and test ads.
+/ReadTheRoom.App/**/.env
+/ReadTheRoom.App/**/.env.development
+/ReadTheRoom.App/**/.env.production
+/ReadTheRoom.App/**/.env.test
+/ReadTheRoom.App/**/.env*.local
+/ReadTheRoom.App/**/*.jks
+/ReadTheRoom.App/**/*.p8
+/ReadTheRoom.App/**/*.p12
+/ReadTheRoom.App/**/*.key
+/ReadTheRoom.App/**/*.pem
+/ReadTheRoom.App/**/*.mobileprovision
+
+# Existing app temporary-file exclusions.
+/ReadTheRoom.App/**/*.orig.*
+/ReadTheRoom.App/**/.metro-health-check*
+/ReadTheRoom.App/**/npm-debug.*
+/ReadTheRoom.App/**/yarn-debug.*
+/ReadTheRoom.App/**/yarn-error.*
+/ReadTheRoom.App/**/*.tsbuildinfo
+/ReadTheRoom.App/**/.DS_Store
+/ReadTheRoom.App/**/Thumbs.db
+/ReadTheRoom.App/**/ehthumbs.db
+/ReadTheRoom.App/**/Desktop.ini
+/ReadTheRoom.App/**/.idea
+/ReadTheRoom.App/**/*.swp
